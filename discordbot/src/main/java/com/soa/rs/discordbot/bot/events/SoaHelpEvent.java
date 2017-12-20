@@ -1,6 +1,7 @@
 package com.soa.rs.discordbot.bot.events;
 
 import com.soa.rs.discordbot.util.SoaClientHelper;
+import com.soa.rs.discordbot.cfg.DiscordCfgFactory;
 
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
@@ -27,9 +28,11 @@ public class SoaHelpEvent extends AbstractSoaMsgRcvEvent {
 	@Override
 	public void executeEvent() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("```Help: SoA Commands\n");
+		sb.append("```Help: ");
+		sb.append(DiscordCfgFactory.getConfig().getGuildAbbreviation());
+		sb.append(" Commands\n");
 		sb.append(".events - Displays an up-to-date listing of today's events.\n");
-		sb.append(".info - Display's bot info.\n");
+		sb.append(".info - Displays bot info.\n");
 		sb.append(".music - Use .music help for music commands.\n");
 		sb.append(".trivia - Use .trivia help for the trivia commands.\n");
 		sb.append(".user - Use .user help for the user tracking commands.\n");

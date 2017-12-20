@@ -2,16 +2,9 @@ package com.soa.rs.discordbot.cfg;
 
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
-import com.soa.rs.discordbot.jaxb.AdminEvent;
-import com.soa.rs.discordbot.jaxb.DiscordConfiguration;
-import com.soa.rs.discordbot.jaxb.EventListingEvent;
-import com.soa.rs.discordbot.jaxb.MusicPlayer;
-import com.soa.rs.discordbot.jaxb.RankList;
-import com.soa.rs.discordbot.jaxb.UserTrackingEvent;
+import com.soa.rs.discordbot.jaxb.*;
 import com.soa.rs.discordbot.util.SoaLogging;
 
 public class ConfigValidatorTest {
@@ -250,6 +243,7 @@ public class ConfigValidatorTest {
 		list.getRole().add("Role 1");
 		cfg.setStaffRoles(list);
 		cfg.setDefaultGuildId(1234567890);
+		cfg.setGuildAbbreviation("abbr");
 
 		Assert.assertTrue(validator.validateConformsToSchema(cfg));
 	}

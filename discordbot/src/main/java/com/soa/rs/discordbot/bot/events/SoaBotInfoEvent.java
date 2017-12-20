@@ -43,7 +43,7 @@ public class SoaBotInfoEvent extends AbstractSoaMsgRcvEvent {
 		Duration uptime = Duration.between(launch, now);
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("Hi there!  I'm the SoA bot!\n");
+		sb.append("Hi there!  I'm the " + DiscordCfgFactory.getConfig().getGuildAbbreviation() + " bot!\n");
 		sb.append("My Version: " + version);
 		sb.append("\n");
 		sb.append("My Uptime: " + uptime.toDays() + "days, " + (uptime.toHours() % 24) + "hours, "

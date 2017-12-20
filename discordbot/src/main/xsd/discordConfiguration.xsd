@@ -6,7 +6,7 @@
       <xsd:element name="discordToken" type="xsd:string" minOccurs="1" maxOccurs="1"/>
       <xsd:element name="staff-roles" type="RankList" minOccurs="1" maxOccurs="1"/>
       <xsd:element name="default-guild-id" type="xsd:long" minOccurs="1" maxOccurs="1"/>
-      <xsd:element name="guild-abbreviation" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="guild-abbreviation" type="xsd:string" minOccurs="1" maxOccurs="1"/>
       <xsd:element name="default-status" type="xsd:string" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="event-listing-event" type="EventListingEvent" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="news-listing-event" type="ListingEvent" minOccurs="0" maxOccurs="1"/>
