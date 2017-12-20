@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<discordConfiguration>
+  <discordToken>Put your token here!</discordToken>
+  <staff-roles>
+    <role>Eldar</role>
+    <role>Lian</role>
+    <role>Arquendi</role>
+  </staff-roles>
+  <default-guild-id>252267969617461248</default-guild-id>
+  <guild-abbreviation>SoA</guild-abbreviation>
+  <event-listing-event>
+    <enabled>true</enabled>
+    <url>https://forums.soa-rs.com/calendar/events.xml</url>
+	<channel>events</channel>
+	<event-endline>For more event information and upcoming events, check out the</event-endline>
+	<event-endline>Events Forum: https://forums.soa-rs.com/forum/9-events/</event-endline>
+	<event-endline>Events Calendar: https://forums.soa-rs.com/calendar/</event-endline>
+  </event-listing-event>
+  <news-listing-event>
+    <enabled>true</enabled>
+    <url>https://forums.soa-rs.com/rss/1-soa-promos-and-news.xml</url>
+	<channel>shoutbox</channel>
+  </news-listing-event>
+  <music-player>
+    <enabled>true</enabled>
+    <allowed-roles>
+      <role>Eldar</role>
+      <role>Lian</role>
+      <role>Arquendi</role>
+	  <role>DJ</role>
+    </allowed-roles>
+    <can-disable-rank-check>
+      <role>Eldar</role>
+      <role>Lian</role>
+    </can-disable-rank-check>
+  </music-player>
+  <trivia>
+    <enabled>true</enabled>
+  </trivia>
+  <dj-pls-event>
+    <enabled>true</enabled>
+  </dj-pls-event>
+  <admin-event>
+    <enabled>true</enabled>
+    <allowed-roles>
+      <role>Eldar</role>
+      <role>Lian</role>
+    </allowed-roles>
+  </admin-event>
+  <user-tracking-event>
+    <enabled>true</enabled>
+    <trackingFile>/path/to/trackingfile.xml</trackingFile>
+    <can-update-query>
+      <role>Eldar</role>
+      <role>Lian</role>
+      <role>Arquendi</role>
+    </can-update-query>
+  </user-tracking-event>
+</discordConfiguration>
