@@ -8,6 +8,7 @@
   </staff-roles>
   <default-guild-id>252267969617461248</default-guild-id>
   <guild-abbreviation>SoA</guild-abbreviation>
+  <default-status>RuneScape Clan</default-status>
   <event-listing-event>
     <enabled>true</enabled>
     <url>https://forums.soa-rs.com/calendar/events.xml</url>
