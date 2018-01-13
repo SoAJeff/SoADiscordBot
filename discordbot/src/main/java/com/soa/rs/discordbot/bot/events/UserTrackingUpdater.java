@@ -378,9 +378,9 @@ public class UserTrackingUpdater {
 		}
 
 		if (actions.getRecentAction().size() >= 15) {
-			actions.getRecentAction().remove(0);
+			actions.getRecentAction().remove(14);
 		}
-		actions.getRecentAction().add(recentAction);
+		actions.getRecentAction().add(0, recentAction);
 	}
 
 	/**

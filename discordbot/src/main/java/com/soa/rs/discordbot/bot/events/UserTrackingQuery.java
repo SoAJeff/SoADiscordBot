@@ -260,7 +260,7 @@ public class UserTrackingQuery extends AbstractSoaMsgRcvEvent {
 	/**
 	 * Displays Recent Actions for a server
 	 */
-	public void postRecentActions() {
+	private void postRecentActions() {
 		if (SoaClientHelper.isRank(getEvent().getMessage(),
 				getEvent().getClient().getGuildByID(DiscordCfgFactory.getConfig().getDefaultGuildId()),
 				DiscordCfgFactory.getConfig().getUserTrackingEvent().getCanUpdateQuery().getRole())) {
@@ -270,7 +270,7 @@ public class UserTrackingQuery extends AbstractSoaMsgRcvEvent {
 			}
 			RecentActions actions = UserTrackingUpdater.getInstance().getRecentActionsForGuild(guildID);
 			StringBuilder sb = new StringBuilder();
-			sb.append("Recent Actions for guild: " + getEvent().getClient().getGuildByID(guildID).getName() + "\n");
+			sb.append("**Recent Actions for guild: " + getEvent().getClient().getGuildByID(guildID).getName() + "**\n");
 			if (actions.getRecentAction().size() == 0) {
 				sb.append("No actions recorded for this guild");
 			} else {
@@ -294,7 +294,7 @@ public class UserTrackingQuery extends AbstractSoaMsgRcvEvent {
 	 *            Action for which to return a string
 	 * @return String representation of the action.
 	 */
-	public String getStringForAction(Actions action) {
+	private String getStringForAction(Actions action) {
 		String value = null;
 		switch (action) {
 		case JOINED_SERVER:
@@ -318,7 +318,7 @@ public class UserTrackingQuery extends AbstractSoaMsgRcvEvent {
 	/**
 	 * Displays the help menu
 	 */
-	public void sendHelp() {
+	private void sendHelp() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("```Help: User Tracking\n");
 		sb.append(
