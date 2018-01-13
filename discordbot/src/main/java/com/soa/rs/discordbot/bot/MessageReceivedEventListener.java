@@ -1,6 +1,6 @@
 package com.soa.rs.discordbot.bot;
 
-import com.soa.rs.discordbot.bot.events.SoaAdminNewsEvent;
+import com.soa.rs.discordbot.bot.events.SoaAdminEvent;
 import com.soa.rs.discordbot.bot.events.SoaBotInfoEvent;
 import com.soa.rs.discordbot.bot.events.SoaDjPlsEvent;
 import com.soa.rs.discordbot.bot.events.SoaEventListerTask;
@@ -102,14 +102,14 @@ public class MessageReceivedEventListener implements IListener<MessageReceivedEv
 				infoEvent.executeEvent();
 			}
 
-			else if (args[0].equalsIgnoreCase("adminnews")) {
+			else if (args[0].equalsIgnoreCase("admin")) {
 				if (DiscordCfgFactory.getConfig().getAdminEvent() != null
 						&& DiscordCfgFactory.getConfig().getAdminEvent().isEnabled()) {
-					SoaAdminNewsEvent newsEvent = new SoaAdminNewsEvent(event);
-					newsEvent.setMustHavePermission(
+					SoaAdminEvent adminEvent = new SoaAdminEvent(event);
+					adminEvent.setMustHavePermission(
 							DiscordCfgFactory.getConfig().getAdminEvent().getAllowedRoles().getRole());
-					newsEvent.setArgs(args);
-					newsEvent.executeEvent();
+					adminEvent.setArgs(args);
+					adminEvent.executeEvent();
 				}
 			}
 
