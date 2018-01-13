@@ -69,6 +69,8 @@ public class SoaAdminEvent extends AbstractSoaMsgRcvEvent {
 					changeBotName();
 				else if (action.equalsIgnoreCase("change-avatar"))
 					changeAvatar();
+				else if (action.equalsIgnoreCase("change-presence-text"))
+					changePresenceText();
 
 			}
 		} catch (NoDefinedRolesException e) {
@@ -117,5 +119,20 @@ public class SoaAdminEvent extends AbstractSoaMsgRcvEvent {
 		String imageType = args[2].substring(args[2].lastIndexOf(".") + 1);
 		SoaLogging.getLogger().info("Changing bot avatar to: " + args[2]);
 		SoaClientHelper.setBotAvatar(getEvent().getClient(), Image.forUrl(imageType, args[2]));
+	}
+
+	/**
+	 * Changes the user's presence text
+	 */
+	/*
+	 * TODO Account for other presence types when they become available in 2.10
+	 */
+	private void changePresenceText() {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 2; i < args.length; i++) {
+			sb.append(args[i] + " ");
+		}
+		SoaLogging.getLogger().info("Setting presence text to " + sb.toString());
+		SoaClientHelper.setBotPlaying(getEvent().getClient(), sb.toString());
 	}
 }
