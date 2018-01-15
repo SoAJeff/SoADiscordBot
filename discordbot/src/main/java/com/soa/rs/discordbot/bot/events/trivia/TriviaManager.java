@@ -1,4 +1,4 @@
-package com.soa.rs.discordbot.bot.events;
+package com.soa.rs.discordbot.bot.events.trivia;
 
 import java.io.IOException;
 import java.net.URL;
@@ -34,12 +34,12 @@ import sx.blah.discord.util.PermissionUtils;
  * The actual execution of the Trivia thread is not handled here. The
  * <tt>SoaTrivia</tt> class is responsible for that.
  */
-public class SoaTriviaManager {
+public class TriviaManager {
 
 	/**
 	 * The object representing the trivia session.
 	 */
-	private SoaTrivia trivia = null;
+	private TriviaBase trivia = null;
 
 	/**
 	 * Used to hold the most recently received message.
@@ -96,47 +96,44 @@ public class SoaTriviaManager {
 	 *            The arguments provided with the message, minus the word "trivia"
 	 */
 	public void executeCmd(String[] args) {
-		if (args[1].equalsIgnoreCase("help")) {
+		if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
 			triviaHelp();
-		}
-		if (msg.getChannel().isPrivate()) {
-
-			if (args[1].equalsIgnoreCase("config")) {
-				loadTriviaConfiguration();
-			} else if (args[1].equalsIgnoreCase("start")) {
-				startTrivia();
-			} else if (args[1].equalsIgnoreCase("stop")) {
-				stopTrivia();
-			} else if (args[1].equalsIgnoreCase("export")) {
-				exportAnswers();
-			} else if (args[1].equalsIgnoreCase("reset")) {
-				resetTriviaSystem();
-			} else if (args[1].equalsIgnoreCase("answer")) {
-				recordAnswer(msg.getContent());
-			} else if (args[1].equalsIgnoreCase("pause")) {
-				pauseTrivia();
-			} else if (args[1].equalsIgnoreCase("resume")) {
-				resumeTrivia();
-			}
 		} else {
+			if (msg.getChannel().isPrivate()) {
 
-			/*
-			 * While trivia commands should be sent via PM, these two will be checked in the
-			 * main channel as they are either revealing the questions and their answers, or
-			 * the answers submitted by others. The bot will read the answer or
-			 * configuration, and then will attempt to delete the message and will provide a
-			 * message to submit commands via PM.
-			 */
-			if (args[1].equalsIgnoreCase("answer")) {
-				recordAnswer(msg.getContent());
-			} else if (args[1].equalsIgnoreCase("config")) {
-				loadTriviaConfiguration();
-			} else if (args[1].equalsIgnoreCase("pause")) {
-				pauseTrivia();
-			} else if (args[1].equalsIgnoreCase("resume")) {
-				resumeTrivia();
-			} else
-				SoaClientHelper.sendMsgToChannel(msg.getChannel(), "Trivia Commands should be sent via Private Chat!");
+				if (args[1].equalsIgnoreCase("config")) {
+					loadTriviaConfiguration();
+				} else if (args[1].equalsIgnoreCase("start")) {
+					startTrivia();
+				} else if (args[1].equalsIgnoreCase("stop")) {
+					stopTrivia();
+				} else if (args[1].equalsIgnoreCase("export")) {
+					exportAnswers();
+				} else if (args[1].equalsIgnoreCase("reset")) {
+					resetTriviaSystem();
+				} else if (args[1].equalsIgnoreCase("answer")) {
+					recordAnswer(msg.getContent());
+				} else if (this.trivia != null) {
+					this.trivia.handleAdditionalArgs(args, msg);
+				}
+
+			} else {
+
+				/*
+				 * While trivia commands should be sent via PM, these two will be checked in the
+				 * main channel as they are either revealing the questions and their answers, or
+				 * the answers submitted by others. The bot will read the answer or
+				 * configuration, and then will attempt to delete the message and will provide a
+				 * message to submit commands via PM.
+				 */
+				if (args[1].equalsIgnoreCase("answer")) {
+					recordAnswer(msg.getContent());
+				} else if (args[1].equalsIgnoreCase("config")) {
+					loadTriviaConfiguration();
+				} else if (this.trivia != null) {
+					this.trivia.handleAdditionalArgs(args, msg);
+				}
+			}
 		}
 
 	}
@@ -183,7 +180,7 @@ public class SoaTriviaManager {
 				TriviaConfiguration configuration = reader.loadTriviaConfigFromURL(url);
 				validateConfiguration(configuration);
 				if (this.trivia == null) {
-					this.trivia = new SoaTrivia(msg.getClient());
+					this.trivia = new AutomatedTrivia(msg.getClient());
 				}
 				if (!this.trivia.isEnabled() && this.trivia.getTriviaMaster() == -1) {
 					if (checkIfServerExists(configuration, msg.getClient())) {
@@ -328,7 +325,7 @@ public class SoaTriviaManager {
 			if (isTriviaMaster(this.msg)) {
 				this.triviaThread = new Thread(this.trivia);
 				this.trivia.enableTrivia(true);
-				this.triviaThread.run();
+				this.triviaThread.start();
 				cleanupTask();
 			} else {
 				SoaClientHelper.sendMsgToChannel(this.msg.getChannel(),
@@ -437,24 +434,6 @@ public class SoaTriviaManager {
 			SoaClientHelper.sendMsgToChannel(this.msg.getChannel(),
 					"Either Trivia is not currently enabled or you are not the Trivia Master and therefore are not permitted to receive the answers.");
 		}
-	}
-
-	/**
-	 * Pauses trivia
-	 */
-	private void pauseTrivia() {
-		this.trivia.setTriviaPaused(true);
-		SoaClientHelper.sendMsgToChannel(this.msg.getChannel(), "Trivia has been paused.");
-		SoaLogging.getLogger().info("Trivia has been paused.");
-	}
-
-	/**
-	 * Resumes trivia if it is paused
-	 */
-	private void resumeTrivia() {
-		this.trivia.setTriviaPaused(false);
-		SoaClientHelper.sendMsgToChannel(this.msg.getChannel(), "Trivia has been resumed.");
-		SoaLogging.getLogger().info("Trivia has been resumed.");
 	}
 
 	/**

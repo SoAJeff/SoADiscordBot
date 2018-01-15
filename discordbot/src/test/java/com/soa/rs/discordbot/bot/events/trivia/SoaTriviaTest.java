@@ -1,9 +1,11 @@
-package com.soa.rs.discordbot.bot.events;
+package com.soa.rs.discordbot.bot.events.trivia;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
 
+import com.soa.rs.discordbot.bot.events.trivia.AutomatedTrivia;
+import com.soa.rs.discordbot.bot.events.trivia.TriviaManager;
 import com.soa.rs.triviacreator.jaxb.QuestionBank;
 import com.soa.rs.triviacreator.jaxb.TriviaAnswers;
 import com.soa.rs.triviacreator.jaxb.TriviaConfiguration;
@@ -15,13 +17,13 @@ import sx.blah.discord.api.IDiscordClient;
 public class SoaTriviaTest {
 
 	private IDiscordClient client;
-	private SoaTrivia trivia;
+	private TriviaBase trivia;
 	private TriviaConfiguration configuration;
-	private SoaTriviaManager manager = new SoaTriviaManager();
+	private TriviaManager manager = new TriviaManager();
 
 	@Before
 	public void createTrivia() {
-		this.trivia = new SoaTrivia(client);
+		this.trivia = new AutomatedTrivia(client);
 
 		configuration = new TriviaConfiguration();
 		configuration.setTriviaName("Test trivia name");

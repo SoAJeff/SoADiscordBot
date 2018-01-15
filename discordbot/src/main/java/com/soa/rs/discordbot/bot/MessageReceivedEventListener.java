@@ -6,8 +6,8 @@ import com.soa.rs.discordbot.bot.events.SoaDjPlsEvent;
 import com.soa.rs.discordbot.bot.events.SoaEventListerTask;
 import com.soa.rs.discordbot.bot.events.SoaHelpEvent;
 import com.soa.rs.discordbot.bot.events.SoaMusicPlayer;
-import com.soa.rs.discordbot.bot.events.SoaTriviaManager;
 import com.soa.rs.discordbot.bot.events.UserTrackingQuery;
+import com.soa.rs.discordbot.bot.events.trivia.TriviaManager;
 import com.soa.rs.discordbot.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.util.SoaDiscordBotConstants;
 import com.soa.rs.discordbot.util.SoaLogging;
@@ -35,7 +35,7 @@ public class MessageReceivedEventListener implements IListener<MessageReceivedEv
 	 */
 	private SoaEventListerTask eventListerTask = null;
 
-	private SoaTriviaManager triviaManager = null;
+	private TriviaManager triviaManager = null;
 
 	/**
 	 * Handles the MessageReceivedEvent
@@ -90,7 +90,7 @@ public class MessageReceivedEventListener implements IListener<MessageReceivedEv
 				if (DiscordCfgFactory.getConfig().getTrivia() != null
 						&& DiscordCfgFactory.getConfig().getTrivia().isEnabled()) {
 					if (triviaManager == null) {
-						triviaManager = new SoaTriviaManager();
+						triviaManager = new TriviaManager();
 					}
 					triviaManager.setMsg(msg);
 					triviaManager.executeCmd(args);
