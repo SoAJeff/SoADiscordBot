@@ -74,6 +74,101 @@ public class SoaTriviaTest {
 	}
 
 	@Test
+	public void submitMultipleQuestionAnswerTest() {
+		this.trivia.initializeAnswersDoc();
+		TriviaAnswers answers = this.trivia.getAnswersDoc();
+
+		answers.getAnswerBank().getTriviaQuestion()
+				.add(this.trivia.createQuestionAndAnswer(
+						this.trivia.getConfiguration().getQuestionBank().getTriviaQuestion().get(0).getQuestion(),
+						this.trivia.getConfiguration().getQuestionBank().getTriviaQuestion().get(0).getAnswer()));
+		this.trivia.setAnswersDoc(answers);
+
+		this.trivia.submitAnswer("Jeff", "Answer 1 to Question 1");
+		this.trivia.submitAnswer("Josh", "Answer 2 to Question 1");
+
+		answers.getAnswerBank().getTriviaQuestion()
+				.add(this.trivia.createQuestionAndAnswer(
+						this.trivia.getConfiguration().getQuestionBank().getTriviaQuestion().get(1).getQuestion(),
+						this.trivia.getConfiguration().getQuestionBank().getTriviaQuestion().get(1).getAnswer()));
+
+		this.trivia.submitAnswer("Jeff", "Answer 1 to Question 2");
+		this.trivia.submitAnswer("Josh", "Answer 2 to Question 2");
+
+		Assert.assertEquals(this.trivia.getAnswersDoc().getAnswerBank().getTriviaQuestion().get(1).getAnswers()
+				.getParticipant().get(0).getParticipantAnswer(), "Answer 1 to Question 2");
+		Assert.assertEquals(this.trivia.getAnswersDoc().getAnswerBank().getTriviaQuestion().get(1).getAnswers()
+				.getParticipant().get(1).getParticipantAnswer(), "Answer 2 to Question 2");
+
+	}
+
+	@Test
+	public void testGetCurrentPlayersWhoRespondedToQuestionSingleQuestion() {
+		this.trivia.initializeAnswersDoc();
+		TriviaAnswers answers = this.trivia.getAnswersDoc();
+
+		answers.getAnswerBank().getTriviaQuestion()
+				.add(this.trivia.createQuestionAndAnswer(
+						this.trivia.getConfiguration().getQuestionBank().getTriviaQuestion().get(0).getQuestion(),
+						this.trivia.getConfiguration().getQuestionBank().getTriviaQuestion().get(0).getAnswer()));
+		this.trivia.setAnswersDoc(answers);
+
+		this.trivia.submitAnswer("Jeff", "Answer 1 to Question 1");
+		this.trivia.submitAnswer("Josh", "Answer 2 to Question 1");
+
+		String participants = this.trivia.sendPlayersWhoAnsweredCurrentQuestion();
+		Assert.assertTrue(participants.contains("Jeff"));
+		Assert.assertTrue(participants.contains("Josh"));
+	}
+
+	@Test
+	public void testGetCurrentPlayersWhoRespondedToQuestionMultipleQuestion() {
+		this.trivia.initializeAnswersDoc();
+
+		TriviaAnswers answers = this.trivia.getAnswersDoc();
+
+		answers.getAnswerBank().getTriviaQuestion()
+				.add(this.trivia.createQuestionAndAnswer(
+						this.trivia.getConfiguration().getQuestionBank().getTriviaQuestion().get(0).getQuestion(),
+						this.trivia.getConfiguration().getQuestionBank().getTriviaQuestion().get(0).getAnswer()));
+		this.trivia.setAnswersDoc(answers);
+
+		this.trivia.submitAnswer("Jeff", "Answer 1 to Question 1");
+		this.trivia.submitAnswer("Josh", "Answer 2 to Question 1");
+
+		answers.getAnswerBank().getTriviaQuestion()
+				.add(this.trivia.createQuestionAndAnswer(
+						this.trivia.getConfiguration().getQuestionBank().getTriviaQuestion().get(1).getQuestion(),
+						this.trivia.getConfiguration().getQuestionBank().getTriviaQuestion().get(1).getAnswer()));
+
+		this.trivia.submitAnswer("Jeff", "Answer 1 to Question 2");
+
+		String participants = this.trivia.sendPlayersWhoAnsweredCurrentQuestion();
+		Assert.assertTrue(participants.contains("Jeff"));
+		Assert.assertFalse(participants.contains("Josh"));
+
+	}
+
+	@Test
+	public void testSubmitAnswersDisabled() {
+		this.trivia.initializeAnswersDoc();
+
+		TriviaAnswers answers = this.trivia.getAnswersDoc();
+
+		answers.getAnswerBank().getTriviaQuestion()
+				.add(this.trivia.createQuestionAndAnswer(
+						this.trivia.getConfiguration().getQuestionBank().getTriviaQuestion().get(0).getQuestion(),
+						this.trivia.getConfiguration().getQuestionBank().getTriviaQuestion().get(0).getAnswer()));
+		this.trivia.setAnswersDoc(answers);
+
+		Assert.assertTrue(this.trivia.submitAnswer("Jeff", "Answer 1 to Question 1"));
+
+		this.trivia.acceptAnswers = false;
+
+		Assert.assertFalse(this.trivia.submitAnswer("Josh", "Answer 2 to Question 1"));
+	}
+
+	@Test
 	public void checkValidConfiguration() {
 		boolean valid = true;
 		try {

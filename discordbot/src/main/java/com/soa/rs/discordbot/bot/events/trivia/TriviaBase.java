@@ -2,6 +2,8 @@ package com.soa.rs.discordbot.bot.events.trivia;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
@@ -21,6 +23,11 @@ import com.soa.rs.triviacreator.util.TriviaAnswersStreamWriter;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IMessage;
 
+/**
+ * The base implementation of Trivia. All trivia implementations must extend
+ * this base class to be compatible with the TriviaManager.
+ * 
+ */
 public abstract class TriviaBase implements Runnable {
 
 	/**
@@ -57,7 +64,88 @@ public abstract class TriviaBase implements Runnable {
 	/**
 	 * A constant string to be used for indicating how to answer a question
 	 */
-	protected final String answerFormat = "PM your answers to me, beginning your answer with \".trivia answer\". \nThe question is: ";
+	private final String answerFormat = "PM your answers to me, beginning your answer with \".trivia answer\". \nThe question is: ";
+
+	/**
+	 * Boolean detailing whether answers for questions are currently being accepted.
+	 */
+	protected boolean acceptAnswers = false;
+
+	/**
+	 * Constructor
+	 * 
+	 * @param client
+	 *            Discord Client in use
+	 */
+	public TriviaBase(IDiscordClient client) {
+		this.client = client;
+	}
+
+	/**
+	 * Execute trivia. This will start the trivia session and will periodically
+	 * check to make sure it still should be running. Upon completion, it will
+	 * export the answers to the triviamaster.
+	 */
+	@Override
+	public void run() {
+		SoaLogging.getLogger().info("Starting Trivia...");
+		initializeAnswersDoc();
+
+		try {
+			StringBuilder sb = new StringBuilder();
+			sb.append("Its Trivia Time! Welcome to " + configuration.getTriviaName());
+			if (configuration.getForumUrl() != null && !configuration.getForumUrl().isEmpty()) {
+				sb.append("\nThe forum thread for this event is: " + configuration.getForumUrl());
+			}
+			messageChannel(sb.toString());
+			while (!checkAdvance())
+				Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			this.triviaEnabled = false;
+			return;
+		}
+
+		Iterator<TriviaQuestion> questions = this.configuration.getQuestionBank().getTriviaQuestion().iterator();
+		question = questions.next();
+		if (!this.isEnabled())
+			return;
+		messageChannel("Ready to play? " + answerFormat + question.getQuestion());
+
+		this.answersDoc.getAnswerBank().getTriviaQuestion()
+				.add(createQuestionAndAnswer(question.getQuestion(), question.getAnswer()));
+
+		while (this.triviaEnabled && questions.hasNext()) {
+			if (!checkStatus())
+				return;
+			acceptAnswers = false;
+			messageChannel(getEndOfQuestionString() + question.getAnswer());
+
+			if (!checkAdvance())
+				return;
+
+			if (questions.hasNext()) {
+				question = questions.next();
+				messageChannel("The next question is: " + question.getQuestion());
+				this.answersDoc.getAnswerBank().getTriviaQuestion()
+						.add(createQuestionAndAnswer(question.getQuestion(), question.getAnswer()));
+
+			}
+		}
+
+		// Last question
+
+		if (!checkStatus())
+			return;
+		messageChannel(getEndOfQuestionString() + question.getAnswer());
+
+		try {
+			exportAnswersToTriviaMaster();
+		} catch (IOException e) {
+			SoaLogging.getLogger().error("Error exporting answers", e);
+		}
+		this.triviaEnabled = false;
+		SoaLogging.getLogger().info("Trivia has ended as  all questions have been asked.");
+	}
 
 	/**
 	 * Toggle trivia as enabled or disabled
@@ -139,6 +227,7 @@ public abstract class TriviaBase implements Runnable {
 		newQuestion.setQuestion(question);
 		newQuestion.setCorrectAnswer(answer);
 		newQuestion.setAnswers(new Answers());
+		acceptAnswers = true;
 		return newQuestion;
 	}
 
@@ -149,14 +238,20 @@ public abstract class TriviaBase implements Runnable {
 	 *            The user submitting the answer
 	 * @param answer
 	 *            The answer text
+	 * @return True if the answer was accepted; false if answers are not currently
+	 *         being accepted.
 	 */
-	public void submitAnswer(String user, String answer) {
-		Participant participant = new Participant();
-		participant.setParticipantName(user);
-		participant.setParticipantAnswer(answer);
-		int questionSize = this.answersDoc.getAnswerBank().getTriviaQuestion().size();
-		this.answersDoc.getAnswerBank().getTriviaQuestion().get(questionSize - 1).getAnswers().getParticipant()
-				.add(participant);
+	public boolean submitAnswer(String user, String answer) {
+		if (acceptAnswers) {
+			Participant participant = new Participant();
+			participant.setParticipantName(user);
+			participant.setParticipantAnswer(answer);
+			int questionSize = this.answersDoc.getAnswerBank().getTriviaQuestion().size();
+			this.answersDoc.getAnswerBank().getTriviaQuestion().get(questionSize - 1).getAnswers().getParticipant()
+					.add(participant);
+			return true;
+		} else
+			return false;
 	}
 
 	/**
@@ -204,6 +299,24 @@ public abstract class TriviaBase implements Runnable {
 	}
 
 	/**
+	 * Sends a list of who has answered the question to the triviamaster.
+	 * 
+	 * @return String of content to send
+	 */
+	public String sendPlayersWhoAnsweredCurrentQuestion() {
+		int questionSize = this.answersDoc.getAnswerBank().getTriviaQuestion().size();
+		List<Participant> participants = this.answersDoc.getAnswerBank().getTriviaQuestion().get(questionSize - 1)
+				.getAnswers().getParticipant();
+		StringBuilder sb = new StringBuilder();
+		sb.append("The following people have answered the current question:\n");
+		for (Participant participant : participants) {
+			sb.append(participant.getParticipantName());
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
+
+	/**
 	 * Cleanup trivia; nulls out necessary values to prepare for another trivia
 	 * session.
 	 */
@@ -216,11 +329,52 @@ public abstract class TriviaBase implements Runnable {
 	}
 
 	/**
+	 * Submit a message to the channel trivia is being played in
+	 * 
+	 * @param content
+	 */
+	protected void messageChannel(String content) {
+		SoaClientHelper.sendMsgToChannel(this.client.getChannelByID(Long.parseLong(this.configuration.getChannelId())),
+				content);
+	}
+
+	/**
+	 * Checks if the trivia thread can advance to the next question
+	 * 
+	 * @return true if can advance, false otherwise
+	 */
+	protected abstract boolean checkAdvance();
+
+	/**
+	 * Checks if the trivia thread should continue waiting and accepting answers to
+	 * the question
+	 * 
+	 * @return true if can advance, false otherwise
+	 */
+	protected abstract boolean checkStatus();
+
+	/**
+	 * Get the "end of answer period" string. The string to use will be defined by
+	 * the implementing subclass
+	 * 
+	 * @return The string to use when the answer period for a question has ended.
+	 */
+	protected abstract String getEndOfQuestionString();
+
+	/**
 	 * Handle arguments specific to this implementation of Trivia.
 	 * 
 	 * @param args
 	 * @param msg
 	 */
-	public abstract void handleAdditionalArgs(String[] args, IMessage msg);
+	protected abstract void handleAdditionalArgs(String[] args, IMessage msg);
+
+	/**
+	 * Adds implementation specific arguments to the help line.
+	 * 
+	 * @param sb
+	 *            StringBuilder containing current help menu to be added to
+	 */
+	protected abstract void addAdditionalArgsToHelp(StringBuilder sb);
 
 }

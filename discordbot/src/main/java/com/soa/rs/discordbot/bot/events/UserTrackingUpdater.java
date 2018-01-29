@@ -214,6 +214,8 @@ public class UserTrackingUpdater {
 						addRecentAction(ourGuild.getRecentActions(), curUser.getUserName(),
 								Actions.CHANGED_DISPLAY_NAME, curUser.getDisplayNames().getDisplayName().get(0),
 								user.getDisplayName(guild));
+					}
+					if (wasPriorDisplayName(curUser.getDisplayNames(), user.getDisplayName(guild))) {
 						curUser.getDisplayNames().getDisplayName().add(0, user.getDisplayName(guild));
 					}
 					IPresence presence = user.getPresence();
@@ -338,15 +340,16 @@ public class UserTrackingUpdater {
 	}
 
 	/**
-	 * Checks if the user has a new display name or not.
+	 * Checks if the user has a new display name or not that they have never had
+	 * before.
 	 * 
 	 * @param displayNames
 	 *            Listing of all past recorded display names
 	 * @param name
-	 *            The current dispaly name
+	 *            The current display name
 	 * @return True if they do have a new display name, false otherwise.
 	 */
-	private boolean isNewDisplayName(DisplayNames displayNames, String name) {
+	private boolean wasPriorDisplayName(DisplayNames displayNames, String name) {
 		Iterator<String> iter = displayNames.getDisplayName().iterator();
 		while (iter.hasNext()) {
 			String dispName = iter.next();
@@ -357,14 +360,66 @@ public class UserTrackingUpdater {
 		return true;
 	}
 
+	/**
+	 * Checks if the user's display name has changed since the last analysis
+	 * 
+	 * @param displayNames
+	 *            Listing of all past recorded display names
+	 * @param name
+	 *            The current display name on the account
+	 * @return True if the name has changed, false otherwise.
+	 */
+	private boolean isNewDisplayName(DisplayNames displayNames, String name) {
+		if (displayNames.getDisplayName().get(0).equals(name))
+			return false;
+		return true;
+	}
+
+	/**
+	 * Adds a recent action to the Recent Actions List
+	 * 
+	 * @param actions
+	 *            The Recent Actions list
+	 * @param user
+	 *            The user affected by the action
+	 * @param action
+	 *            The action to be recorded
+	 */
 	private void addRecentAction(RecentActions actions, String user, Actions action) {
 		addRecentAction(actions, user, action, null, null);
 	}
 
+	/**
+	 * Adds a recent action including the after value to the Recent Actions List
+	 * 
+	 * @param actions
+	 *            The Recent Actions list
+	 * @param user
+	 *            The user affected by the action
+	 * @param action
+	 *            The action to be recorded
+	 * @param changedValue
+	 *            The new value for the property changed
+	 */
 	private void addRecentAction(RecentActions actions, String user, Actions action, String changedValue) {
 		addRecentAction(actions, user, action, null, changedValue);
 	}
 
+	/**
+	 * Adds a recent action including the before and after values specified to the
+	 * Recent Actions List
+	 * 
+	 * @param actions
+	 *            The Recent Actions list
+	 * @param user
+	 *            The user affected by the action
+	 * @param action
+	 *            The action to be recorded
+	 * @param originalValue
+	 *            The before value for the property changed
+	 * @param changedValue
+	 *            The after value for the property changed
+	 */
 	private void addRecentAction(RecentActions actions, String user, Actions action, String originalValue,
 			String changedValue) {
 		RecentAction recentAction = new RecentAction();

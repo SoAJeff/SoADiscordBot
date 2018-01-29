@@ -13,6 +13,7 @@ import com.soa.rs.discordbot.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.util.NoSuchServerException;
 import com.soa.rs.discordbot.util.SoaClientHelper;
 import com.soa.rs.discordbot.util.SoaLogging;
+import com.soa.rs.triviacreator.jaxb.Mode;
 import com.soa.rs.triviacreator.jaxb.TriviaConfiguration;
 import com.soa.rs.triviacreator.jaxb.TriviaQuestion;
 import com.soa.rs.triviacreator.util.InvalidTriviaConfigurationException;
@@ -25,14 +26,14 @@ import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.PermissionUtils;
 
 /**
- * The <tt>SoaTriviaManager</tt> class handles the management of the trivia
- * system through the commands issued by the user from Discord. It is
- * responsible for the loading of the Trivia configuration file, starting and
- * stopping trivia, recording answers from the participants, and exporting the
- * answers in XML format back to the trivia master.
+ * The <tt>TriviaManager</tt> class handles the management of the trivia system
+ * through the commands issued by the user from Discord. It is responsible for
+ * the loading of the Trivia configuration file, starting and stopping trivia,
+ * recording answers from the participants, and exporting the answers in XML
+ * format back to the trivia master.
  * <p>
- * The actual execution of the Trivia thread is not handled here. The
- * <tt>SoaTrivia</tt> class is responsible for that.
+ * The actual execution of the Trivia thread is not handled here. Trivia
+ * implementations extend the <tt>TriviaBase</tt> class is responsible for that.
  */
 public class TriviaManager {
 
@@ -47,7 +48,7 @@ public class TriviaManager {
 	private IMessage msg;
 
 	/**
-	 * The thread executing the trivia session. Note that <tt>SoaTrivia</tt> is the
+	 * The thread executing the trivia session. Note that <tt>Trivia</tt> is the
 	 * class implementing the <tt>Runnable</tt> interface.
 	 */
 	private Thread triviaThread;
@@ -90,7 +91,11 @@ public class TriviaManager {
 	 * question before it was paused.</li>
 	 * <li>Resume: Will resume the currently running Trivia thread, waiting however
 	 * much time was still left before asking the next question.</li>
+	 * <li>CurrentPlayers: Will list the players who have answered the current
+	 * question</li>
+	 * <li>Advance: (Manual Trivia only) Advance to the next question</li>
 	 * </ul>
+	 * Note: There may be other commands specific to each implementation of Trivia.
 	 * 
 	 * @param args
 	 *            The arguments provided with the message, minus the word "trivia"
@@ -113,6 +118,8 @@ public class TriviaManager {
 					resetTriviaSystem();
 				} else if (args[1].equalsIgnoreCase("answer")) {
 					recordAnswer(msg.getContent());
+				} else if (args[1].equalsIgnoreCase("currentplayers")) {
+					getPlayersWhoAnsweredCurrentQuestion();
 				} else if (this.trivia != null) {
 					this.trivia.handleAdditionalArgs(args, msg);
 				}
@@ -144,21 +151,23 @@ public class TriviaManager {
 	private void triviaHelp() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("```Help: Trivia (command: .trivia [args])\n");
-		sb.append("Note - Trivia commands should be sent privately through private chat to the bot\n\n");
-		sb.append(".trivia help - Bot displays this menu.");
+		sb.append("Note - Trivia commands should be sent privately through private chat to the bot\n");
+		sb.append(
+				"Note - Commands containing a * can only be executed by the current Trivia Master or a member of staff\n\n");
+		sb.append(".trivia help - Bot displays this menu.\n");
 		sb.append(".trivia answer - Submits an answer to the currently asked Trivia Question.\n");
 		sb.append(
 				".trivia config - Should be used in a file upload, uploads a configuration file to configure trivia.  The uploader will be assigned to be the \"Trivia Master\" if successful.\n");
+
+		sb.append(".trivia start* - Starts a round of trivia if one has been successfully configured\n");
+		sb.append(".trivia stop* - Immediately ends the currently running instance of trivia\n");
 		sb.append(
-				"\nNote - The rest of the commands in this menu can only be executed by the current Trivia Master or a member of staff\n");
-		sb.append(".trivia start - Starts a round of trivia if one has been successfully configured\n");
-		sb.append(".trivia stop - Immediately ends the currently running instance of trivia\n");
+				".trivia export* - Exports the current set of collected answers as an XML document.  This document will also be exported automatically when trivia finishes.\n");
 		sb.append(
-				".trivia pause & .trivia resume - Pauses or resumes trivia.  Answers can still be collected while paused.\n");
-		sb.append(
-				".trivia export - Exports the current set of collected answers as an XML document.  This document will also be exported automatically when trivia finishes.\n");
-		sb.append(
-				".trivia reset - This command immediately resets the trivia instance so that a new round can be uploaded and run.  This includes bypassing the 15 minute cooldown period between rounds.");
+				".trivia reset* - This command immediately resets the trivia instance so that a new round can be uploaded and run.  This includes bypassing the 15 minute cooldown period between rounds.\n");
+		if (this.trivia != null) {
+			this.trivia.addAdditionalArgsToHelp(sb);
+		}
 		sb.append("```");
 		SoaClientHelper.sendMsgToChannel(msg.getChannel(), sb.toString());
 
@@ -180,7 +189,10 @@ public class TriviaManager {
 				TriviaConfiguration configuration = reader.loadTriviaConfigFromURL(url);
 				validateConfiguration(configuration);
 				if (this.trivia == null) {
-					this.trivia = new AutomatedTrivia(msg.getClient());
+					if (configuration.getMode() == Mode.AUTOMATED)
+						this.trivia = new AutomatedTrivia(msg.getClient());
+					else if (configuration.getMode() == Mode.MANUAL)
+						this.trivia = new ManualTrivia(msg.getClient());
 				}
 				if (!this.trivia.isEnabled() && this.trivia.getTriviaMaster() == -1) {
 					if (checkIfServerExists(configuration, msg.getClient())) {
@@ -356,6 +368,19 @@ public class TriviaManager {
 	}
 
 	/**
+	 * Sends a list of the players who have answered the current question to the
+	 * triviamaster.
+	 */
+	private void getPlayersWhoAnsweredCurrentQuestion() {
+		if (this.trivia != null) {
+			if (isTriviaMaster(this.msg) && this.trivia.isEnabled()) {
+				SoaClientHelper.sendMessageToUser(this.trivia.getTriviaMaster(), this.msg.getClient(),
+						this.trivia.sendPlayersWhoAnsweredCurrentQuestion());
+			}
+		}
+	}
+
+	/**
 	 * Records an answer submitted by a participant
 	 * 
 	 * @param answer
@@ -372,41 +397,43 @@ public class TriviaManager {
 							"The answer provided was empty; no answer recorded");
 					return;
 				}
-				this.trivia.submitAnswer(displayName, answer.trim());
-				if (!msg.getChannel().isPrivate()) {
-					if (PermissionUtils.hasPermissions(msg.getChannel(), msg.getClient().getOurUser(),
-							Permissions.MANAGE_MESSAGES)) {
-						SoaClientHelper.deleteMessageFromChannel(msg);
-						SoaClientHelper.sendMsgToChannel(msg.getChannel(), msg.getAuthor()
-								.getDisplayName(msg.getGuild())
-								+ ", I got your answer but please PM future answers so others don't see!  I deleted the answer from here");
-						SoaLogging
-								.getLogger().info(
-										"Recorded answer from "
-												+ msg.getAuthor()
-														.getDisplayName(this.msg.getClient()
-																.getGuildByID(Long.parseLong(
-																		this.trivia.getConfiguration().getServerId())))
-												+ " and deleted their message.");
+				if (!this.trivia.submitAnswer(displayName, answer.trim()))
+					SoaClientHelper.sendMsgToChannel(msg.getChannel(), "Trivia is not currently accepting answers");
+				else {
+					if (!msg.getChannel().isPrivate()) {
+						if (PermissionUtils.hasPermissions(msg.getChannel(), msg.getClient().getOurUser(),
+								Permissions.MANAGE_MESSAGES)) {
+							SoaClientHelper.deleteMessageFromChannel(msg);
+							SoaClientHelper.sendMsgToChannel(msg.getChannel(), msg.getAuthor()
+									.getDisplayName(msg.getGuild())
+									+ ", I got your answer but please PM future answers so others don't see!  I deleted the answer from here");
+							SoaLogging.getLogger()
+									.info("Recorded answer from "
+											+ msg.getAuthor()
+													.getDisplayName(this.msg.getClient()
+															.getGuildByID(Long.parseLong(
+																	this.trivia.getConfiguration().getServerId())))
+											+ " and deleted their message.");
+						} else {
+							SoaClientHelper.sendMsgToChannel(msg.getChannel(), msg.getAuthor()
+									.getDisplayName(msg.getGuild())
+									+ ", I got your answer but please PM future answers so others don't see!  I can't delete your message, so please delete it so others don't see!");
+							SoaLogging.getLogger()
+									.info("Recorded answer from "
+											+ msg.getAuthor()
+													.getDisplayName(this.msg.getClient()
+															.getGuildByID(Long.parseLong(
+																	this.trivia.getConfiguration().getServerId())))
+											+ " but was unable to delete their message in the server.");
+						}
 					} else {
-						SoaClientHelper.sendMsgToChannel(msg.getChannel(), msg.getAuthor()
-								.getDisplayName(msg.getGuild())
-								+ ", I got your answer but please PM future answers so others don't see!  I can't delete your message, so please delete it so others don't see!");
-						SoaLogging
-								.getLogger().info(
-										"Recorded answer from "
-												+ msg.getAuthor()
-														.getDisplayName(this.msg.getClient()
-																.getGuildByID(Long.parseLong(
-																		this.trivia.getConfiguration().getServerId())))
-												+ " but was unable to delete their message in the server.");
+						SoaClientHelper.sendMsgToChannel(msg.getChannel(),
+								"Answer recorded, " + msg.getAuthor().getDisplayName(this.msg.getClient()
+										.getGuildByID(Long.parseLong(this.trivia.getConfiguration().getServerId()))));
+						SoaLogging.getLogger()
+								.info("Recorded answer from " + msg.getAuthor().getDisplayName(this.msg.getClient()
+										.getGuildByID(Long.parseLong(this.trivia.getConfiguration().getServerId()))));
 					}
-				} else {
-					SoaClientHelper.sendMsgToChannel(msg.getChannel(),
-							"Answer recorded, " + msg.getAuthor().getDisplayName(this.msg.getClient()
-									.getGuildByID(Long.parseLong(this.trivia.getConfiguration().getServerId()))));
-					SoaLogging.getLogger().info("Recorded answer from " + msg.getAuthor().getDisplayName(this.msg
-							.getClient().getGuildByID(Long.parseLong(this.trivia.getConfiguration().getServerId()))));
 				}
 			}
 		}
@@ -453,6 +480,7 @@ public class TriviaManager {
 					// Sleep 15 minutes
 					Thread.sleep(1000 * 60 * 15);
 					trivia.cleanupTrivia();
+					trivia = null;
 					SoaLogging.getLogger().info("Trivia cleanup has occurred");
 				} catch (InterruptedException e) {
 					SoaLogging.getLogger().info("Trivia Cleanup thread has been interrupted");
@@ -481,6 +509,7 @@ public class TriviaManager {
 					}
 				}
 				this.trivia.cleanupTrivia();
+				this.trivia = null;
 				SoaClientHelper.sendMsgToChannel(msg.getChannel(), "Trivia has been reset");
 				SoaLogging.getLogger().info("Trivia has been reset");
 			}
