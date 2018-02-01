@@ -2,6 +2,7 @@ package com.soa.rs.discordbot.bot.events;
 
 import java.util.List;
 
+import com.soa.rs.discordbot.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.util.NoDefinedRolesException;
 import com.soa.rs.discordbot.util.SoaClientHelper;
 import com.soa.rs.discordbot.util.SoaLogging;
@@ -134,5 +135,7 @@ public class SoaAdminEvent extends AbstractSoaMsgRcvEvent {
 		}
 		SoaLogging.getLogger().info("Setting presence text to " + sb.toString());
 		SoaClientHelper.setBotPlaying(getEvent().getClient(), sb.toString());
+		//Apply to the config so that it can be used in the case of a disconnection
+		DiscordCfgFactory.getConfig().setDefaultStatus(sb.toString());
 	}
 }
