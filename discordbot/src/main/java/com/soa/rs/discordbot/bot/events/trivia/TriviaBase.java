@@ -26,7 +26,6 @@ import sx.blah.discord.handle.obj.IMessage;
 /**
  * The base implementation of Trivia. All trivia implementations must extend
  * this base class to be compatible with the TriviaManager.
- * 
  */
 public abstract class TriviaBase implements Runnable {
 
@@ -43,23 +42,23 @@ public abstract class TriviaBase implements Runnable {
 	/**
 	 * The Discord ID of the triviamaster who submitted the configuration
 	 */
-	protected long triviaMaster = -1;
+	private long triviaMaster = -1;
 
 	/**
 	 * An object representing a Trivia Question; contains a question and its
 	 * associated correct answer
 	 */
-	protected TriviaQuestion question;
+	private TriviaQuestion question;
 
 	/**
 	 * The Answers document for holding all submitted answers.
 	 */
-	protected TriviaAnswers answersDoc;
+	private TriviaAnswers answersDoc;
 
 	/**
 	 * Boolean detailing whether trivia is currently running or not.
 	 */
-	protected boolean triviaEnabled = false;
+	private boolean triviaEnabled = false;
 
 	/**
 	 * A constant string to be used for indicating how to answer a question
@@ -73,7 +72,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param client
 	 *            Discord Client in use
 	 */
@@ -149,7 +148,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Toggle trivia as enabled or disabled
-	 * 
+	 *
 	 * @param enable
 	 *            Whether trivia should be enabled or disabled
 	 */
@@ -159,7 +158,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Check if trivia is enabled
-	 * 
+	 *
 	 * @return true if enabled, false if not
 	 */
 	public boolean isEnabled() {
@@ -168,7 +167,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Set the trivia configuration to be used.
-	 * 
+	 *
 	 * @param configuration
 	 *            the configuration to be used
 	 */
@@ -178,7 +177,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Get the trivia configuration
-	 * 
+	 *
 	 * @return The trivia configuration
 	 */
 	public TriviaConfiguration getConfiguration() {
@@ -187,7 +186,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Get the trivia master
-	 * 
+	 *
 	 * @return The trivia master's ID
 	 */
 	public long getTriviaMaster() {
@@ -196,7 +195,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Set the trivia master
-	 * 
+	 *
 	 * @param triviaMaster
 	 *            The trivia master's ID
 	 */
@@ -215,7 +214,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Create a question and answer for use in the answers document
-	 * 
+	 *
 	 * @param question
 	 *            The question text
 	 * @param answer
@@ -233,7 +232,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Submits an answer to the answers document
-	 * 
+	 *
 	 * @param user
 	 *            The user submitting the answer
 	 * @param answer
@@ -256,7 +255,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Exports the trivia answers to the triviamaster.
-	 * 
+	 *
 	 * @throws IOException
 	 *             If there is an error in writing to the stream
 	 */
@@ -274,14 +273,16 @@ public abstract class TriviaBase implements Runnable {
 					"Trivia Answers were unable to be provided due to an error; this should be reported to the developer.");
 			SoaLogging.getLogger().error("Error sending Trivia Answers to the user: " + e.getMessage(), e);
 		} finally {
-			dataStream.close();
+			if (dataStream != null) {
+				dataStream.close();
+			}
 		}
 
 	}
 
 	/**
 	 * Get the answer doc
-	 * 
+	 *
 	 * @return The answer doc
 	 */
 	protected TriviaAnswers getAnswersDoc() {
@@ -290,7 +291,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Set the answer doc
-	 * 
+	 *
 	 * @param answersDoc
 	 *            The answer doc
 	 */
@@ -300,7 +301,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Sends a list of who has answered the question to the triviamaster.
-	 * 
+	 *
 	 * @return String of content to send
 	 */
 	public String sendPlayersWhoAnsweredCurrentQuestion() {
@@ -330,7 +331,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Submit a message to the channel trivia is being played in
-	 * 
+	 *
 	 * @param content
 	 */
 	protected void messageChannel(String content) {
@@ -340,7 +341,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Checks if the trivia thread can advance to the next question
-	 * 
+	 *
 	 * @return true if can advance, false otherwise
 	 */
 	protected abstract boolean checkAdvance();
@@ -348,7 +349,7 @@ public abstract class TriviaBase implements Runnable {
 	/**
 	 * Checks if the trivia thread should continue waiting and accepting answers to
 	 * the question
-	 * 
+	 *
 	 * @return true if can advance, false otherwise
 	 */
 	protected abstract boolean checkStatus();
@@ -356,14 +357,14 @@ public abstract class TriviaBase implements Runnable {
 	/**
 	 * Get the "end of answer period" string. The string to use will be defined by
 	 * the implementing subclass
-	 * 
+	 *
 	 * @return The string to use when the answer period for a question has ended.
 	 */
 	protected abstract String getEndOfQuestionString();
 
 	/**
 	 * Handle arguments specific to this implementation of Trivia.
-	 * 
+	 *
 	 * @param args
 	 * @param msg
 	 */
@@ -371,7 +372,7 @@ public abstract class TriviaBase implements Runnable {
 
 	/**
 	 * Adds implementation specific arguments to the help line.
-	 * 
+	 *
 	 * @param sb
 	 *            StringBuilder containing current help menu to be added to
 	 */

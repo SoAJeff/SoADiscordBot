@@ -4,7 +4,9 @@
 **/.classpath
 **/.project
 **/maven-eclipse.xml
+**/*.iml
 **/.settings/**
 **/.externalToolBuilders/**
 **/jaxb/**
+**/.idea/**
 **/META-INF/**
