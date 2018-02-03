@@ -351,11 +351,17 @@ public class UserTrackingUpdater {
 	 */
 	private boolean wasPriorDisplayName(DisplayNames displayNames, String name) {
 		Iterator<String> iter = displayNames.getDisplayName().iterator();
+		int i = 0;
 		while (iter.hasNext()) {
 			String dispName = iter.next();
 			if (dispName.equals(name)) {
+				if (i > 0) {
+					iter.remove();
+					displayNames.getDisplayName().add(0, dispName);
+				}
 				return false;
 			}
+			i++;
 		}
 		return true;
 	}
