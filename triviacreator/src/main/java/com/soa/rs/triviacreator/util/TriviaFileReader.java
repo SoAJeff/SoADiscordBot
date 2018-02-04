@@ -39,9 +39,12 @@ public class TriviaFileReader {
 	 *             If the file cannot be schema validated.
 	 */
 	public TriviaConfiguration loadTriviaConfigFile(String filename) throws JAXBException, SAXException {
-		TriviaConfiguration config = null;
-
 		File file = new File(filename);
+		return loadTriviaConfigFile(file);
+	}
+
+	public TriviaConfiguration loadTriviaConfigFile(File file) throws JAXBException, SAXException {
+		TriviaConfiguration config = null;
 		JAXBContext jaxbContext = JAXBContext.newInstance("com.soa.rs.triviacreator.jaxb");
 
 		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);

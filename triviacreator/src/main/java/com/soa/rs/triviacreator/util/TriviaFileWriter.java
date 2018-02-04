@@ -37,6 +37,10 @@ public class TriviaFileWriter {
 	 */
 	public void writeTriviaConfigFile(TriviaConfiguration cfg, String filename) throws JAXBException, SAXException {
 		File file = new File(filename);
+		writeTriviaConfigFile(cfg, file);
+	}
+
+	public void writeTriviaConfigFile(TriviaConfiguration cfg, File file) throws JAXBException, SAXException {
 		JAXBContext jaxbContext = JAXBContext.newInstance("com.soa.rs.triviacreator.jaxb");
 
 		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
