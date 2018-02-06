@@ -22,8 +22,8 @@ public class TriviaConfigValidator {
 	public static void validateConfiguration(TriviaConfiguration configuration)
 			throws InvalidTriviaConfigurationException {
 		validateTriviaName(configuration.getTriviaName());
-		validateServerOrChannelId(configuration.getServerId(), "server");
-		validateServerOrChannelId(configuration.getChannelId(), "channel");
+		validateServerOrChannelId(configuration.getServerId(), DiscordType.SERVER);
+		validateServerOrChannelId(configuration.getChannelId(), DiscordType.CHANNEL);
 		validateWaitTime(configuration.getWaitTime(), configuration.getMode());
 		validateQuestions(configuration.getQuestionBank().getTriviaQuestion());
 
@@ -32,20 +32,20 @@ public class TriviaConfigValidator {
 	public static void validateTriviaName(String name) throws InvalidTriviaConfigurationException {
 		if (name == null || name.trim().isEmpty()) {
 			throw new InvalidTriviaConfigurationException(
-					"The server name field is required, and is empty in the provided configuration");
+					"The trivia name field is required, and is empty in the provided configuration");
 		}
 	}
 
-	public static void validateServerOrChannelId(String id, String whichId) throws InvalidTriviaConfigurationException {
+	public static void validateServerOrChannelId(String id, DiscordType type) throws InvalidTriviaConfigurationException {
 		if (id == null || id.trim().isEmpty()) {
 			throw new InvalidTriviaConfigurationException(
-					"The " + whichId + " id field is required, and is empty in the provided configuration");
+					"The " + type.getType() + " id field is required, and is empty in the provided configuration");
 		}
 		try {
 			Long.parseLong(id);
 		} catch (NumberFormatException ex) {
 			throw new InvalidTriviaConfigurationException(
-					"The " + whichId + " id field is not valid (should be a long, but could not be parsed as a long)");
+					"The " + type.getType() + " id field is not valid (should be a long, but could not be parsed as a long)");
 		}
 	}
 

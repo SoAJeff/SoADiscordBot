@@ -41,8 +41,7 @@ public class DefaultTriviaCreateController implements TriviaCreateController, Tr
 	}
 
 	@Override
-	public void setServerId(String id) throws InvalidTriviaConfigurationException {
-		TriviaConfigValidator.validateServerOrChannelId(id, "server");
+	public void setServerId(String id) {
 		this.model.setServerId(id);
 	}
 
@@ -52,8 +51,7 @@ public class DefaultTriviaCreateController implements TriviaCreateController, Tr
 	}
 
 	@Override
-	public void setChannelId(String id) throws InvalidTriviaConfigurationException {
-		TriviaConfigValidator.validateServerOrChannelId(id, "server");
+	public void setChannelId(String id)  {
 		this.model.setChannelId(id);
 	}
 
@@ -65,6 +63,7 @@ public class DefaultTriviaCreateController implements TriviaCreateController, Tr
 	@Override
 	public void setMode(Mode mode) {
 		this.model.setMode(mode);
+		System.out.println("Mode: " + mode.value());
 	}
 
 	@Override

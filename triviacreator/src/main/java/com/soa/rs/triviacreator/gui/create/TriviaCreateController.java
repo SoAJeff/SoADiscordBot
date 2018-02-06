@@ -25,11 +25,11 @@ public interface TriviaCreateController {
 	
 	public String getTriviaName();
 	
-	public void setServerId(String id)throws InvalidTriviaConfigurationException;
+	public void setServerId(String id);
 	
 	public String getServerId();
 	
-	public void setChannelId(String id)throws InvalidTriviaConfigurationException;
+	public void setChannelId(String id);
 	
 	public String getChannelId();
 	
