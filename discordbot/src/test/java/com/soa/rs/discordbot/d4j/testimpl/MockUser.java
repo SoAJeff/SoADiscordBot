@@ -197,4 +197,16 @@ public class MockUser implements IUser {
 
 	}
 
+	@Override
+	public LongMap<IVoiceState> getVoiceStates() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean hasRole(IRole role) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -10,6 +10,7 @@ import java.util.List;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.IShard;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import sx.blah.discord.handle.obj.ICategory;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IExtendedInvite;
 import sx.blah.discord.handle.obj.IGuild;
@@ -426,13 +427,13 @@ public class MockChannel implements IChannel {
 	}
 
 	@Override
-	public LongMap<PermissionOverride> getUserOverridesLong() {
+	public LongMap<sx.blah.discord.handle.obj.PermissionOverride> getUserOverridesLong() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public LongMap<PermissionOverride> getRoleOverridesLong() {
+	public LongMap<sx.blah.discord.handle.obj.PermissionOverride> getRoleOverridesLong() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -543,6 +544,30 @@ public class MockChannel implements IChannel {
 	public boolean isDeleted() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public LongMap<sx.blah.discord.handle.obj.PermissionOverride> getUserOverrides() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public LongMap<sx.blah.discord.handle.obj.PermissionOverride> getRoleOverrides() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void changeCategory(ICategory category) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ICategory getCategory() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

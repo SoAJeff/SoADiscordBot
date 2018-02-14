@@ -9,6 +9,7 @@ import sx.blah.discord.api.IShard;
 import sx.blah.discord.handle.audio.IAudioManager;
 import sx.blah.discord.handle.audit.ActionType;
 import sx.blah.discord.handle.audit.AuditLog;
+import sx.blah.discord.handle.obj.ICategory;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IEmoji;
 import sx.blah.discord.handle.obj.IExtendedInvite;
@@ -526,6 +527,42 @@ public class MockGuild implements IGuild {
 
 	@Override
 	public AuditLog getAuditLog(IUser user, ActionType actionType) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IEmoji createEmoji(String name, Image image, IRole[] roles) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ICategory createCategory(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<ICategory> getCategories() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ICategory getCategoryByID(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<ICategory> getCategoriesByName(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IChannel getSystemChannel() {
 		// TODO Auto-generated method stub
 		return null;
 	}

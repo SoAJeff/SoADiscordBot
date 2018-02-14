@@ -336,4 +336,16 @@ public class MockMessage implements IMessage {
 		return 0;
 	}
 
+	@Override
+	public Type getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isSystemMessage() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

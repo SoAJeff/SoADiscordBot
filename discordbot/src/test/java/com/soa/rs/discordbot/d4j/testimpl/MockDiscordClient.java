@@ -7,6 +7,7 @@ import java.util.List;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.IShard;
 import sx.blah.discord.api.events.EventDispatcher;
+import sx.blah.discord.handle.obj.ICategory;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IInvite;
@@ -336,6 +337,24 @@ public class MockDiscordClient implements IDiscordClient {
 
 	@Override
 	public IUser getApplicationOwner() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<ICategory> getCategories() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ICategory getCategoryByID(long categoryID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<ICategory> getCategoriesByName(String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
