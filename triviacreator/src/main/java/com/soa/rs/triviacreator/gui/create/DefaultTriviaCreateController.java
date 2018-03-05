@@ -63,7 +63,6 @@ public class DefaultTriviaCreateController implements TriviaCreateController, Tr
 	@Override
 	public void setMode(Mode mode) {
 		this.model.setMode(mode);
-		System.out.println("Mode: " + mode.value());
 	}
 
 	@Override
@@ -113,16 +112,16 @@ public class DefaultTriviaCreateController implements TriviaCreateController, Tr
 		return this.model.getFile();
 	}
 	
+
 	@Override
 	public void save() {
 		this.model.save();
-		
+
 	}
 
 	@Override
 	public void load() {
 		this.model.load();
-		
 	}
 
 	@Override
@@ -151,6 +150,5 @@ public class DefaultTriviaCreateController implements TriviaCreateController, Tr
 		for (TriviaCreateControllerListener listener : listeners)
 			listener.notifyError(msg);
 	}
-
 
 }

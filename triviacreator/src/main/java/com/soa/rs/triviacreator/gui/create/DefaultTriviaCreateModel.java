@@ -14,13 +14,20 @@ import com.soa.rs.triviacreator.util.TriviaFileWriter;
 public class DefaultTriviaCreateModel implements TriviaCreateModel {
 
 	private List<TriviaCreateModelListener> listeners = new ArrayList<TriviaCreateModelListener>();
-	private String name;
-	private String serverId;
-	private String channelId;
+//	private String name;
+//	private String serverId;
+//	private String channelId;
+//	private Mode mode;
+//	private int waitTime;
+//	private String forumUrl;
+//	private List<TriviaQuestion> questions;
+	private String name = null;
+	private String serverId = null;
+	private String channelId = null;
 	private Mode mode;
 	private int waitTime;
 	private String forumUrl;
-	private List<TriviaQuestion> questions;
+	private List<TriviaQuestion> questions = new ArrayList<TriviaQuestion>();
 	private File file;
 
 	@Override
@@ -130,34 +137,38 @@ public class DefaultTriviaCreateModel implements TriviaCreateModel {
 			this.mode = config.getMode();
 			this.waitTime = config.getWaitTime();
 			if (config.getForumUrl() != null || !config.getForumUrl().trim().isEmpty()) {
-				this.forumUrl = config.getForumUrl();
+				if (config.getForumUrl() != null && !config.getForumUrl().trim().isEmpty()) {
+					this.forumUrl = config.getForumUrl();
+				}
+				for (TriviaQuestion question : config.getQuestionBank().getTriviaQuestion()) {
+					this.questions.add(question);
+				}
+
 			}
-			for (TriviaQuestion question : config.getQuestionBank().getTriviaQuestion()) {
-				this.questions.add(question);
-			}
+			notifyLoadCompleted();
 
 		}
-		notifyLoadCompleted();
-
 	}
 
 	@Override
 	public void save() {
-		TriviaConfiguration config = new TriviaConfiguration();
-		config.setTriviaName(this.name);
-		config.setServerId(this.serverId);
-		config.setChannelId(this.channelId);
-		config.setMode(this.mode);
-		config.setWaitTime(this.waitTime);
-		if (this.forumUrl != null || !this.forumUrl.trim().isEmpty()) {
-			config.setForumUrl(this.forumUrl);
-		}
-		config.setQuestionBank(new QuestionBank());
-		for (TriviaQuestion question : this.questions) {
-			config.getQuestionBank().getTriviaQuestion().add(question);
-		}
-		TriviaFileWriter writer = new TriviaFileWriter();
+
 		try {
+			TriviaConfiguration config = new TriviaConfiguration();
+			config.setTriviaName(this.name);
+			config.setServerId(this.serverId);
+			config.setChannelId(this.channelId);
+			config.setMode(this.mode);
+			config.setWaitTime(this.waitTime);
+			if (this.forumUrl != null && !this.forumUrl.trim().isEmpty()) {
+				config.setForumUrl(this.forumUrl);
+			}
+			config.setQuestionBank(new QuestionBank());
+			for (TriviaQuestion question : this.questions) {
+				config.getQuestionBank().getTriviaQuestion().add(question);
+			}
+			TriviaFileWriter writer = new TriviaFileWriter();
+
 			writer.writeTriviaConfigFile(config, this.file);
 		} catch (Exception e) {
 			notifyFailedSave(e.getCause().getMessage());

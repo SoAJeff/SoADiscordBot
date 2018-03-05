@@ -12,6 +12,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -38,12 +41,13 @@ import com.soa.rs.triviacreator.util.DiscordType;
 import com.soa.rs.triviacreator.util.InvalidTriviaConfigurationException;
 import com.soa.rs.triviacreator.util.StringToDiscordPair;
 
-public class TriviaCreatePanel extends JPanel implements TriviaCreateControllerListener {
+public class TriviaCreatePanel extends JPanel implements TriviaCreateControllerListener, TriviaPanel {
 
 	private TriviaCreateController controller;
 	private JTextField triviaNameField;
 	private JComboBox<StringToDiscordPair> serverName;
 	private JComboBox<StringToDiscordPair> channelName;
+	private List<JRadioButton> buttonList = new ArrayList<>();
 	private JTextField waitTimeField;
 	private JTextField forumUrl;
 	private TriviaQuestionTableModel tableModel;
@@ -59,6 +63,7 @@ public class TriviaCreatePanel extends JPanel implements TriviaCreateControllerL
 		this.setLayout(new BorderLayout());
 	}
 
+	@Override
 	public JPanel createPanel() {
 		this.add(buildDataEntryPanel(), BorderLayout.NORTH);
 		this.add(buildQuestionsPanel(), BorderLayout.CENTER);
@@ -137,6 +142,7 @@ public class TriviaCreatePanel extends JPanel implements TriviaCreateControllerL
 
 			}
 		});
+		this.controller.setServerId(((StringToDiscordPair) this.serverName.getSelectedItem()).getId());
 		panel.add(this.serverName, gbc);
 
 		gbc.gridx = 0;
@@ -172,6 +178,7 @@ public class TriviaCreatePanel extends JPanel implements TriviaCreateControllerL
 			}
 
 		});
+		this.controller.setChannelId(((StringToDiscordPair) this.channelName.getSelectedItem()).getId());
 		panel.add(this.channelName, gbc);
 
 		gbc.gridx = 0;
@@ -275,6 +282,7 @@ public class TriviaCreatePanel extends JPanel implements TriviaCreateControllerL
 			});
 			modeGroup.add(btn);
 			panel.add(btn);
+			buttonList.add(btn);
 		}
 		return panel;
 	}
@@ -402,7 +410,7 @@ public class TriviaCreatePanel extends JPanel implements TriviaCreateControllerL
 
 	@Override
 	public void updateSave() {
-		// TODO Auto-generated method stub
+		JOptionPane.showMessageDialog(null, "Save successful!", "Save Successful!", JOptionPane.INFORMATION_MESSAGE);
 
 	}
 
@@ -413,16 +421,64 @@ public class TriviaCreatePanel extends JPanel implements TriviaCreateControllerL
 
 	private void populateData() {
 
+		this.triviaNameField.setText(this.controller.getTriviaName());
+		setComboBox(this.serverName, this.controller.getServerId());
+		setComboBox(this.channelName, this.controller.getChannelId());
+		for (JRadioButton btn : buttonList) {
+			if (btn.getText().equals(this.controller.getMode().toString()))
+				btn.setSelected(true);
+		}
+		this.waitTimeField.setText(Integer.toString(this.controller.getWaitTime()));
+		this.tableModel.setQuestions(this.controller.getQuestions());
+
+	}
+
+	private void setComboBox(JComboBox<StringToDiscordPair> box, String id) {
+		boolean itemFound = false;
+		for (int i = 0; i < box.getItemCount(); i++) {
+			if (id.equals(box.getItemAt(i).getId())) {
+				box.setSelectedIndex(i);
+				itemFound = true;
+				break;
+			}
+		}
+		if (!itemFound) {
+			box.addItem(new StringToDiscordPair(id, id));
+		}
 	}
 
 	@Override
 	public void notifyError(String error) {
-		JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(this, "An error was encountered: " + error, "Error", JOptionPane.ERROR_MESSAGE);
 
 	}
 
 	private void setErrorBorder(JComponent component) {
 		component.setBorder(BorderFactory.createLineBorder(Color.RED));
+	}
+
+	@Override
+	public void handleLoad(File file) {
+		this.controller.setFile(file);
+		this.controller.load();
+
+	}
+
+	@Override
+	public void handleSave() {
+		try {
+			this.controller.setQuestions(this.tableModel.getQuestions());
+			this.controller.save();
+		} catch (Exception e) {
+			notifyError(e.getMessage());
+		}
+
+	}
+
+	@Override
+	public void handleSaveAs(File file) {
+		this.controller.setFile(file);
+		handleSave();
 	}
 
 }
