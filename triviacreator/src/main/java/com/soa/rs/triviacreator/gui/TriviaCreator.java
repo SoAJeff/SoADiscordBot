@@ -10,7 +10,6 @@ import javax.swing.JTabbedPane;
 
 import com.soa.rs.triviacreator.gui.create.DefaultTriviaCreateController;
 import com.soa.rs.triviacreator.gui.create.DefaultTriviaCreateModel;
-import com.soa.rs.triviacreator.gui.create.TriviaPanel;
 import com.soa.rs.triviacreator.gui.create.TriviaCreateController;
 import com.soa.rs.triviacreator.gui.create.TriviaCreateModel;
 import com.soa.rs.triviacreator.gui.create.TriviaCreatePanel;

@@ -1,4 +1,4 @@
-package com.soa.rs.triviacreator.gui.create;
+package com.soa.rs.triviacreator.gui;
 
 import java.io.File;
 

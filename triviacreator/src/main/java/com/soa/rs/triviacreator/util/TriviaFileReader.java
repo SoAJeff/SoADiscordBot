@@ -16,6 +16,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 
+import com.soa.rs.triviacreator.jaxb.TriviaAnswers;
 import com.soa.rs.triviacreator.jaxb.TriviaConfiguration;
 
 /**
@@ -57,6 +58,22 @@ public class TriviaFileReader {
 		config = (TriviaConfiguration) jaxbElement.getValue();
 
 		return config;
+	}
+
+	public TriviaAnswers loadTriviaAnswerFile(File file) throws JAXBException, SAXException {
+		TriviaAnswers answers = null;
+		JAXBContext jaxbContext = JAXBContext.newInstance("com.soa.rs.triviacreator.jaxb");
+
+		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		Schema schema = sf.newSchema(this.getClass().getResource("/xsd/triviaAnswers.xsd"));
+
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		jaxbUnmarshaller.setSchema(schema);
+
+		JAXBElement<?> jaxbElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(file);
+		answers = (TriviaAnswers) jaxbElement.getValue();
+
+		return answers;
 	}
 
 	/**

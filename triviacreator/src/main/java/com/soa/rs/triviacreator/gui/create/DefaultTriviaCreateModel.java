@@ -14,13 +14,6 @@ import com.soa.rs.triviacreator.util.TriviaFileWriter;
 public class DefaultTriviaCreateModel implements TriviaCreateModel {
 
 	private List<TriviaCreateModelListener> listeners = new ArrayList<TriviaCreateModelListener>();
-//	private String name;
-//	private String serverId;
-//	private String channelId;
-//	private Mode mode;
-//	private int waitTime;
-//	private String forumUrl;
-//	private List<TriviaQuestion> questions;
 	private String name = null;
 	private String serverId = null;
 	private String channelId = null;

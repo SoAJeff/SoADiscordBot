@@ -36,6 +36,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import com.soa.rs.triviacreator.gui.TriviaPanel;
 import com.soa.rs.triviacreator.jaxb.Mode;
 import com.soa.rs.triviacreator.util.DiscordType;
 import com.soa.rs.triviacreator.util.InvalidTriviaConfigurationException;
@@ -410,7 +411,8 @@ public class TriviaCreatePanel extends JPanel implements TriviaCreateControllerL
 
 	@Override
 	public void updateSave() {
-		JOptionPane.showMessageDialog(null, "Save successful!", "Save Successful!", JOptionPane.INFORMATION_MESSAGE);
+		SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, "Save successful!", "Save Successful!",
+				JOptionPane.INFORMATION_MESSAGE));
 
 	}
 
@@ -449,7 +451,8 @@ public class TriviaCreatePanel extends JPanel implements TriviaCreateControllerL
 
 	@Override
 	public void notifyError(String error) {
-		JOptionPane.showMessageDialog(this, "An error was encountered: " + error, "Error", JOptionPane.ERROR_MESSAGE);
+		SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(TriviaCreatePanel.this,
+				"An error was encountered: " + error, "Error", JOptionPane.ERROR_MESSAGE));
 
 	}
 
