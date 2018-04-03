@@ -8,6 +8,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import com.soa.rs.triviacreator.gui.answer.DefaultTriviaAnswerController;
+import com.soa.rs.triviacreator.gui.answer.DefaultTriviaAnswerModel;
+import com.soa.rs.triviacreator.gui.answer.TriviaAnswerController;
+import com.soa.rs.triviacreator.gui.answer.TriviaAnswerModel;
+import com.soa.rs.triviacreator.gui.answer.TriviaAnswerPanel;
 import com.soa.rs.triviacreator.gui.create.DefaultTriviaCreateController;
 import com.soa.rs.triviacreator.gui.create.DefaultTriviaCreateModel;
 import com.soa.rs.triviacreator.gui.create.TriviaCreateController;
@@ -38,7 +43,7 @@ public class TriviaCreator implements MenuListener {
 		frame.add(tabPanel);
 		frame.setTitle("Trivia Creator");
 		frame.pack();
-		frame.setMinimumSize(new Dimension(500, 500));
+		frame.setMinimumSize(new Dimension(800, 800));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 
@@ -49,6 +54,8 @@ public class TriviaCreator implements MenuListener {
 		try {
 			if (ConfigFileTypeValidator.getPanelTypeForFile(file) == PanelType.TRIVIA_CREATE)
 				createNewTabbedPanel(PanelType.TRIVIA_CREATE, file);
+			else
+				createNewTabbedPanel(PanelType.TRIVIA_ANSWER, file);
 		} catch (Exception e) {
 			// something...
 		}
@@ -84,7 +91,16 @@ public class TriviaCreator implements MenuListener {
 			if (file != null)
 				panel.handleLoad(file);
 
+		} else if (type == PanelType.TRIVIA_ANSWER) {
+			if (file != null) {
+				TriviaAnswerModel model = new DefaultTriviaAnswerModel();
+				TriviaAnswerController controller = new DefaultTriviaAnswerController(model);
+				TriviaAnswerPanel panel = new TriviaAnswerPanel(controller);
+				tabbedPane.addTab(file.getName(), panel.createPanel());
+				panel.handleLoad(file);
+			}
 		}
+		tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 
 	}
 
