@@ -3,6 +3,7 @@ package com.soa.rs.triviacreator.gui.answer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.soa.rs.triviacreator.jaxb.TriviaAnswers;
 
@@ -34,6 +35,26 @@ public class DefaultTriviaAnswerController implements TriviaAnswerController, Tr
 	@Override
 	public TriviaAnswers getAnswers() {
 		return this.model.getAnswers();
+	}
+
+	@Override
+	public int getTotalAnswersSubmitted() {
+		return this.model.getTotalAnswersSubmitted();
+	}
+
+	@Override
+	public void generateTotalParticipantSet() {
+		this.model.generateTotalParticipantSet();
+	}
+
+	@Override
+	public int getTotalParticipants() {
+		return this.model.getTotalParticipants();
+	}
+
+	@Override
+	public Set<String> getAllParticipantNames() {
+		return this.model.getAllParticipantNames();
 	}
 
 	@Override

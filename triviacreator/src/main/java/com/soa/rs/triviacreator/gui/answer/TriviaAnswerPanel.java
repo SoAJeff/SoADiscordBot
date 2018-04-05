@@ -4,8 +4,13 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -39,6 +44,10 @@ public class TriviaAnswerPanel extends JPanel implements TriviaPanel, TriviaAnsw
 	private TriviaAnswerTableModel tableModel;
 	private JTextArea questionArea = new JTextArea();
 	private JTextArea answerArea = new JTextArea();
+	private JLabel questionSummaryLabel;
+	private JLabel answerSummaryLabel;
+	private JLabel totalParticipantsSummaryLabel;
+	private JTextArea participantsSummaryTextArea;
 	private static final String SUMMARY = "Summary";
 	private static final String ANSWERBANK = "Answer Bank";
 
@@ -101,7 +110,38 @@ public class TriviaAnswerPanel extends JPanel implements TriviaPanel, TriviaAnsw
 	}
 
 	private JPanel createSummaryPanel() {
-		JPanel panel = new JPanel();
+		JPanel panel = new JPanel(new BorderLayout());
+		TitledBorder border = new TitledBorder("Trivia Summary");
+		panel.setBorder(border);
+
+		JPanel topPanel = new JPanel(new GridLayout(4, 1));
+		this.questionSummaryLabel = new JLabel("Questions asked: ");
+		topPanel.add(this.questionSummaryLabel);
+		this.answerSummaryLabel = new JLabel("Total Answers submitted: ");
+		topPanel.add(this.answerSummaryLabel);
+		this.totalParticipantsSummaryLabel = new JLabel("Total Participants: ");
+		topPanel.add(this.totalParticipantsSummaryLabel);
+		panel.add(topPanel, BorderLayout.NORTH);
+
+		JPanel participantsPanel = new JPanel(new BorderLayout());
+		TitledBorder participantsBorder = new TitledBorder("List of Participants");
+		participantsPanel.setBorder(participantsBorder);
+		this.participantsSummaryTextArea = new JTextArea();
+		this.participantsSummaryTextArea.setEditable(false);
+		this.participantsSummaryTextArea.setBackground(UIManager.getColor("Label.background"));
+		JScrollPane pane = new JScrollPane(this.participantsSummaryTextArea);
+		participantsPanel.add(pane, BorderLayout.CENTER);
+		panel.add(participantsPanel, BorderLayout.CENTER);
+
+		JPanel buttonPanel = new JPanel();
+		JButton copyParticipantsButton = new JButton("Copy Participants List");
+		copyParticipantsButton.addActionListener((event) -> {
+			StringSelection clip = new StringSelection(participantsSummaryTextArea.getText());
+			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clip, clip);
+		});
+		buttonPanel.add(copyParticipantsButton);
+		panel.add(buttonPanel, BorderLayout.SOUTH);
+
 		return panel;
 	}
 
@@ -156,6 +196,19 @@ public class TriviaAnswerPanel extends JPanel implements TriviaPanel, TriviaAnsw
 
 	private void handlePopulate() {
 		this.titleLabel.setText(this.titleLabel.getText() + this.controller.getAnswers().getTriviaName());
+		this.questionSummaryLabel.setText(this.questionSummaryLabel.getText()
+				+ this.controller.getAnswers().getAnswerBank().getTriviaQuestion().size());
+		this.controller.generateTotalParticipantSet();
+		this.answerSummaryLabel.setText(this.answerSummaryLabel.getText() + this.controller.getTotalAnswersSubmitted());
+		this.totalParticipantsSummaryLabel
+				.setText(this.totalParticipantsSummaryLabel.getText() + this.controller.getTotalParticipants());
+
+		StringBuilder sb = new StringBuilder();
+		for (String participant : this.controller.getAllParticipantNames()) {
+			sb.append(participant);
+			sb.append("\n");
+		}
+		this.participantsSummaryTextArea.setText(sb.toString().trim());
 		createTreeNodes();
 	}
 
