@@ -1,7 +1,9 @@
 package com.soa.rs.triviacreator.gui.create;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -53,13 +55,32 @@ public class TriviaQuestionEditorDialog {
 
 	private JPanel createTextPanel() {
 		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(2, 2));
-		panel.add(new JLabel("Trivia Question: "));
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = gbc.NORTHWEST;
+		gbc.weightx = 3;
+		gbc.insets = new Insets(5, 5, 5, 5);
+
+		panel.add(new JLabel("Trivia Question: "), gbc);
+
+		gbc.gridx++;
+		gbc.weightx = 10;
+
 		this.questionField = new JTextField(20);
-		panel.add(this.questionField);
-		panel.add(new JLabel("Trivia Answer: "));
+		panel.add(this.questionField, gbc);
+
+		gbc.gridx = 0;
+		gbc.gridy++;
+		gbc.weightx = 3;
+		panel.add(new JLabel("Trivia Answer: "), gbc);
+
+		gbc.gridx++;
+		gbc.weightx = 10;
 		this.answerField = new JTextField(20);
-		panel.add(this.answerField);
+		panel.add(this.answerField, gbc);
+
 		return panel;
 	}
 
@@ -69,6 +90,7 @@ public class TriviaQuestionEditorDialog {
 		okButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
 				question = new TriviaQuestion();
 				if (!questionField.getText().trim().isEmpty() && !questionField.getText().trim().isEmpty()) {
 					question.setQuestion(questionField.getText());
@@ -86,6 +108,7 @@ public class TriviaQuestionEditorDialog {
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
 				dialog.dispose();
 			}
 		});

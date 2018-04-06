@@ -1,7 +1,9 @@
 package com.soa.rs.triviacreator.gui.create;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -12,7 +14,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
 import com.soa.rs.triviacreator.util.DiscordType;
 import com.soa.rs.triviacreator.util.InvalidTriviaConfigurationException;
@@ -47,17 +48,33 @@ public class CreateDiscordPairDialog {
 
 	private JPanel dataEntryPanel() {
 		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(2, 2));
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.anchor = gbc.NORTHWEST;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.insets = new Insets(5, 5, 5, 5);
+
 		JLabel nameLabel = new JLabel(this.type.getType() + " Name: ");
-		nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		panel.add(nameLabel);
+		gbc.weightx = 3;
+		panel.add(nameLabel, gbc);
+
+		gbc.gridx++;
+		gbc.weightx = 10;
 		this.nameField = new JTextField(20);
-		panel.add(this.nameField);
+		panel.add(this.nameField, gbc);
+
+		gbc.gridx = 0;
+		gbc.gridy++;
+		gbc.weightx = 3;
 		JLabel idLabel = new JLabel(this.type.getType() + "'s Discord ID: ");
-		idLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		panel.add(idLabel);
+		panel.add(idLabel, gbc);
+
+		gbc.gridx++;
+		gbc.weightx = 10;
 		this.idField = new JTextField(20);
-		panel.add(this.idField);
+		panel.add(this.idField, gbc);
+
 		return panel;
 	}
 
