@@ -13,14 +13,14 @@ import com.soa.rs.triviacreator.util.TriviaFileWriter;
 
 public class DefaultTriviaCreateModel implements TriviaCreateModel {
 
-	private List<TriviaCreateModelListener> listeners = new ArrayList<TriviaCreateModelListener>();
+	private List<TriviaCreateModelListener> listeners = new ArrayList<>();
 	private String name = null;
 	private String serverId = null;
 	private String channelId = null;
 	private Mode mode;
 	private int waitTime;
 	private String forumUrl;
-	private List<TriviaQuestion> questions = new ArrayList<TriviaQuestion>();
+	private List<TriviaQuestion> questions = new ArrayList<>();
 	private File file;
 
 	@Override
@@ -129,15 +129,11 @@ public class DefaultTriviaCreateModel implements TriviaCreateModel {
 			this.channelId = config.getChannelId();
 			this.mode = config.getMode();
 			this.waitTime = config.getWaitTime();
-			if (config.getForumUrl() != null || !config.getForumUrl().trim().isEmpty()) {
-				if (config.getForumUrl() != null && !config.getForumUrl().trim().isEmpty()) {
-					this.forumUrl = config.getForumUrl();
-				}
-				for (TriviaQuestion question : config.getQuestionBank().getTriviaQuestion()) {
-					this.questions.add(question);
-				}
-
+			if (config.getForumUrl() != null && !config.getForumUrl().trim().isEmpty()) {
+				this.forumUrl = config.getForumUrl();
 			}
+			this.questions.addAll(config.getQuestionBank().getTriviaQuestion());
+
 			notifyLoadCompleted();
 
 		}
@@ -157,9 +153,7 @@ public class DefaultTriviaCreateModel implements TriviaCreateModel {
 				config.setForumUrl(this.forumUrl);
 			}
 			config.setQuestionBank(new QuestionBank());
-			for (TriviaQuestion question : this.questions) {
-				config.getQuestionBank().getTriviaQuestion().add(question);
-			}
+			config.getQuestionBank().getTriviaQuestion().addAll(this.questions);
 			TriviaFileWriter writer = new TriviaFileWriter();
 
 			writer.writeTriviaConfigFile(config, this.file);

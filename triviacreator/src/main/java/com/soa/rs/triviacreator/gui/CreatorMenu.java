@@ -9,6 +9,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.soa.rs.triviacreator.util.PanelType;
@@ -86,9 +87,9 @@ public class CreatorMenu extends JMenuBar {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int confirm = JOptionPane.showConfirmDialog(null,
-						"Are you sure you want to quit?  Ensure all files have been saved.", "Are you sure?",
-						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				int confirm = JOptionPane
+						.showConfirmDialog(null, "Are you sure you want to quit?  Ensure all files have been saved.",
+								"Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if (confirm == JOptionPane.YES_OPTION)
 					System.exit(0);
 
@@ -118,17 +119,38 @@ public class CreatorMenu extends JMenuBar {
 			returnValue = chooser.showOpenDialog(null);
 		else
 			returnValue = chooser.showSaveDialog(null);
-		if (returnValue == JFileChooser.APPROVE_OPTION)
-		{
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
 			String filepath = chooser.getSelectedFile().getAbsolutePath();
-			if(!filepath.endsWith(".xml"))
-			{
+			if (!filepath.endsWith(".xml")) {
 				filepath = filepath + ".xml";
 			}
 			return new File(filepath);
-		}
-		else
+		} else
 			return null;
+	}
+
+	public void toggleSaveOptionsEnabled(boolean enabled) {
+		SwingUtilities.invokeLater(() -> {
+			if (enabled) {
+				this.saveConfigButton.setEnabled(true);
+				this.saveAsConfigButton.setEnabled(true);
+			} else {
+				this.saveConfigButton.setEnabled(false);
+				this.saveAsConfigButton.setEnabled(false);
+			}
+		});
+	}
+
+	public void toggleCloseOptionEnabled(boolean enabled) {
+		SwingUtilities.invokeLater(() -> {
+
+			if (enabled) {
+				this.closeTabConfigButton.setEnabled(true);
+			} else {
+				this.closeTabConfigButton.setEnabled(false);
+			}
+		});
+
 	}
 
 }

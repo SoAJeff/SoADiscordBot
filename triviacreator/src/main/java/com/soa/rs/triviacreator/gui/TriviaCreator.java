@@ -1,12 +1,16 @@
 package com.soa.rs.triviacreator.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.io.File;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import com.soa.rs.triviacreator.gui.answer.DefaultTriviaAnswerController;
 import com.soa.rs.triviacreator.gui.answer.DefaultTriviaAnswerModel;
@@ -35,16 +39,19 @@ public class TriviaCreator implements MenuListener {
 	public void initialize() {
 		this.frame = new JFrame();
 		menu = new CreatorMenu(this);
+		menu.toggleSaveOptionsEnabled(false);
 		this.frame.setJMenuBar(menu);
 		JPanel tabPanel = new JPanel();
 		tabPanel.setLayout(new GridLayout(1, 1));
 		tabbedPane = new JTabbedPane();
+		tabbedPane.addChangeListener(e -> handleSelectedTabChanged());
 		tabPanel.add(tabbedPane);
 		frame.add(tabPanel);
 		frame.setTitle("Trivia Creator");
 		frame.pack();
 		frame.setMinimumSize(new Dimension(800, 800));
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new TriviaCreatorWindowListener());
 		frame.setVisible(true);
 
 	}
@@ -57,7 +64,7 @@ public class TriviaCreator implements MenuListener {
 			else
 				createNewTabbedPanel(PanelType.TRIVIA_ANSWER, file);
 		} catch (Exception e) {
-			// something...
+			notifyLoadError(e);
 		}
 
 	}
@@ -81,6 +88,7 @@ public class TriviaCreator implements MenuListener {
 	@Override
 	public void createNewTabbedPanel(PanelType type, File file) {
 		String tabName = "New Config";
+		System.out.println("Beginning of create new tabbed panel");
 		if (type == PanelType.TRIVIA_CREATE) {
 			TriviaCreateModel model = new DefaultTriviaCreateModel();
 			TriviaCreateController controller = new DefaultTriviaCreateController(model);
@@ -101,6 +109,7 @@ public class TriviaCreator implements MenuListener {
 			}
 		}
 		tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+		menu.toggleCloseOptionEnabled(true);
 
 	}
 
@@ -109,8 +118,36 @@ public class TriviaCreator implements MenuListener {
 		try {
 			tabbedPane.remove(tabbedPane.getSelectedIndex());
 		} catch (IndexOutOfBoundsException e) {
+			notifyError("Unable to close tab, " + e.getMessage());
+		} finally {
+			if (tabbedPane.getTabCount() == 0) {
+				menu.toggleCloseOptionEnabled(false);
+				menu.toggleSaveOptionsEnabled(false);
+			}
+
 		}
 
+	}
+
+	private void handleSelectedTabChanged() {
+		if (tabbedPane.getTabCount() > 0) {
+			Component component = tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
+			if (component instanceof TriviaCreatePanel) {
+				menu.toggleSaveOptionsEnabled(true);
+			} else {
+				menu.toggleSaveOptionsEnabled(false);
+			}
+		}
+	}
+
+	private void notifyLoadError(Exception e)
+	{
+		SwingUtilities.invokeLater(()-> JOptionPane.showMessageDialog(frame, "Error loading file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE));
+	}
+
+	private void notifyError(String message)
+	{
+		SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(frame, "An error has occurred: " + message, "Error", JOptionPane.ERROR_MESSAGE));
 	}
 
 }
