@@ -38,7 +38,7 @@ public class TriviaCreator implements MenuListener {
 		creator.initialize();
 	}
 
-	public void initialize() {
+	private void initialize() {
 		this.frame = new JFrame();
 		menu = new CreatorMenu(this);
 		menu.toggleSaveOptionsEnabled(false);
@@ -118,7 +118,20 @@ public class TriviaCreator implements MenuListener {
 	}
 
 	@Override
-	public void closeTab() {
+	public void handleCloseTab() {
+		//Prompt to save if the tab is a configuration - we don't need to prompt on Welcome or Answers.
+		if (tabbedPane.getSelectedComponent() instanceof TriviaCreatePanel) {
+			int confirm = JOptionPane.showConfirmDialog(frame,
+					"Are you sure you want to close this tab?  Ensure your configuration is saved before clicking Yes.",
+					"Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+			if (confirm == JOptionPane.YES_OPTION)
+				closeTab();
+		} else {
+			closeTab();
+		}
+	}
+
+	private void closeTab() {
 		try {
 			tabbedPane.remove(tabbedPane.getSelectedIndex());
 		} catch (IndexOutOfBoundsException e) {
@@ -130,7 +143,6 @@ public class TriviaCreator implements MenuListener {
 			}
 
 		}
-
 	}
 
 	@Override

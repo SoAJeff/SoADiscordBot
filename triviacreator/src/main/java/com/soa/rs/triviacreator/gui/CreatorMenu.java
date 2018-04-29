@@ -58,7 +58,7 @@ public class CreatorMenu extends JMenuBar {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				listener.closeTab();
+				listener.handleCloseTab();
 			}
 		});
 
