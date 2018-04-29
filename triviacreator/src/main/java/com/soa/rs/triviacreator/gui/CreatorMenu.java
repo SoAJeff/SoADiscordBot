@@ -4,14 +4,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.soa.rs.triviacreator.util.FilePromptUtility;
 import com.soa.rs.triviacreator.util.PanelType;
 
 public class CreatorMenu extends JMenuBar {
@@ -24,9 +22,11 @@ public class CreatorMenu extends JMenuBar {
 	private JMenuItem saveConfigButton;
 	private JMenuItem saveAsConfigButton;
 	private JMenuItem exitButton;
+	private FilePromptUtility filePromptUtility;
 
 	public CreatorMenu(MenuListener listener) {
 		this.listener = listener;
+		this.filePromptUtility = new FilePromptUtility();
 		this.add(createFileMenu());
 	}
 
@@ -46,7 +46,7 @@ public class CreatorMenu extends JMenuBar {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				File loadFile = promptForFile("Open file...", true);
+				File loadFile = filePromptUtility.promptForFile("Open file...", true);
 				if (loadFile != null)
 					listener.loadFile(loadFile);
 
@@ -76,7 +76,7 @@ public class CreatorMenu extends JMenuBar {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				File saveFile = promptForFile("Save file...", false);
+				File saveFile = filePromptUtility.promptForFile("Save file...", false);
 				if (saveFile != null)
 					listener.saveAsFile(saveFile);
 			}
@@ -87,12 +87,7 @@ public class CreatorMenu extends JMenuBar {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int confirm = JOptionPane
-						.showConfirmDialog(null, "Are you sure you want to quit?  Ensure all files have been saved.",
-								"Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-				if (confirm == JOptionPane.YES_OPTION)
-					System.exit(0);
-
+				listener.askToCloseApplication();
 			}
 		});
 
@@ -106,27 +101,6 @@ public class CreatorMenu extends JMenuBar {
 		this.fileMenu.addSeparator();
 		this.fileMenu.add(this.exitButton);
 		return this.fileMenu;
-	}
-
-	private File promptForFile(String title, boolean load) {
-		JFileChooser chooser = new JFileChooser();
-		chooser.setDialogTitle(title);
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.setMultiSelectionEnabled(false);
-		chooser.setFileFilter(new FileNameExtensionFilter("XML file", "xml"));
-		int returnValue;
-		if (load)
-			returnValue = chooser.showOpenDialog(null);
-		else
-			returnValue = chooser.showSaveDialog(null);
-		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			String filepath = chooser.getSelectedFile().getAbsolutePath();
-			if (!filepath.endsWith(".xml")) {
-				filepath = filepath + ".xml";
-			}
-			return new File(filepath);
-		} else
-			return null;
 	}
 
 	public void toggleSaveOptionsEnabled(boolean enabled) {

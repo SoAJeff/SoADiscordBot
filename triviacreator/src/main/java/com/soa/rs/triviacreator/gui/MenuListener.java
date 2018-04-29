@@ -15,5 +15,7 @@ public interface MenuListener {
 	public void createNewTabbedPanel(PanelType type, File file);
 	
 	public void closeTab();
+
+	public void askToCloseApplication();
 	
 }

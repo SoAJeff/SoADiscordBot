@@ -24,7 +24,7 @@ public class ConfigFileTypeValidator {
 	}
 
 	private static boolean validateSchema(Source xmlFile, SchemaFactory schemaFactory, String xsdPath) {
-		boolean retval = false;
+		boolean retval;
 		try {
 			Schema schema = schemaFactory.newSchema(ConfigFileTypeValidator.class.getResource(xsdPath));
 
@@ -32,7 +32,8 @@ public class ConfigFileTypeValidator {
 			validator.validate(xmlFile);
 			retval = true;
 		} catch (Exception e) {
-			e.printStackTrace();
+			retval = false;
+//			e.printStackTrace();
 
 		}
 		return retval;
