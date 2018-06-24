@@ -1,6 +1,7 @@
 package com.soa.rs.discordbot.test;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 
 import org.junit.Assert;
@@ -48,6 +49,15 @@ public class DateAnalyzerTest {
 		Assert.assertEquals(DateAnalyzer.daysBetween(cal1.getTime(), cal4.getTime()), 3);
 		Assert.assertEquals(DateAnalyzer.daysBetween(cal1.getTime(), cal5.getTime()), 0);
 
+	}
+
+	@Test
+	public void testMultipleTimeZones() {
+		//For use during test, this sets the time to 23 June 2018, 7:43 PM EDT
+		Date date = new Date(1529797404281L);
+
+		Assert.assertEquals("23-Jun 19:43 EDT | 23-Jun 23:43 UTC (Game time) | 24-Jun 09:43 AEST",
+				DateAnalyzer.showMultipleTimezonesForEvent(date));
 	}
 
 }

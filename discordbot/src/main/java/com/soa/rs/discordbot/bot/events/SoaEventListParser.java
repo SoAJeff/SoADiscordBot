@@ -104,7 +104,7 @@ public class SoaEventListParser extends SoaDefaultRssParser {
 				// Today's events
 				else if (DateAnalyzer.isSameDay(cal1, cal2)) {
 					sb.append("Event Title: " + entry.getTitle());
-					sb.append("\nEvent Date: " + sdf.format(entry.getPublishedDate()));
+					sb.append("\nEvent Date: " + DateAnalyzer.showMultipleTimezonesForEvent(entry.getPublishedDate()));
 					sb.append("\nFor details, visit: <" + entry.getLink() + ">");
 					sb.append("\n\n");
 					i++;

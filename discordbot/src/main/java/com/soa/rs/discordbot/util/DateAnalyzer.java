@@ -1,7 +1,9 @@
 package com.soa.rs.discordbot.util;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * The DateAnalyzer handles simple tasks such as determining if a date is on the
@@ -61,6 +63,34 @@ public class DateAnalyzer {
 	 */
 	public static int daysBetween(Date d1, Date d2) {
 		return (int) ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+	}
+
+	/**
+	 * Shows a date in multiple time zones.  Currently will show times in Eastern, UTC, and Australian Eastern
+	 * @param date Date object to convert into timezones
+	 * @return A string containing the date in the timezones.
+	 */
+	public static String showMultipleTimezonesForEvent(Date date)
+	{
+		StringBuilder sb = new StringBuilder();
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM HH:mm z");
+		sdf.setTimeZone(TimeZone.getTimeZone("America/New_York"));
+
+		sb.append(sdf.format(date));
+		sb.append(" | ");
+
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		sb.append(sdf.format(date));
+		sb.append(" (Game time)");
+		sb.append(" | ");
+
+		sdf.setTimeZone(TimeZone.getTimeZone("Australia/Sydney"));
+
+		sb.append(sdf.format(date));
+
+		return sb.toString();
 	}
 
 }
