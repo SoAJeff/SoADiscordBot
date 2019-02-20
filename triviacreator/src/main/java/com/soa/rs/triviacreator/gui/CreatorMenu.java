@@ -4,11 +4,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
+import com.soa.rs.triviacreator.gui.help.HelpViewerDialog;
 import com.soa.rs.triviacreator.util.FilePromptUtility;
 import com.soa.rs.triviacreator.util.PanelType;
 
@@ -22,12 +24,16 @@ public class CreatorMenu extends JMenuBar {
 	private JMenuItem saveConfigButton;
 	private JMenuItem saveAsConfigButton;
 	private JMenuItem exitButton;
+	private JMenu helpMenu;
+	private JMenuItem helpItem;
 	private FilePromptUtility filePromptUtility;
 
 	public CreatorMenu(MenuListener listener) {
 		this.listener = listener;
 		this.filePromptUtility = new FilePromptUtility();
 		this.add(createFileMenu());
+		this.add(createHelpMenu());
+
 	}
 
 	private JMenu createFileMenu() {
@@ -101,6 +107,24 @@ public class CreatorMenu extends JMenuBar {
 		this.fileMenu.addSeparator();
 		this.fileMenu.add(this.exitButton);
 		return this.fileMenu;
+	}
+
+	private JMenu createHelpMenu()
+	{
+		this.helpMenu = new JMenu("Help");
+
+		this.helpItem = new JMenuItem("Open Help");
+		this.helpItem.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new HelpViewerDialog(new JFrame(), null);
+			}
+		});
+
+		this.helpMenu.add(this.helpItem);
+
+		return this.helpMenu;
 	}
 
 	public void toggleSaveOptionsEnabled(boolean enabled) {

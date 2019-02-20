@@ -54,7 +54,7 @@ public class SoaDiscordBot {
 	 */
 	private IDiscordClient loginClient() throws DiscordException {
 		ClientBuilder clientBuilder = new ClientBuilder();
-		clientBuilder.withToken(DiscordCfgFactory.getConfig().getDiscordToken());
+		clientBuilder.withToken(DiscordCfgFactory.getConfig().getDiscordToken()).setMaxReconnectAttempts(1000);
 		return clientBuilder.login();
 	}
 

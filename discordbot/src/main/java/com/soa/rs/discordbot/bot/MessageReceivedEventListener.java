@@ -1,11 +1,14 @@
 package com.soa.rs.discordbot.bot;
 
+import com.soa.rs.discordbot.bot.events.BenIsNoobEvent;
+import com.soa.rs.discordbot.bot.events.OldWikiEvent;
 import com.soa.rs.discordbot.bot.events.SoaAdminEvent;
 import com.soa.rs.discordbot.bot.events.SoaBotInfoEvent;
 import com.soa.rs.discordbot.bot.events.SoaDjPlsEvent;
 import com.soa.rs.discordbot.bot.events.SoaEventListerTask;
 import com.soa.rs.discordbot.bot.events.SoaHelpEvent;
 import com.soa.rs.discordbot.bot.events.SoaMusicPlayer;
+import com.soa.rs.discordbot.bot.events.UserBanEvent;
 import com.soa.rs.discordbot.bot.events.UserTrackingQuery;
 import com.soa.rs.discordbot.bot.events.trivia.TriviaManager;
 import com.soa.rs.discordbot.cfg.DiscordCfgFactory;
@@ -36,6 +39,8 @@ public class MessageReceivedEventListener implements IListener<MessageReceivedEv
 	private SoaEventListerTask eventListerTask = null;
 
 	private TriviaManager triviaManager = null;
+
+	private OldWikiEvent wikiEvent;
 
 	/**
 	 * Handles the MessageReceivedEvent
@@ -123,6 +128,17 @@ public class MessageReceivedEventListener implements IListener<MessageReceivedEv
 
 			}
 
+			//Ban will use admin permissions
+			else if (args[0].equalsIgnoreCase("ban")) {
+				if (DiscordCfgFactory.getConfig().getAdminEvent() != null && DiscordCfgFactory.getConfig()
+						.getAdminEvent().isEnabled()) {
+					UserBanEvent banEvent = new UserBanEvent(event);
+					banEvent.setMustHavePermission(
+							DiscordCfgFactory.getConfig().getAdminEvent().getAllowedRoles().getRole());
+					banEvent.executeEvent();
+				}
+			}
+
 			else if (args[0].equalsIgnoreCase("help")) {
 				SoaHelpEvent helpEvent = new SoaHelpEvent(event);
 				helpEvent.executeEvent();
@@ -135,7 +151,21 @@ public class MessageReceivedEventListener implements IListener<MessageReceivedEv
 				SoaDjPlsEvent djPlsEvent = new SoaDjPlsEvent(event);
 				djPlsEvent.executeEvent();
 			}
+		} //259152327800389632L = Ben
+		else if (msg.getMentions().contains(event.getClient().getUserByID(259152327800389632L)) && msg.getContent().toLowerCase().contains("noob"))
+		{
+			BenIsNoobEvent benEvent = new BenIsNoobEvent(event);
+			benEvent.executeEvent();
 		}
+
+		if(wikiEvent == null)
+		{
+			wikiEvent= new OldWikiEvent(event);
+		}
+		else {
+			wikiEvent.setEvent(event);
+		}
+		wikiEvent.executeEvent();
 
 	}
 }

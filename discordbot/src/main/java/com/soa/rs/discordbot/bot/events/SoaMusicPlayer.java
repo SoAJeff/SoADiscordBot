@@ -43,7 +43,7 @@ public class SoaMusicPlayer {
 	private IMessage msg;
 	private final AudioPlayerManager playerManager;
 	private final Map<Long, GuildMusicManager> musicManagers;
-	private boolean disableRankCheck = false;
+	private boolean disableRankCheck = true;
 
 	public SoaMusicPlayer(IMessage msg) {
 		this.playerManager = new DefaultAudioPlayerManager();
@@ -57,9 +57,8 @@ public class SoaMusicPlayer {
 
 	/**
 	 * Sets the message parameter for the music player event
-	 * 
-	 * @param msg
-	 *            IMessage object for the received message
+	 *
+	 * @param msg IMessage object for the received message
 	 */
 	public void setMsg(IMessage msg) {
 		this.msg = msg;
@@ -68,9 +67,8 @@ public class SoaMusicPlayer {
 	/**
 	 * Get the GuildMusicManager for the provided guild. If one does not exist, one
 	 * will be created.
-	 * 
-	 * @param guild
-	 *            The guild for which a music manager will be retrieved
+	 *
+	 * @param guild The guild for which a music manager will be retrieved
 	 * @return The music manager for the guild
 	 */
 	private synchronized GuildMusicManager getGuildAudioPlayer(IGuild guild) {
@@ -90,9 +88,8 @@ public class SoaMusicPlayer {
 	/**
 	 * Checks to determine if the person who has issued a music command is permitted
 	 * to run the MusicPlayer
-	 * 
-	 * @param event
-	 *            MessageReceivedEvent
+	 *
+	 * @param event MessageReceivedEvent
 	 * @return true if user is allowed to issue these commands, false otherwise
 	 */
 	private boolean checkMusicRoles(MessageReceivedEvent event) {
@@ -129,17 +126,15 @@ public class SoaMusicPlayer {
 
 	/**
 	 * Handles the arguments sent to the MusicPlayer.
-	 * 
-	 * @param event
-	 *            MessageReceivedEvent
-	 * @param args
-	 *            The additional arguments other than ".music" sent to the bot.
+	 *
+	 * @param event MessageReceivedEvent
+	 * @param args  The additional arguments other than ".music" sent to the bot.
 	 */
 	public void handleMusicArgs(MessageReceivedEvent event, String[] args) {
 
 		StringBuilder sb = new StringBuilder();
-		if (!checkMusicRoles(event) && !args[1].equalsIgnoreCase("playlist")
-				&& !args[1].equalsIgnoreCase("nowplaying")) {
+		if (!checkMusicRoles(event) && !args[1].equalsIgnoreCase("playlist") && !args[1]
+				.equalsIgnoreCase("nowplaying")) {
 			sb.append(event.getMessage().getAuthor().getName());
 			sb.append(" attempted to run a music command but did not have the appropriate rank.");
 			SoaLogging.getLogger().info(sb.toString());
@@ -209,8 +204,12 @@ public class SoaMusicPlayer {
 		}
 
 		if (message.equals("skip")) {
+			int skipVal = 1;
+			if (args.length == 3) {
+				skipVal = Integer.parseInt(args[2]);
+			}
 			SoaLogging.getLogger().info(sb.toString());
-			handleSkip(event.getMessage().getChannel());
+			handleSkip(event.getMessage().getChannel(), skipVal);
 		}
 
 		if (message.equals("volume")) {
@@ -222,8 +221,8 @@ public class SoaMusicPlayer {
 		}
 		if (message.equalsIgnoreCase("disableRankCheck")) {
 
-			if (SoaClientHelper.isRank(msg,
-					DiscordCfgFactory.getConfig().getMusicPlayer().getCanDisableRankCheck().getRole())) {
+			if (SoaClientHelper
+					.isRank(msg, DiscordCfgFactory.getConfig().getMusicPlayer().getCanDisableRankCheck().getRole())) {
 				if (args[2].equals("true")) {
 					disableRankCheck = true;
 				} else if (args[2].equals("false")) {
@@ -238,11 +237,9 @@ public class SoaMusicPlayer {
 
 	/**
 	 * Handle playing a music track
-	 * 
-	 * @param args
-	 *            The arguments containing the track to play
-	 * @param channel
-	 *            The text channel the command was entered in
+	 *
+	 * @param args    The arguments containing the track to play
+	 * @param channel The text channel the command was entered in
 	 */
 	private void handlePlay(String[] args, IChannel channel) {
 		GuildMusicManager musicManager = getGuildAudioPlayer(channel.getGuild());
@@ -250,9 +247,7 @@ public class SoaMusicPlayer {
 		if (!this.msg.getAttachments().isEmpty() && this.msg.getAttachments().get(0).getUrl() != null) {
 			playerManager.loadItemOrdered(musicManager, this.msg.getAttachments().get(0).getUrl(),
 					new DefaultAudioLoadResultHandler(musicManager, channel, null));
-		}
-
-		else if (args.length > 2) {
+		} else if (args.length > 2) {
 			playerManager.loadItemOrdered(musicManager, args[2],
 					new DefaultAudioLoadResultHandler(musicManager, channel, args[2]));
 		}
@@ -261,9 +256,8 @@ public class SoaMusicPlayer {
 
 	/**
 	 * List out all entries in the current music queue
-	 * 
-	 * @param channel
-	 *            The channel the message will be entered into
+	 *
+	 * @param channel The channel the message will be entered into
 	 */
 	private void handleListQueue(IChannel channel) {
 		GuildMusicManager musicManager = getGuildAudioPlayer(channel.getGuild());
@@ -307,11 +301,9 @@ public class SoaMusicPlayer {
 
 	/**
 	 * Send a message to the specified channel
-	 * 
-	 * @param channel
-	 *            The channel the message will be entered into
-	 * @param message
-	 *            The message to be entered
+	 *
+	 * @param channel The channel the message will be entered into
+	 * @param message The message to be entered
 	 */
 	private void sendMessageToChannel(IChannel channel, String message) {
 		SoaClientHelper.sendMsgToChannel(channel, message);
@@ -319,9 +311,8 @@ public class SoaMusicPlayer {
 
 	/**
 	 * Stop a music track from playing
-	 * 
-	 * @param channel
-	 *            The channel the command was entered in
+	 *
+	 * @param channel The channel the command was entered in
 	 */
 	private void handleStop(IChannel channel) {
 		GuildMusicManager musicManager = getGuildAudioPlayer(channel.getGuild());
@@ -331,9 +322,8 @@ public class SoaMusicPlayer {
 
 	/**
 	 * Pause a currently playing music track
-	 * 
-	 * @param channel
-	 *            The channel the command was entered in
+	 *
+	 * @param channel The channel the command was entered in
 	 */
 	private void handlePause(IChannel channel) {
 		GuildMusicManager musicManager = getGuildAudioPlayer(channel.getGuild());
@@ -345,9 +335,8 @@ public class SoaMusicPlayer {
 
 	/**
 	 * Resume a currently paused music track
-	 * 
-	 * @param channel
-	 *            The channel the command was entered in
+	 *
+	 * @param channel The channel the command was entered in
 	 */
 	private void handleResume(IChannel channel) {
 		GuildMusicManager musicManager = getGuildAudioPlayer(channel.getGuild());
@@ -359,11 +348,9 @@ public class SoaMusicPlayer {
 
 	/**
 	 * Change the volume of the player
-	 * 
-	 * @param channel
-	 *            The text channel the command was entered in
-	 * @param args
-	 *            The arguments containing volume to set the music at
+	 *
+	 * @param channel The text channel the command was entered in
+	 * @param args    The arguments containing volume to set the music at
 	 */
 	private void handleVolume(IChannel channel, String[] args) {
 		GuildMusicManager musicManager = getGuildAudioPlayer(channel.getGuild());
@@ -380,14 +367,20 @@ public class SoaMusicPlayer {
 
 	/**
 	 * Skip a currently playing music track
-	 * 
-	 * @param channel
-	 *            The text channel the command was entered in
+	 *
+	 * @param channel   The text channel the command was entered in
+	 * @param numToSkip The number of tracks to skip.
 	 */
-	private void handleSkip(IChannel channel) {
+	private void handleSkip(IChannel channel, int numToSkip) {
 		GuildMusicManager musicManager = getGuildAudioPlayer(channel.getGuild());
-		musicManager.scheduler.nextTrack();
-		sendMessageToChannel(channel, "Track skipped");
+		if (numToSkip < 0) {
+			SoaClientHelper.sendMsgWithFileToChannel(channel, "... You just tried to skip 0 or less tracks... ",
+					"https://i.imgur.com/Tf2DfkS.jpg", "ytho.jpg");
+		} else {
+			for (int i = 0; i < numToSkip; i++)
+				musicManager.scheduler.nextTrack();
+			sendMessageToChannel(channel, numToSkip + " track(s) skipped");
+		}
 	}
 
 	/**
@@ -402,8 +395,7 @@ public class SoaMusicPlayer {
 				sb.append(
 						"Note - This menu and these commands will only work for users assigned one of the following roles: "
 								+ SoaClientHelper.translateRoleList(
-										DiscordCfgFactory.getConfig().getMusicPlayer().getAllowedRoles().getRole())
-								+ "\n\n");
+								DiscordCfgFactory.getConfig().getMusicPlayer().getAllowedRoles().getRole()) + "\n\n");
 
 			}
 
@@ -414,7 +406,7 @@ public class SoaMusicPlayer {
 				".music play <attachment> - Bot will play uploaded file; comment with attachment must be the play command.  Discord enforces an 8mb max file size.\n");
 		sb.append(".music pause - Bot pauses playback.\n");
 		sb.append(".music resume - Bot resumes playback.\n");
-		sb.append(".music skip - Bot skips the currently playing song.\n");
+		sb.append(".music skip [number]- Bot skips the currently playing song.  If an (optional) number is provided, the bot will skip that many songs in a row.\n");
 		sb.append(".music stop - Bot stops playing and empties playlist.\n");
 		sb.append(".music playlist - Bot lists currently queued playlist.\n");
 		sb.append(".music nowplaying - Bot lists currently playing track.\n");
@@ -489,8 +481,9 @@ public class SoaMusicPlayer {
 				firstTrack = playlist.getTracks().get(0);
 			}
 
-			sendMessageToChannel(channel, "Adding to queue " + firstTrack.getInfo().title + " (first track of playlist "
-					+ playlist.getName() + ")");
+			sendMessageToChannel(channel,
+					"Adding to queue " + firstTrack.getInfo().title + " (first track of playlist " + playlist.getName()
+							+ ")");
 
 			musicManager.scheduler.queue(firstTrack);
 

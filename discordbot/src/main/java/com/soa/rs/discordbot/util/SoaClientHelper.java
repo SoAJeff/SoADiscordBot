@@ -30,7 +30,7 @@ public class SoaClientHelper {
 
 	/**
 	 * Sends a message to a channel
-	 * 
+	 *
 	 * @param channel
 	 *            The channel to receive the message
 	 * @param msg
@@ -48,7 +48,7 @@ public class SoaClientHelper {
 
 	/**
 	 * Sends a message to a user
-	 * 
+	 *
 	 * @param userId
 	 *            The user's Discord ID as a Long
 	 * @param client
@@ -69,7 +69,7 @@ public class SoaClientHelper {
 
 	/**
 	 * Sends a message and a file to a channel
-	 * 
+	 *
 	 * @param channel
 	 *            The channel to receive the message
 	 * @param msg
@@ -90,8 +90,29 @@ public class SoaClientHelper {
 	}
 
 	/**
+	 * Sends a message and a file to a channel.  This method expects a URL which it will download and then upload.
+	 *
+	 * @param channel  The channel to receive the message
+	 * @param msg      The message to send to the channel
+	 * @param url      A URL to the file data
+	 * @param fileName The name the file should have when uploaded to Discord
+	 */
+	public static void sendMsgWithFileToChannel(IChannel channel, String msg, String url, String fileName) {
+		RequestBuffer.request(() -> {
+			try (InputStream stream = FileDownloader.downloadFile(url)) {
+				channel.sendFile(msg, stream, fileName);
+			} catch (MissingPermissionsException | DiscordException e) {
+				SoaLogging.getLogger().error("Error sending message: " + e.getMessage(), e);
+			} catch (Exception e) {
+				//Something wrong with the URL, just send the message
+				sendMsgToChannel(channel, msg);
+			}
+		});
+	}
+
+	/**
 	 * Sends a message and a file to a user via private message
-	 * 
+	 *
 	 * @param userId
 	 *            The user's Discord ID as a Long
 	 * @param client
@@ -117,7 +138,7 @@ public class SoaClientHelper {
 
 	/**
 	 * Sends an embed to a channel
-	 * 
+	 *
 	 * @param channel
 	 *            The channel to send the message to
 	 * @param msg
@@ -136,7 +157,7 @@ public class SoaClientHelper {
 	/**
 	 * Formats a user's Discord name in the format of @user#name, which is the
 	 * format Discord uses for names.
-	 * 
+	 *
 	 * @param user
 	 *            The user for whom to get the name for
 	 * @return The formatted name
@@ -153,7 +174,7 @@ public class SoaClientHelper {
 
 	/**
 	 * Deletes a message from a channel
-	 * 
+	 *
 	 * @param msg
 	 *            The message to be deleted.
 	 */
@@ -169,7 +190,7 @@ public class SoaClientHelper {
 
 	/**
 	 * Sets the bot's avatar
-	 * 
+	 *
 	 * @param client
 	 *            The client object which represents the bot
 	 * @param img
@@ -188,7 +209,7 @@ public class SoaClientHelper {
 
 	/**
 	 * Sets the bot's account name
-	 * 
+	 *
 	 * @param client
 	 *            The client object which represents the bot
 	 * @param name
@@ -207,7 +228,7 @@ public class SoaClientHelper {
 
 	/**
 	 * Sets the bot's 'playing' status
-	 * 
+	 *
 	 * @param client
 	 *            The client object which represents the bot
 	 * @param playing
@@ -221,7 +242,7 @@ public class SoaClientHelper {
 
 	/**
 	 * Checks if the user who sent the message has the appropriate rank
-	 * 
+	 *
 	 * @param msg
 	 *            The message sent by the user
 	 * @param roleString
@@ -234,7 +255,7 @@ public class SoaClientHelper {
 
 	/**
 	 * Checks if the user who sent the message has the appropriate rank
-	 * 
+	 *
 	 * @param msg
 	 *            The message sent by the user
 	 * @param guild
@@ -251,7 +272,7 @@ public class SoaClientHelper {
 
 	/**
 	 * Checks if the user who sent the message has the appropriate rank
-	 * 
+	 *
 	 * @param msg
 	 *            The message sent by the user
 	 * @param roleStrings
@@ -265,7 +286,7 @@ public class SoaClientHelper {
 
 	/**
 	 * Checks if the user who sent the message has the appropriate rank
-	 * 
+	 *
 	 * @param msg
 	 *            The message sent by the user
 	 * @param guild
@@ -290,7 +311,7 @@ public class SoaClientHelper {
 
 	/**
 	 * Formats a list of roles into a comma separated list in a string
-	 * 
+	 *
 	 * @param roles
 	 *            The list of roles
 	 * @return A string listing each role, separated by a comma.
@@ -306,10 +327,10 @@ public class SoaClientHelper {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Finds a guild with the provided name
-	 * 
+	 *
 	 * @param client Client to search in
 	 * @param name Name of guild to search for
 	 * @return Guild object for that guild

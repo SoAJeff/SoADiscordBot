@@ -13,11 +13,9 @@ public class DateAnalyzer {
 
 	/**
 	 * Checks if <tt>cal1</tt> is before <tt>cal2</tt>
-	 * 
-	 * @param cal1
-	 *            Calendar containing the earlier date
-	 * @param cal2
-	 *            Calendar containing the later date
+	 *
+	 * @param cal1 Calendar containing the earlier date
+	 * @param cal2 Calendar containing the later date
 	 * @return true if <tt>cal1</tt>is before <tt>cal2</tt>, false if otherwise
 	 */
 	public static boolean isBeforeDay(Calendar cal1, Calendar cal2) {
@@ -37,11 +35,9 @@ public class DateAnalyzer {
 
 	/**
 	 * Checks if <tt>cal1</tt> is the same date as <tt>cal2</tt>
-	 * 
-	 * @param cal1
-	 *            Calendar 1
-	 * @param cal2
-	 *            Calendar 2
+	 *
+	 * @param cal1 Calendar 1
+	 * @param cal2 Calendar 2
 	 * @return true if the dates are the same, false if otherwise
 	 */
 	public static boolean isSameDay(Calendar cal1, Calendar cal2) {
@@ -54,11 +50,9 @@ public class DateAnalyzer {
 
 	/**
 	 * Gets the days in between two dates
-	 * 
-	 * @param d1
-	 *            Date object containing the earlier date
-	 * @param d2
-	 *            Date Object containing the later date
+	 *
+	 * @param d1 Date object containing the earlier date
+	 * @param d2 Date Object containing the later date
 	 * @return the number of days in between the dates
 	 */
 	public static int daysBetween(Date d1, Date d2) {
@@ -67,11 +61,11 @@ public class DateAnalyzer {
 
 	/**
 	 * Shows a date in multiple time zones.  Currently will show times in Eastern, UTC, and Australian Eastern
+	 *
 	 * @param date Date object to convert into timezones
 	 * @return A string containing the date in the timezones.
 	 */
-	public static String showMultipleTimezonesForEvent(Date date)
-	{
+	public static String showMultipleTimezonesForEvent(Date date) {
 		StringBuilder sb = new StringBuilder();
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM HH:mm z");
@@ -91,6 +85,25 @@ public class DateAnalyzer {
 		sb.append(sdf.format(date));
 
 		return sb.toString();
+	}
+
+	/**
+	 * Gets the number of seconds until an interval of "10 minutes" is hit
+	 * @returnt The number of seconds
+	 */
+	public static long calculateMinutesUntil10() {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+
+		calendar.set(Calendar.SECOND, 0);
+		if (calendar.get(Calendar.MINUTE % 10) == 0) {
+			calendar.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE) + 10);
+		} else {
+			int minutesToAdd = 10 - calendar.get(Calendar.MINUTE) % 10;
+			calendar.set(Calendar.MINUTE, (calendar.get(Calendar.MINUTE) + minutesToAdd));
+		}
+		return (calendar.getTime().getTime() - new Date().getTime()) / 1000;
+
 	}
 
 }

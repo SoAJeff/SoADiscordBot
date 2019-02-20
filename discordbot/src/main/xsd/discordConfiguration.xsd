@@ -15,6 +15,7 @@
       <xsd:element name="dj-pls-event" type="BaseEvent" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="admin-event" type="AdminEvent" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="user-tracking-event" type="UserTrackingEvent" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="rs-news-task" type="RsListingEvent" minOccurs="0" maxOccurs="1"/>
     </xsd:sequence>
   </xsd:complexType>
   </xsd:element>
@@ -43,6 +44,16 @@
       <xsd:extension base="ListingEvent">
         <xsd:sequence>
           <xsd:element name="event-endline" type="xsd:string" minOccurs="0" maxOccurs="10"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="RsListingEvent">
+    <xsd:complexContent>
+      <xsd:extension base="ListingEvent">
+        <xsd:sequence>
+          <xsd:element name="rs-news-archive-link" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+          <xsd:element name="rs-news-archive-image" type="xsd:string" minOccurs="1" maxOccurs="1"/>
         </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>

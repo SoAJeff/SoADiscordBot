@@ -60,4 +60,11 @@ public class DateAnalyzerTest {
 				DateAnalyzer.showMultipleTimezonesForEvent(date));
 	}
 
+	@Test
+	public void testSecondsUntil10()
+	{
+		long seconds = DateAnalyzer.calculateMinutesUntil10();
+		Assert.assertTrue((seconds >= 0) && (seconds <= 600));
+	}
+
 }

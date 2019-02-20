@@ -1,6 +1,7 @@
 package com.soa.rs.triviacreator.gui.create;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -15,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.soa.rs.triviacreator.gui.help.HelpViewerDialog;
 import com.soa.rs.triviacreator.util.DiscordType;
 import com.soa.rs.triviacreator.util.InvalidTriviaConfigurationException;
 import com.soa.rs.triviacreator.util.StringToDiscordPair;
@@ -74,6 +76,17 @@ public class CreateDiscordPairDialog {
 		gbc.weightx = 10;
 		this.idField = new JTextField(20);
 		panel.add(this.idField, gbc);
+
+		gbc.gridx++;
+		gbc.weightx = 1;
+		JButton helpButton = new JButton("?");
+		//Set the height of the button to be identical to the height of the TextField
+		helpButton.setPreferredSize(
+				new Dimension(helpButton.getPreferredSize().width, idField.getPreferredSize().height));
+		helpButton.addActionListener(e -> {
+			new HelpViewerDialog(dialog, null);
+		});
+		panel.add(helpButton, gbc);
 
 		return panel;
 	}

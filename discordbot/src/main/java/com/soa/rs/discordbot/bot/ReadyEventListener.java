@@ -1,10 +1,16 @@
 package com.soa.rs.discordbot.bot;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import com.soa.rs.discordbot.bot.events.RsNewsTask;
 import com.soa.rs.discordbot.bot.events.SoaEventListerScheduler;
 import com.soa.rs.discordbot.bot.events.SoaNewsListerScheduler;
 import com.soa.rs.discordbot.bot.events.SoaTaskScheduler;
 import com.soa.rs.discordbot.bot.events.UserTrackingScheduler;
 import com.soa.rs.discordbot.cfg.DiscordCfgFactory;
+import com.soa.rs.discordbot.util.DateAnalyzer;
 import com.soa.rs.discordbot.util.SoaClientHelper;
 import com.soa.rs.discordbot.util.SoaLogging;
 
@@ -33,23 +39,34 @@ public class ReadyEventListener implements IListener<ReadyEvent> {
 		client = event.getClient();
 		setDiscordUserSettings();
 
-		if (DiscordCfgFactory.getConfig().getEventListingEvent() != null
-				&& DiscordCfgFactory.getConfig().getEventListingEvent().isEnabled()) {
+		if (DiscordCfgFactory.getConfig().getEventListingEvent() != null && DiscordCfgFactory.getConfig()
+				.getEventListingEvent().isEnabled()) {
 			SoaTaskScheduler listScheduler = new SoaEventListerScheduler(client,
 					DiscordCfgFactory.getConfig().getEventListingEvent().getUrl());
 			listScheduler.scheduleTask();
 		}
-		if (DiscordCfgFactory.getConfig().getNewsListingEvent() != null
-				&& DiscordCfgFactory.getConfig().getNewsListingEvent().isEnabled()) {
+		if (DiscordCfgFactory.getConfig().getNewsListingEvent() != null && DiscordCfgFactory.getConfig()
+				.getNewsListingEvent().isEnabled()) {
 			SoaTaskScheduler newsScheduler = new SoaNewsListerScheduler(client,
 					DiscordCfgFactory.getConfig().getNewsListingEvent().getUrl());
 			newsScheduler.scheduleTask();
 		}
-		if (DiscordCfgFactory.getConfig().getUserTrackingEvent() != null
-				&& DiscordCfgFactory.getConfig().getUserTrackingEvent().isEnabled()) {
+		if (DiscordCfgFactory.getConfig().getUserTrackingEvent() != null && DiscordCfgFactory.getConfig()
+				.getUserTrackingEvent().isEnabled()) {
 			UserTrackingScheduler trackingScheduler = new UserTrackingScheduler(client);
 			trackingScheduler.scheduleTask();
 		}
+		if (DiscordCfgFactory.getConfig().getRsNewsTask() != null && DiscordCfgFactory.getConfig().getRsNewsTask()
+				.isEnabled()) {
+			//Create event, set initial title
+			RsNewsTask newsTask = new RsNewsTask(DiscordCfgFactory.getConfig().getRsNewsTask().getUrl(), client);
+			newsTask.runTask();
+
+			//Schedule the run every 10 mins
+			ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+			executorService.scheduleAtFixedRate(newsTask::runTask, DateAnalyzer.calculateMinutesUntil10(), 10*60, TimeUnit.SECONDS);
+		}
+
 	}
 
 	/**
@@ -63,8 +80,8 @@ public class ReadyEventListener implements IListener<ReadyEvent> {
 			String imageType = DiscordCfgFactory.getInstance().getAvatarUrl()
 					.substring(DiscordCfgFactory.getInstance().getAvatarUrl().lastIndexOf(".") + 1);
 
-			SoaClientHelper.setBotAvatar(client,
-					Image.forUrl(imageType, DiscordCfgFactory.getInstance().getAvatarUrl()));
+			SoaClientHelper
+					.setBotAvatar(client, Image.forUrl(imageType, DiscordCfgFactory.getInstance().getAvatarUrl()));
 		}
 		if (DiscordCfgFactory.getInstance().getBotname() != null) {
 
