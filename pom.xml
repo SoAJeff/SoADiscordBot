@@ -4,17 +4,30 @@
   <groupId>com.soa.rs</groupId>
   <artifactId>DISCORD</artifactId>
   <packaging>pom</packaging>
-  <version>2.0-SNAPSHOT</version>
+  <version>3.0-SNAPSHOT</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <url>https://github.com/SoAJeff/SoADiscordBot</url>
-  
-  <modules>
-    <module>triviacreator</module>
-    <module>discordbot</module>
-  </modules>  
 
+  <profiles>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+          <module>soa-discord</module>
+        </modules>
+    </profile>
+    <profile>
+      <id>v2</id>
+      <modules>
+        <module>triviacreator</module>
+        <module>discordbot</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

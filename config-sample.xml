@@ -8,19 +8,39 @@
   </staff-roles>
   <default-guild-id>252267969617461248</default-guild-id>
   <guild-abbreviation>SoA</guild-abbreviation>
-  <default-status>RuneScape Clan</default-status>
+  <default-status>Jeff_Test</default-status>
+  <db-connection>
+    <jdbc-url>Put your URL here</jdbc-url>
+    <db-username>Database Username</db-username>
+    <db-password>Database Password</db-password>
+    <db-name>Database Name</db-name>
+    <jdbc-properties>
+      <property>
+        <property-key>serverTimezone</property-key>
+        <property-value>America/New_York</property-value>
+      </property>
+      <property>
+        <property-key>characterEncoding</property-key>
+        <property-value>utf-8</property-value>
+      </property>
+      <property>
+        <property-key>useUnicode</property-key>
+        <property-value>true</property-value>
+      </property>
+    </jdbc-properties>
+  </db-connection>
   <event-listing-event>
     <enabled>true</enabled>
     <url>https://forums.soa-rs.com/calendar/events.xml</url>
-	<channel>events</channel>
-	<event-endline>For more event information and upcoming events, check out the</event-endline>
-	<event-endline>Events Forum: https://forums.soa-rs.com/forum/9-events/</event-endline>
-	<event-endline>Events Calendar: https://forums.soa-rs.com/calendar/</event-endline>
+    <channel>events</channel>
+    <event-endline>For more event information and upcoming events, check out the</event-endline>
+    <event-endline>Events Forum: https://forums.soa-rs.com/forum/9-events/</event-endline>
+    <event-endline>Events Calendar: https://forums.soa-rs.com/calendar/</event-endline>
   </event-listing-event>
   <news-listing-event>
     <enabled>true</enabled>
     <url>https://forums.soa-rs.com/rss/1-soa-promos-and-news.xml</url>
-	<channel>shoutbox</channel>
+    <channel>shoutbox</channel>
   </news-listing-event>
   <music-player>
     <enabled>true</enabled>
@@ -28,7 +48,7 @@
       <role>Eldar</role>
       <role>Lian</role>
       <role>Arquendi</role>
-	  <role>DJ</role>
+      <role>DJ</role>
     </allowed-roles>
     <can-disable-rank-check>
       <role>Eldar</role>
@@ -50,11 +70,17 @@
   </admin-event>
   <user-tracking-event>
     <enabled>true</enabled>
-    <trackingFile>/path/to/trackingfile.xml</trackingFile>
     <can-update-query>
       <role>Eldar</role>
       <role>Lian</role>
       <role>Arquendi</role>
     </can-update-query>
   </user-tracking-event>
+  <rs-news-task>
+    <enabled>true</enabled>
+    <url>https://secure.runescape.com/m=news/latest_news.rss</url>
+    <channel>rs-news</channel>
+    <rs-news-archive-link>https://secure.runescape.com/m=news/list</rs-news-archive-link>
+    <rs-news-archive-image>https://i.imgur.com/wy894Wu.png</rs-news-archive-image>
+  </rs-news-task>
 </discordConfiguration>
