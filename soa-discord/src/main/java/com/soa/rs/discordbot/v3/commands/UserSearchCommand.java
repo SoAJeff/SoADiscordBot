@@ -26,7 +26,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Command(triggers = { ".usersearch" })
+@Command(triggers = { ".usersearch", ".user-search" })
 public class UserSearchCommand extends AbstractCommand {
 
 	private GuildUserUtility guildUserUtility = new GuildUserUtility();
@@ -51,11 +51,9 @@ public class UserSearchCommand extends AbstractCommand {
 				//Is in a guild, so search for that guild.
 				users.addAll(guildNicknameUtility.getGuildUserWithNameInGuildWithServerName(search.getSearchTerm(),
 						event.getGuildId().get().asLong()));
-				//users.addAll(searchDisplayNames(search.getSearchTerm(), event.getGuildId().get().asLong()));
 			} else {
 				//Was sent in a private message, so get everything
 				users.addAll(guildNicknameUtility.getGuildUserWithServerName(search.getSearchTerm()));
-				//users.addAll(searchDisplayNames(search.getSearchTerm(), 0));
 			}
 		} else {
 			long id = getServerIdForName(search.getServerName());
@@ -67,7 +65,6 @@ public class UserSearchCommand extends AbstractCommand {
 						"More than 1 server with that name, provide ID or send search from server to search.")).then();
 			}
 			users.addAll(guildNicknameUtility.getGuildUserWithNameInGuildWithServerName(search.getSearchTerm(), id));
-			//users.addAll(searchDisplayNames(search.getSearchTerm(), id));
 		}
 
 		SoaLogging.getLogger(this).debug("After searching, size of users is " + users.size());
@@ -137,26 +134,6 @@ public class UserSearchCommand extends AbstractCommand {
 			return 1;
 		return entries.get(0).getSnowflake();
 	}
-
-	//	private Set<GuildUser> searchDisplayNames(String searchTerm, long id) {
-	//		Set<GuildUser> userSet = new HashSet<>();
-	//		List<Nickname> nicknames;
-	//		if (id != 0) {
-	//			nicknames = nicknameUtility.getNicknameForUserWithName(searchTerm, id);
-	//		} else {
-	//			nicknames = nicknameUtility.getNicknameForUserWithName(searchTerm);
-	//		}
-	//
-	//		for (Nickname nickname : nicknames) {
-	//			List<GuildUser> user = guildUserUtility
-	//					.getGuildUser(nickname.getUserSnowflake(), nickname.getGuildSnowflake());
-	//			if (user.size() > 0) {
-	//				userSet.addAll(user);
-	//			}
-	//		}
-	//
-	//		return userSet;
-	//	}
 
 	public Consumer<EmbedCreateSpec> createEmbed(GuildServerUser user) {
 		return embedCreateSpec -> {

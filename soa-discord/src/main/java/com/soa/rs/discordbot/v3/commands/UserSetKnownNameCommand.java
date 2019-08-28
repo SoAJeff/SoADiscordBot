@@ -26,35 +26,39 @@ public class UserSetKnownNameCommand extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
-		Search search;
-		try {
-			search = determineSearch(event);
-		} catch (Exception e) {
-			return event.getMessage().getChannel()
-					.flatMap(messageChannel -> messageChannel.createMessage(e.getMessage())).then();
-		}
-
-		if (search.getSearch() == null) {
-			if (event.getMessage().getUserMentionIds().size() > 0) {
-				return permittedToExecuteEvent(event.getMember().get())
-						.flatMapMany(ignored -> event.getMessage().getUserMentions()).flatMap(user -> Flux.fromIterable(
-								guildUserUtility
-										.getGuildUser("@" + user.getUsername() + "#" + user.getDiscriminator())))
-						.flatMap(guildUser -> Mono.fromRunnable(() -> {
-							guildUser.setKnownName(search.getName());
-							guildUserUtility.updateExistingUser(guildUser);
-						})).then(event.getMessage().addReaction(ReactionEmoji.unicode(thumbsUp)));
-			} else {
+		if (event.getMember().isPresent()) {
+			Search search;
+			try {
+				search = determineSearch(event);
+			} catch (Exception e) {
 				return event.getMessage().getChannel()
-						.flatMap(messageChannel -> messageChannel.createMessage("Invalid arguments")).then();
+						.flatMap(messageChannel -> messageChannel.createMessage(e.getMessage())).then();
 			}
-		}
-		return permittedToExecuteEvent(event.getMember().get())
-				.flatMapMany(ignored -> Flux.fromIterable(guildNicknameUtility.getGuildUser(search.getSearch())))
-				.flatMap(guildUser -> Mono.fromRunnable(() -> {
-					guildUser.setKnownName(search.getName());
-					guildUserUtility.updateExistingUser(guildUser);
-				})).then(event.getMessage().addReaction(ReactionEmoji.unicode(thumbsUp)));
+
+			if (search.getSearch() == null) {
+				if (event.getMessage().getUserMentionIds().size() > 0) {
+					return permittedToExecuteEvent(event.getMember().get())
+							.flatMapMany(ignored -> event.getMessage().getUserMentions()).flatMap(user -> Flux
+									.fromIterable(guildUserUtility
+											.getGuildUser("@" + user.getUsername() + "#" + user.getDiscriminator())))
+							.flatMap(guildUser -> Mono.fromRunnable(() -> {
+								guildUser.setKnownName(search.getName());
+								guildUserUtility.updateExistingUser(guildUser);
+							})).then(event.getMessage().addReaction(ReactionEmoji.unicode(thumbsUp)));
+				} else {
+					return event.getMessage().getChannel()
+							.flatMap(messageChannel -> messageChannel.createMessage("Invalid arguments")).then();
+				}
+			}
+			return permittedToExecuteEvent(event.getMember().get())
+					.flatMapMany(ignored -> Flux.fromIterable(guildNicknameUtility.getGuildUser(search.getSearch())))
+					.flatMap(guildUser -> Mono.fromRunnable(() -> {
+						guildUser.setKnownName(search.getName());
+						guildUserUtility.updateExistingUser(guildUser);
+					})).then(event.getMessage().addReaction(ReactionEmoji.unicode(thumbsUp)));
+		} else
+			return event.getMessage().getChannel().flatMap(messageChannel -> messageChannel.createMessage(
+					"Sorry, this command can only be used in a guild by those with the appropriate role")).then();
 	}
 
 	public Search determineSearch(MessageCreateEvent event) throws Exception {

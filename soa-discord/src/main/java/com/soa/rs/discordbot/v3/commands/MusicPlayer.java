@@ -225,9 +225,6 @@ public class MusicPlayer extends AbstractCommand {
 					.flatMap(guildMusicManager -> Mono.fromRunnable(() -> guildMusicManager.player.setVolume(volume)))
 					.flatMap(ignored -> sendMessageToChannelReactively(event.getMessage(), "Volume set to " + volume))
 					.then();
-				/*return event.getMessage().getChannel().flatMap(messageChannel -> messageChannel.createMessage(
-						"Adjusting volume is temporarily disabled - you can manually change the volume of the bot by selecting the bot account on the sidebar and using the volume slider. "))
-						.then();*/
 		} else if (args.length == 2) {
 			return event.getGuild().map(this::getGuildAudioPlayer).flatMap(
 					guildMusicManager -> sendMessageToChannelReactively(event.getMessage(),
