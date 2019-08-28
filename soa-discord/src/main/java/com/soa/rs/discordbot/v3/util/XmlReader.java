@@ -43,30 +43,7 @@ public class XmlReader {
 		jaxbUnmarshaller.setSchema(schema);
 		config = (DiscordConfiguration) jaxbUnmarshaller.unmarshal(file);
 
-		// config = (DiscordConfiguration) jaxbElement.getValue();
-
 		return config;
 	}
 
-//	public TrackedInformation loadTrackedConfiguration(String filename)
-//			throws JAXBException, SAXException, IOException {
-//		TrackedInformation info = null;
-//
-//		File file = new File(filename);
-//		if (!file.exists()) {
-//			throw new IOException("File does not exist");
-//		}
-//		JAXBContext jaxbContext = JAXBContext.newInstance("com.soa.rs.discordbot.jaxb");
-//
-//		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-//		Schema schema = sf.newSchema(this.getClass().getResource("/xsd/userTracking.xsd"));
-//
-//		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-//		jaxbUnmarshaller.setSchema(schema);
-//		info = (TrackedInformation) jaxbUnmarshaller.unmarshal(file);
-//
-//		// info = (TrackedInformation) jaxbElement.getValue();
-//
-//		return info;
-//	}
 }

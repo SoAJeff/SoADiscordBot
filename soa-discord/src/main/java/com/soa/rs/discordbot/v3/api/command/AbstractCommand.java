@@ -51,28 +51,6 @@ public abstract class AbstractCommand {
 				.filter(role -> mustHavePermission.contains(role.getName()) || mustHavePermission.isEmpty()).next()
 				.switchIfEmpty(Mono.fromRunnable(
 						() -> SoaLogging.getLogger(this).debug("User does not have permission to run event")));
-		//return member.getRoles().toStream().anyMatch(role -> mustHavePermission.contains(role.getName()));
-
-		//Shadbot started doing this, but i can't get it to work...
-		//		event.getMember().filter(member -> !member.isBot()).flatMap(member -> member.getRoles().collectList())
-		//				.filter(roles -> roles.stream)
-
-		//		Mono<Member> member = event.getMessage().getAuthorAsMember();
-		//		return member.flatMapMany(Membember::getRoles).any(role -> mustHavePermission.contains(role.getName()));
-
-		//		return member.getRoles().map(Role::getName).any(::equals);
-		//		List<Role> roleList = event.getMessage().getAuthorAsMember().flatMapMany(user -> user.getRoles()).;
-		//		event.getMessage().getAuthorAsMember().map(user -> user.getRoles()).map(Role::getName)).filter(s -> mustHavePermission.containins(s));
-		/*return event.getMessage().getAuthorAsMember().flatMapMany(user -> user.getRoles())
-				.flatMap(role -> Mono.just(role.getName())).filter(s -> mustHavePermission.contains(s));*/
-/*		Mono<List<Role>> guildRoles = event.getGuild().flatMapMany(Guild::getRoles).collectList();
-		Mono<List<Role>> membersRoles = event.getMember().filter(member -> member.getRoles().any(guildRoles));*/
-		//		return event.getMember().
-/*		if (SoaClientHelper.isRank(event.getMessage(), mustHavePermission)) {
-			return true;
-		} else {
-			return false;
-		}*/
 	}
 
 	protected void addHelpMsg(String command, String text) {
