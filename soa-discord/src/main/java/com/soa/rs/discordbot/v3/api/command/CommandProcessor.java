@@ -29,7 +29,7 @@ public class CommandProcessor {
 					.startsWith(SoaDiscordBotConstants.RUNEINFO_PREFIX)) {
 				String cmd = content.split(" ")[0];
 				SoaLogging.getLogger(this).info("cmd is: " + cmd);
-				if (CommandInitializer.getCommand(cmd) != null) {
+				if (CommandInitializer.getCommand(cmd.toLowerCase()) != null) {
 					SoaLogging.getLogger(CommandProcessor.class)
 							.info("Executing command [" + CommandInitializer.getCommand(cmd).getClass().getSimpleName()
 									+ "]");
@@ -40,7 +40,7 @@ public class CommandProcessor {
 			} else {
 				//Handle the 'everything events'
 				for (String key : CommandInitializer.getAnyMessageMap().keySet()) {
-					if (content.contains(key)) {
+					if (content.contains(key.toLowerCase())) {
 						SoaLogging.getLogger(CommandProcessor.class)
 								.info("Executing msgRcvEvent [" + CommandInitializer.getMsgRcvd(key).getClass()
 										.getSimpleName() + "]");

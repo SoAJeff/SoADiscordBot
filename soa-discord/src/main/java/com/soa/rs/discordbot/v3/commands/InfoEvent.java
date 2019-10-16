@@ -19,6 +19,7 @@ import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.util.DiscordUtils;
 import com.soa.rs.discordbot.v3.util.SoaDiscordBotConstants;
+import com.soa.rs.discordbot.v3.util.UptimeUtility;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
@@ -37,10 +38,7 @@ public class InfoEvent extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
-		LocalDateTime launch = DiscordCfgFactory.getInstance().getLaunchTime();
-		LocalDateTime now = LocalDateTime.now();
-
-		Duration uptime = Duration.between(launch, now);
+		Duration uptime = UptimeUtility.getUptime();
 
 		final Runtime runtime = Runtime.getRuntime();
 		final long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / MB_UNIT;
@@ -50,8 +48,8 @@ public class InfoEvent extends AbstractCommand {
 		sb.append("Hi there!  I'm the " + DiscordCfgFactory.getConfig().getGuildAbbreviation() + " bot!\n");
 		sb.append("My Version: " + version);
 		sb.append("\n");
-		sb.append("My Uptime: " + uptime.toDays() + "days, " + (uptime.toHours() % 24) + "hours, " + (uptime.toMinutes()
-				% 60) + "minutes");
+		sb.append("My Uptime: " + uptime.toDays() + " days, " + (uptime.toHours() % 24) + " hours, " + (uptime.toMinutes()
+				% 60) + " minutes");
 		sb.append("\n");
 		if (event.getMessage().getContent().get().startsWith(".debug")) {
 			sb.append("\nJVM Statistics:");

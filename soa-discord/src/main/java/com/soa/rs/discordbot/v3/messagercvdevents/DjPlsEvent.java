@@ -27,23 +27,22 @@ public class DjPlsEvent extends MsgRcvd {
 	public Mono<Void> execute(MessageCreateEvent event) {
 		Random rndm = new Random();
 		int msg = rndm.nextInt(4) + 1;
-		StringBuilder sb = new StringBuilder();
+		return event.getMessage().getChannel().flatMap(channel -> DiscordUtils.sendMessage(getMsg(msg), channel))
+				.then();
+	}
+
+	private String getMsg(int msg) {
 		switch (msg) {
 		case 1:
-			sb.append("DJ pls");
-			break;
+			return "DJ pls";
 		case 2:
-			sb.append("DJ is a noob");
-			break;
+			return "DJ is a noob";
 		case 3:
-			sb.append("#blameDJ");
-			break;
+			return "#blameDJ";
 		case 4:
-			sb.append("Thank you for refreshing your twitter page");
-			break;
+			return "Thank you for refreshing your twitter page";
 		default:
-			break;
+			return "";
 		}
-		return event.getMessage().getChannel().flatMap(channel -> DiscordUtils.sendMessage(sb.toString(), channel)).then();
 	}
 }

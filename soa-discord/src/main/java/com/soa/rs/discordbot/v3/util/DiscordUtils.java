@@ -1,7 +1,6 @@
 package com.soa.rs.discordbot.v3.util;
 
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -28,7 +27,7 @@ public class DiscordUtils {
 	}
 
 	public static Mono<Message> sendMessage(String content, MessageChannel channel) {
-		return sendMessage(content, null,  channel);
+		return sendMessage(content, null, channel);
 	}
 
 	public static Mono<Message> sendMessage(Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
@@ -65,8 +64,7 @@ public class DiscordUtils {
 		});
 	}
 
-	public static Mono<Message> sendMessage(String content, InputStream file, String filename, MessageChannel channel)
-	{
+	public static Mono<Message> sendMessage(String content, InputStream file, String filename, MessageChannel channel) {
 		final Snowflake selfId = channel.getClient().getSelfId().get();
 		return Mono.zip(DiscordUtils.hasPermission(channel, selfId, Permission.SEND_MESSAGES),
 				DiscordUtils.hasPermission(channel, selfId, Permission.ATTACH_FILES)).flatMap(tuple -> {
@@ -97,15 +95,7 @@ public class DiscordUtils {
 	}
 
 	public static String translateRoleList(List<String> roles) {
-		Iterator<String> iter = roles.iterator();
-		StringBuilder sb = new StringBuilder();
-		while (iter.hasNext()) {
-			sb.append(iter.next());
-			if (iter.hasNext()) {
-				sb.append(", ");
-			}
-		}
-		return sb.toString();
+		return String.join(", ", roles);
 	}
 
 	public static Consumer<MessageCreateSpec> createMessageSpecWithMessage(String content) {

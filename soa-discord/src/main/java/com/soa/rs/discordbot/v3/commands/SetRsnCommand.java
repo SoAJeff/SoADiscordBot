@@ -25,6 +25,9 @@ public class SetRsnCommand extends AbstractCommand {
 		if (DiscordCfgFactory.getInstance().isUserTrackingEnabled()) {
 			userUtility = new GuildUserUtility();
 			setEnabled(true);
+			addHelpMsg(".setrsn",
+					"Set's a user's RSN for search purposes and also updates the user's nickname on the server. "
+							+ "(use !setrsn to also affect RuneInfo, ask Staff if you also want nickname to include an emoji)");
 		}
 	}
 
@@ -41,7 +44,11 @@ public class SetRsnCommand extends AbstractCommand {
 			success = true;
 		});
 		if (success) {
-			return event.getMessage().addReaction(ReactionEmoji.unicode(thumbsUp)).then();
+			return event.getMessage().addReaction(ReactionEmoji.unicode(thumbsUp))
+					.then(event.getMember().get().edit(guildMemberEditSpec -> guildMemberEditSpec.setNickname(name))
+							.onErrorResume(throwable -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+									.error("Failed to change server nickname of user, don't have permission?",
+											throwable)))).then();
 		} else {
 			if (event.getMessage().getAuthor().isPresent()) {
 				SoaLogging.getLogger(this)

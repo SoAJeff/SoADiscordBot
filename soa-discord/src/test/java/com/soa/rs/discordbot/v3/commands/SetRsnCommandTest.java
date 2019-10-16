@@ -1,6 +1,7 @@
 package com.soa.rs.discordbot.v3.commands;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 
@@ -39,8 +40,35 @@ public class SetRsnCommandTest {
 		Mockito.when(message.getContent()).thenReturn(Optional.of("!setrsn noob"));
 		Mockito.when(message.addReaction(ReactionEmoji.unicode(thumbsUp))).thenReturn(Mono.empty());
 		Mockito.when(event.getMessage()).thenReturn(message);
+		Mockito.when(member.edit(Mockito.any(Consumer.class))).thenReturn(Mono.empty());
 
 		command.execute(event);
+
+		Mockito.verify(utility, Mockito.times(1)).updateKnownNameForUser("noob", 1234, 6789);
+		Mockito.verify(message, Mockito.times(1)).addReaction(ReactionEmoji.unicode(thumbsUp));
+	}
+
+	@Test
+	public void testSetRsnButCantChangeNickname() {
+		GuildUserUtility utility = Mockito.mock(GuildUserUtility.class);
+
+		SetRsnCommand command = new SetRsnCommand();
+		command.setUserUtility(utility);
+
+		MessageCreateEvent event = Mockito.mock(MessageCreateEvent.class);
+		Member member = Mockito.mock(Member.class);
+
+		Mockito.when(member.getGuildId()).thenReturn(Snowflake.of(6789));
+		Mockito.when(member.getId()).thenReturn(Snowflake.of(1234));
+		Mockito.when(event.getMember()).thenReturn(Optional.of(member));
+
+		Message message = Mockito.mock(Message.class);
+		Mockito.when(message.getContent()).thenReturn(Optional.of("!setrsn noob"));
+		Mockito.when(message.addReaction(ReactionEmoji.unicode(thumbsUp))).thenReturn(Mono.empty());
+		Mockito.when(event.getMessage()).thenReturn(message);
+		Mockito.when(member.edit(Mockito.any(Consumer.class))).thenReturn(Mono.error(new Throwable("Tested error.")));
+
+		command.execute(event).block();
 
 		Mockito.verify(utility, Mockito.times(1)).updateKnownNameForUser("noob", 1234, 6789);
 		Mockito.verify(message, Mockito.times(1)).addReaction(ReactionEmoji.unicode(thumbsUp));
@@ -75,8 +103,7 @@ public class SetRsnCommandTest {
 	}
 
 	@Test
-	public void testSetRsnNoMemberNoUser()
-	{
+	public void testSetRsnNoMemberNoUser() {
 		GuildUserUtility utility = Mockito.mock(GuildUserUtility.class);
 
 		SetRsnCommand command = new SetRsnCommand();

@@ -37,6 +37,9 @@ public class UserSearchCommand extends AbstractCommand {
 	@Override
 	public void initialize() {
 		setEnabled(DiscordCfgFactory.getInstance().isUserTrackingEnabled());
+		if (DiscordCfgFactory.getInstance().isUserTrackingEnabled()) {
+			addHelpMsg(".usersearch", "Search the users database for information about a specific user.");
+		}
 	}
 
 	@Override
@@ -139,8 +142,7 @@ public class UserSearchCommand extends AbstractCommand {
 		return embedCreateSpec -> {
 			SoaLogging.getLogger(this).trace("Creating embed for user " + user.getUsername());
 			embedCreateSpec.setTitle(user.getDisplayName());
-			embedCreateSpec.setDescription(
-					user.getUsername() + " in server: " + user.getGuildName());
+			embedCreateSpec.setDescription(user.getUsername() + " in server: " + user.getGuildName());
 
 			if (user.getKnownName() != null && user.getKnownName().trim().length() > 0) {
 				embedCreateSpec.addField("Known as", user.getKnownName(), false);

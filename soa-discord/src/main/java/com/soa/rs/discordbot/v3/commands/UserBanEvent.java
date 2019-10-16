@@ -18,6 +18,7 @@ public class UserBanEvent extends AbstractCommand {
 				.isEnabled()) {
 			setEnabled(true);
 			setMustHavePermission(DiscordCfgFactory.getConfig().getAdminEvent().getAllowedRoles().getRole());
+			addHelpMsg(".ban", "Admin can tag user(s) and they will be banned from the server.");
 		} else {
 			setEnabled(false);
 		}
@@ -25,7 +26,6 @@ public class UserBanEvent extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
-		Member member = event.getMember().get();
 		SoaLogging.getLogger(this).info("Attempting to ban user from server");
 		return permittedToExecuteEvent(event.getMember().get())
 				.flatMapMany(ignored -> event.getMessage().getUserMentions())

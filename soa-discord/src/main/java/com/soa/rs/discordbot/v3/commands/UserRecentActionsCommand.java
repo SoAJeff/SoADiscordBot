@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @Command(triggers = { ".user-recent", ".user-recents", ".user-recentactions" })
 public class UserRecentActionsCommand extends AbstractCommand {
 
-	RecentActionUtility recentActionUtility = new RecentActionUtility();
+	private RecentActionUtility recentActionUtility = new RecentActionUtility();
 
 	@Override
 	public void initialize() {

@@ -62,20 +62,16 @@ public class FileDownloader {
 	{
 		Image.Format format;
 		String imageType = url.substring(url.lastIndexOf(".") + 1);
-		if(imageType != null && !imageType.trim().isEmpty()) {
+		if(!imageType.trim().isEmpty()) {
 
-			switch (imageType) {
-			case "PNG":
+			switch (imageType.toLowerCase()) {
 			case "png":
 				format = Image.Format.PNG;
 				break;
-			case "JPG":
 			case "jpg":
-			case "JPEG":
 			case "jpeg":
 				format = Image.Format.JPEG;
 				break;
-			case "GIF":
 			case "gif":
 				format = Image.Format.GIF;
 				break;
