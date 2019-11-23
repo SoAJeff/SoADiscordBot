@@ -1,7 +1,7 @@
 package com.soa.rs.discordbot.v3.bot;
 
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
-import com.soa.rs.discordbot.v3.usertrack.RecentlySeenCache;
+import com.soa.rs.discordbot.v3.usertrack.RecentCache;
 import com.soa.rs.discordbot.v3.usertrack.UserTrackVoiceStateUpdate;
 
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
@@ -17,8 +17,12 @@ public class VoiceStateUpdateHandler {
 						.handleVoiceStateUpdate(user.getId(), event.getCurrent().getGuildId()))).then();
 	}
 
-	public void setCache(RecentlySeenCache cache) {
-		this.userTrackVoiceStateUpdate.setCache(cache);
+	public void setLastSeenCache(RecentCache cache) {
+		this.userTrackVoiceStateUpdate.setLastSeenCache(cache);
+	}
+
+	public void setLastActiveCache(RecentCache cache) {
+		this.userTrackVoiceStateUpdate.setLastActiveCache(cache);
 	}
 
 }

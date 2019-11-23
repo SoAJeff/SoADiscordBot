@@ -173,6 +173,7 @@ public class UserSearchCommand extends AbstractCommand {
 
 			if (sdf.format(user.getLeftServer()).equals(sdf.format(Date.from(Instant.EPOCH)))) {
 				embedCreateSpec.addField("Last seen date", sdf.format(user.getLastSeen()), true);
+				embedCreateSpec.addField("Last active date", sdf.format(user.getLastActive()), false);
 			} else {
 				embedCreateSpec.addField("Left server date", sdf.format(user.getLeftServer()), true);
 			}

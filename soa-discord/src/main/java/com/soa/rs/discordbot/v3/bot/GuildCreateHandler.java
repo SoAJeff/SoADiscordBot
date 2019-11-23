@@ -5,7 +5,7 @@ import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 import com.soa.rs.discordbot.v3.jdbi.GuildUtility;
 import com.soa.rs.discordbot.v3.jdbi.NicknameUtility;
 import com.soa.rs.discordbot.v3.jdbi.RecentActionUtility;
-import com.soa.rs.discordbot.v3.usertrack.RecentlySeenCache;
+import com.soa.rs.discordbot.v3.usertrack.RecentCache;
 import com.soa.rs.discordbot.v3.usertrack.UserTrackGuildCreate;
 
 import discord4j.core.event.domain.guild.GuildCreateEvent;
@@ -29,7 +29,12 @@ public class GuildCreateHandler {
 		}
 	}
 
-	public void setCache(RecentlySeenCache cache) {
-		this.guildCreate.setCache(cache);
+	public void setLastSeenCache(RecentCache cache) {
+		this.guildCreate.setLastSeenCache(cache);
+	}
+
+	public void setLastActiveCache(RecentCache cache)
+	{
+		this.guildCreate.setLastActiveCache(cache);
 	}
 }

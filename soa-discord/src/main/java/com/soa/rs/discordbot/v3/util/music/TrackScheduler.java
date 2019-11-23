@@ -43,7 +43,7 @@ public class TrackScheduler extends AudioEventAdapter {
 		// something is playing, it returns false and does nothing. In that case
 		// the player was already playing so this
 		// track goes to the queue instead.
-		if (!player.startTrack(track, true)) {
+		if (!player.startTrack(track.makeClone(), true)) {
 			queue.offer(track);
 		} else {
 			currentTrack = Optional.ofNullable(track);
@@ -58,8 +58,15 @@ public class TrackScheduler extends AudioEventAdapter {
 		// or not. In case queue was empty, we are
 		// giving null to startTrack, which is a valid argument and will simply
 		// stop the player.
-		currentTrack = Optional.ofNullable(queue.poll());
+		currentTrack = Optional.ofNullable(queue.poll().makeClone());
 		player.startTrack(currentTrack.orElse(null), false);
+	}
+
+	public void skipNumTracks(int num) {
+		for (int i = 0; i < num; i++) {
+			queue.poll();
+		}
+		nextTrack();
 	}
 
 	@Override

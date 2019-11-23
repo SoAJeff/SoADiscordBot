@@ -1,7 +1,7 @@
 package com.soa.rs.discordbot.v3.api.command;
 
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
-import com.soa.rs.discordbot.v3.usertrack.RecentlySeenCache;
+import com.soa.rs.discordbot.v3.usertrack.RecentCache;
 import com.soa.rs.discordbot.v3.util.SoaDiscordBotConstants;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
@@ -11,7 +11,8 @@ import reactor.core.publisher.Mono;
 
 public class CommandProcessor {
 
-	private RecentlySeenCache cache;
+	private RecentCache lastSeenCache;
+	private RecentCache lastActiveCache;
 
 	public Mono<Void> processMessageEvent(MessageCreateEvent event) {
 		String content = event.getMessage().getContent().orElse("").toLowerCase();
@@ -20,10 +21,14 @@ public class CommandProcessor {
 		if (member != null && !member.isBot() && !(content.trim().isEmpty())) {
 
 			//Update the cache
-			if (event.getGuildId().isPresent() && DiscordCfgFactory.getInstance().isUserTrackingEnabled())
-				if (cache != null) {
-					cache.updateCacheForGuildUser(event.getGuildId().get().asLong(), member.getId().asLong());
+			if (event.getGuildId().isPresent() && DiscordCfgFactory.getInstance().isUserTrackingEnabled()) {
+				if (lastSeenCache != null) {
+					lastSeenCache.updateCacheForGuildUser(event.getGuildId().get().asLong(), member.getId().asLong());
 				}
+				if (lastActiveCache != null) {
+					lastActiveCache.updateCacheForGuildUser(event.getGuildId().get().asLong(), member.getId().asLong());
+				}
+			}
 
 			if (content.startsWith(SoaDiscordBotConstants.BOT_PREFIX) || content.toLowerCase()
 					.startsWith(SoaDiscordBotConstants.RUNEINFO_PREFIX)) {
@@ -54,7 +59,11 @@ public class CommandProcessor {
 		}
 	}
 
-	public void setCache(RecentlySeenCache cache) {
-		this.cache = cache;
+	public void setLastSeenCache(RecentCache cache) {
+		this.lastSeenCache = cache;
+	}
+
+	public void setLastActiveCache(RecentCache cache) {
+		this.lastActiveCache = cache;
 	}
 }

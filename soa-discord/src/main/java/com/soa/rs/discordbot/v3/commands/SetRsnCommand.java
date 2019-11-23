@@ -44,7 +44,9 @@ public class SetRsnCommand extends AbstractCommand {
 			success = true;
 		});
 		if (success) {
-			return event.getMessage().addReaction(ReactionEmoji.unicode(thumbsUp))
+			return event.getMessage().addReaction(ReactionEmoji.unicode(thumbsUp)).onErrorResume(throwable -> Mono
+					.fromRunnable(() -> SoaLogging.getLogger(this)
+							.error("Failed to react to the message - message deleted?")))
 					.then(event.getMember().get().edit(guildMemberEditSpec -> guildMemberEditSpec.setNickname(name))
 							.onErrorResume(throwable -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
 									.error("Failed to change server nickname of user, don't have permission?",

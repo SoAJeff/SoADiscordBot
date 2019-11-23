@@ -2,6 +2,7 @@ package com.soa.rs.discordbot.v3.commands;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -45,6 +46,7 @@ public class MusicPlayer extends AbstractCommand {
 	private final AudioPlayerManager playerManager;
 	private final Map<Long, GuildMusicManager> musicManagers;
 	private boolean disableRankCheck;
+	private static final String YTSEARCH = "ytsearch:";
 
 	public MusicPlayer() {
 		//Initialization things for Lavaplayer only.  Most other will be in the initialize method.
@@ -62,7 +64,7 @@ public class MusicPlayer extends AbstractCommand {
 			setEnabled(true);
 			setMustHavePermission(DiscordCfgFactory.getConfig().getMusicPlayer().getAllowedRoles().getRole());
 			if (DiscordCfgFactory.getConfig().getMusicPlayer().isEnforceOnlyAllowedRoles() != null) {
-				disableRankCheck = DiscordCfgFactory.getConfig().getMusicPlayer().isEnforceOnlyAllowedRoles();
+				disableRankCheck = !DiscordCfgFactory.getConfig().getMusicPlayer().isEnforceOnlyAllowedRoles();
 			}
 			addHelpMsg(".music", "Use .music help for music commands.");
 		} else
@@ -166,14 +168,39 @@ public class MusicPlayer extends AbstractCommand {
 						.info("User attempted to add a track to the queue but the user did not have permission to.");
 				sendMissingRoleMessage(event.getMessage()).subscribe();
 			})).flatMap(ignored -> event.getGuild()).map(this::getGuildAudioPlayer).flatMap(guildMusicManager -> Mono
-					.fromRunnable(() -> playerManager.loadItemOrdered(guildMusicManager, args[2],
-							new DefaultAudioLoadResultHandler(guildMusicManager, event.getMessage(), args[2])))).then();
+					.fromRunnable(() -> {
+						String argument = args[2];
+						if (!isValidUrl(args[2])) {
+							argument = getYoutubeSearchString(args);
+						}
+						playerManager.loadItemOrdered(guildMusicManager, argument,
+								new DefaultAudioLoadResultHandler(guildMusicManager, event.getMessage(), argument));
+					})).then();
 
+		} else if (args.length < 2 && event.getMessage().getAttachments().isEmpty()) {
+			SoaLogging.getLogger(this).info("Attempted to run play with invalid number of args");
+			return sendMessageToChannelReactively(event.getMessage(), "Invalid args provided - use `.music play <url>`")
+					.then();
 		} else {
 			SoaLogging.getLogger(this)
 					.info("User attempted to add a track to the queue but the user did not have permission to.");
 			return sendMissingRoleMessage(event.getMessage()).then();
 		}
+	}
+
+	/**
+	 * Format of Youtube search string is "ytsearch: Title of track here"
+	 * @param args Arguments that will be searched
+	 * @return Properly formatted YT search string
+	 */
+	private String getYoutubeSearchString(String[] args) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(YTSEARCH);
+		for (int i = 2; i < args.length; i++) {
+			sb.append(" ");
+			sb.append(args[i]);
+		}
+		return sb.toString();
 	}
 
 	private Mono<Void> handleStop(MessageCreateEvent event) {
@@ -266,12 +293,20 @@ public class MusicPlayer extends AbstractCommand {
 						.info("User attempted to skip a track but the user did not have permission to.");
 				sendMissingRoleMessage(event.getMessage()).subscribe();
 			})).flatMap(ignored -> event.getGuild()).map(this::getGuildAudioPlayer)
-					.flatMap(guildMusicManager -> Mono.fromRunnable(() -> {
-						for (int i = 0; i < finalSkipVal; i++) {
+					.flatMap(guildMusicManager -> Mono.fromCallable(() -> {
+						String message = finalSkipVal + " track(s) skipped";
+						try {
+							guildMusicManager.scheduler.skipNumTracks(finalSkipVal);
+//							for (int i = 0; i < finalSkipVal; i++) {
+//								guildMusicManager.scheduler.nextTrack();
+//							}
+						} catch (Exception e) {
+							SoaLogging.getLogger(this).error("Attempted to skip tracks but hit an error", e);
 							guildMusicManager.scheduler.nextTrack();
+							return "Attempted to skip tracks but encountered an error - will try and skip 1 track instead.  You may need to manually skip again if bot is unable to skip.";
 						}
-					})).flatMap(ignored -> sendMessageToChannelReactively(event.getMessage(),
-							finalSkipVal + " track(s) skipped")).then();
+						return message;
+					})).flatMap(message -> sendMessageToChannelReactively(event.getMessage(), message)).then();
 		}
 	}
 
@@ -341,6 +376,8 @@ public class MusicPlayer extends AbstractCommand {
 		}
 		sb.append(".music join - Bot joins the voice channel you are in.\n");
 		sb.append(".music play <url> - Bot queues up the URL provided.\n");
+		sb.append(
+				".music search <search term> - Bot searches Youtube for the given search term and plays the first result.");
 		sb.append(
 				".music play <attachment> - Bot will play uploaded file; comment with attachment must be the play command.  Discord enforces an 8mb max file size.\n");
 		sb.append(".music pause - Bot pauses playback.\n");
@@ -436,6 +473,16 @@ public class MusicPlayer extends AbstractCommand {
 				firstTrack = playlist.getTracks().get(0);
 			}
 
+			//Searches seem to grab whatever it finds and add ALL of them.  Just add the first one
+			if (musicArg.startsWith(YTSEARCH)) {
+				SoaLogging.getLogger(this).debug("Attempting to add track " + firstTrack.getInfo().title
+						+ ", which came from search term " + musicArg + ", to queue.");
+				sendMessageToChannel(message, "Adding to queue " + firstTrack.getInfo().title);
+				musicManager.scheduler.queue(firstTrack);
+
+				return;
+			}
+
 			SoaLogging.getLogger(this)
 					.debug("Attempting to add playlist with " + playlist.getTracks().size() + " tracks to queue.");
 			sendMessageToChannel(message,
@@ -444,11 +491,17 @@ public class MusicPlayer extends AbstractCommand {
 
 			musicManager.scheduler.queue(firstTrack);
 
-			for (int i = 1; i < playlist.getTracks().size(); i++) {
-				firstTrack = playlist.getTracks().get(i);
+			for (int i = 0; i < playlist.getTracks().size(); i++) {
+				AudioTrack nextTrack = playlist.getTracks().get(i);
 
-				musicManager.scheduler.queue(firstTrack);
-				SoaLogging.getLogger(this).trace("Adding song from Playlist: " + firstTrack.getInfo().title);
+				//Per playlist.getSelectedTrack, the selectedTrack is ALSO in the playlist all tracks list.  Don't re-insert it.
+				if (!nextTrack.equals(firstTrack)) {
+					musicManager.scheduler.queue(nextTrack);
+					SoaLogging.getLogger(this).trace("Adding song from Playlist: " + nextTrack.getInfo().title);
+				} else {
+					SoaLogging.getLogger(this).trace("This is the same track (" + nextTrack.getInfo().title
+							+ ") as the first one, so not putting it in again.");
+				}
 			}
 			SoaLogging.getLogger(this)
 					.debug("Tracks added to queue, " + +musicManager.scheduler.getQueue().size() + " tracks in queue.");
@@ -480,5 +533,18 @@ public class MusicPlayer extends AbstractCommand {
 				"Sorry, only the following roles can run the music player: " + DiscordUtils
 						.translateRoleList(DiscordCfgFactory.getConfig().getMusicPlayer().getAllowedRoles().getRole()),
 				messageChannel));
+	}
+
+	private boolean isValidUrl(String url) {
+		try {
+			new URL(url).toURI();
+		} catch (Exception e) {
+			return false;
+		}
+		if (url.toLowerCase().startsWith("https://www.youtube") || url.toLowerCase().startsWith("https://youtube")
+				|| url.toLowerCase().startsWith("https://youtu.be")) {
+			return true;
+		} else
+			return false;
 	}
 }

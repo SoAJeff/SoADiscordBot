@@ -12,7 +12,6 @@
       <xsd:element name="event-listing-event" type="EventListingEvent" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="news-listing-event" type="ListingEvent" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="music-player" type="MusicPlayer" minOccurs="0" maxOccurs="1"/>
-      <xsd:element name="trivia" type="BaseEvent" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="dj-pls-event" type="BaseEvent" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="admin-event" type="AdminEvent" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="user-tracking-event" type="UserTrackingEvent" minOccurs="0" maxOccurs="1"/>

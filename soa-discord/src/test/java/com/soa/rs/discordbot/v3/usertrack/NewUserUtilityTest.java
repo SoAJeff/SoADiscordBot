@@ -35,6 +35,7 @@ public class NewUserUtilityTest {
 		newUser.setDisplayName("User1");
 		newUser.setJoinedServer(Date.from(now));
 		newUser.setLastSeen(Date.from(now));
+		newUser.setLastActive(Date.from(now));
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
 
 		NewUserUtility utility = new NewUserUtility();

@@ -49,6 +49,7 @@ public class GuildUserUtilityTest {
 		Date date = new Date();
 		user.setJoinedServer(date);
 		user.setLastSeen(date);
+		user.setLastActive(date);
 
 		userUtility.addNewUser(user);
 
@@ -66,6 +67,7 @@ public class GuildUserUtilityTest {
 		System.out.println("Joined Server: " + user.getJoinedServer());
 		Assert.assertEquals(date, user2.getJoinedServer());
 		Assert.assertEquals(date, user2.getLastSeen());
+		Assert.assertEquals(date, user2.getLastActive());
 		Assert.assertNull(user.getLeftServer());
 	}
 
@@ -79,6 +81,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -90,6 +93,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		try {
 			userUtility.addNewUser(user);
@@ -110,6 +114,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -137,6 +142,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 		updatedUsers.add(user);
@@ -149,6 +155,7 @@ public class GuildUserUtilityTest {
 		user2.setDisplayName("User");
 		user2.setJoinedServer(new Date());
 		user2.setLastSeen(new Date());
+		user2.setLastActive(new Date());
 
 		userUtility.addNewUser(user2);
 		updatedUsers.add(user2);
@@ -177,6 +184,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -201,6 +209,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -223,6 +232,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -247,6 +257,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -269,6 +280,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -294,6 +306,7 @@ public class GuildUserUtilityTest {
 		Date date = new Date();
 		user.setJoinedServer(date);
 		user.setLastSeen(date);
+		user.setLastActive(date);
 
 		userUtility.addNewUser(user);
 
@@ -324,6 +337,7 @@ public class GuildUserUtilityTest {
 		Date date = new Date();
 		user.setJoinedServer(date);
 		user.setLastSeen(date);
+		user.setLastActive(date);
 
 		userUtility.addNewUser(user);
 
@@ -360,6 +374,7 @@ public class GuildUserUtilityTest {
 		Date date = new Date();
 		user.setJoinedServer(date);
 		user.setLastSeen(date);
+		user.setLastActive(date);
 
 		userUtility.addNewUser(user);
 
@@ -382,6 +397,103 @@ public class GuildUserUtilityTest {
 	}
 
 	@Test
+	public void updateLastActiveForExistingUser() {
+		GuildUser user = new GuildUser();
+		user.setSnowflake(1234);
+		user.setGuildSnowflake(6789);
+		user.setUsername("@User#1234");
+		user.setKnownName("User");
+		user.setDisplayName("User");
+		Date date = new Date();
+		user.setJoinedServer(date);
+		user.setLastSeen(date);
+		user.setLastActive(date);
+
+		userUtility.addNewUser(user);
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setWeekDate(2010, 5, 2);
+
+		userUtility.updateLastActiveForUser(calendar.getTime(), 1234, 6789);
+
+		List<GuildUser> users = JdbiWrapper.getInstance().getJdbi()
+				.withHandle(handle -> handle.createQuery("select * from users").mapToBean(GuildUser.class).list());
+
+		Assert.assertEquals(users.size(), 1);
+		GuildUser user2 = users.get(0);
+
+		Assert.assertEquals(calendar.getTime(), user2.getLastActive());
+	}
+
+	@Test
+	public void updateLastActiveForExistingUserViaMap() {
+		GuildUser user = new GuildUser();
+		user.setSnowflake(1234);
+		user.setGuildSnowflake(6789);
+		user.setUsername("@User#1234");
+		user.setKnownName("User");
+		user.setDisplayName("User");
+		Date date = new Date();
+		user.setJoinedServer(date);
+		user.setLastSeen(date);
+		user.setLastActive(date);
+
+		userUtility.addNewUser(user);
+
+		user.setSnowflake(5678);
+		userUtility.addNewUser(user);
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setWeekDate(2010, 5, 2);
+
+		Map<Long, Date> map = new HashMap<>();
+		map.put(1234L, calendar.getTime());
+		map.put(5678L, calendar.getTime());
+
+		userUtility.updateLastActiveForUser(6789, map);
+
+		List<GuildUser> users = JdbiWrapper.getInstance().getJdbi()
+				.withHandle(handle -> handle.createQuery("select * from users").mapToBean(GuildUser.class).list());
+
+		Assert.assertEquals(2, users.size());
+		for (GuildUser finalUser : users) {
+			Assert.assertEquals(calendar.getTime(), finalUser.getLastActive());
+		}
+
+	}
+
+	@Test
+	public void updateLastActiveForExistingUserViaGuildUser() {
+		GuildUser user = new GuildUser();
+		user.setSnowflake(1234);
+		user.setGuildSnowflake(6789);
+		user.setUsername("@User#1234");
+		user.setKnownName("User");
+		user.setDisplayName("User");
+		Date date = new Date();
+		user.setJoinedServer(date);
+		user.setLastSeen(date);
+		user.setLastActive(date);
+
+		userUtility.addNewUser(user);
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setWeekDate(2010, 5, 2);
+
+		user.setLastActive(calendar.getTime());
+
+		userUtility.updateLastActiveForUser(user);
+
+		List<GuildUser> users = JdbiWrapper.getInstance().getJdbi()
+				.withHandle(handle -> handle.createQuery("select * from users").mapToBean(GuildUser.class).list());
+
+		Assert.assertEquals(users.size(), 1);
+		GuildUser user2 = users.get(0);
+
+		Assert.assertEquals(calendar.getTime(), user2.getLastActive());
+	}
+
+	@Test
 	public void getJoinDateForExistingUser() {
 		GuildUser user = new GuildUser();
 		user.setSnowflake(1234);
@@ -392,6 +504,7 @@ public class GuildUserUtilityTest {
 		Date date = new Date();
 		user.setJoinedServer(date);
 		user.setLastSeen(date);
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -421,6 +534,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -447,6 +561,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -462,7 +577,8 @@ public class GuildUserUtilityTest {
 
 		Assert.assertNotNull(user2.getJoinedServer());
 		Assert.assertNotNull(user2.getLastSeen());
-		Assert.assertNull(user.getLeftServer());
+		Assert.assertNull(user2.getLeftServer());
+		Assert.assertNotNull(user2.getLastActive());
 	}
 
 	@Test
@@ -475,6 +591,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -490,7 +607,8 @@ public class GuildUserUtilityTest {
 
 		Assert.assertNotNull(user2.getJoinedServer());
 		Assert.assertNotNull(user2.getLastSeen());
-		Assert.assertNull(user.getLeftServer());
+		Assert.assertNull(user2.getLeftServer());
+		Assert.assertNotNull(user2.getLastActive());
 	}
 
 	@Test
@@ -503,6 +621,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -518,7 +637,8 @@ public class GuildUserUtilityTest {
 
 		Assert.assertNotNull(user2.getJoinedServer());
 		Assert.assertNotNull(user2.getLastSeen());
-		Assert.assertNull(user.getLeftServer());
+		Assert.assertNull(user2.getLeftServer());
+		Assert.assertNotNull(user2.getLastActive());
 	}
 
 	@Test
@@ -531,6 +651,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -550,6 +671,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -573,6 +695,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -596,6 +719,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -607,6 +731,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -618,6 +743,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -636,6 +762,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -647,6 +774,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -658,6 +786,7 @@ public class GuildUserUtilityTest {
 		user.setDisplayName("User");
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -677,6 +806,7 @@ public class GuildUserUtilityTest {
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
 		user.setLeftServer(Date.from(Instant.EPOCH));
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -689,6 +819,7 @@ public class GuildUserUtilityTest {
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
 		user.setLeftServer(Date.from(Instant.EPOCH));
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 
@@ -701,6 +832,7 @@ public class GuildUserUtilityTest {
 		user.setJoinedServer(new Date());
 		user.setLastSeen(new Date());
 		user.setLeftServer(new Date());
+		user.setLastActive(new Date());
 
 		userUtility.addNewUser(user);
 

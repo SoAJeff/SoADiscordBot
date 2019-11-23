@@ -2,7 +2,7 @@ package com.soa.rs.discordbot.v3.bot;
 
 import java.util.Optional;
 
-import com.soa.rs.discordbot.v3.usertrack.RecentlySeenCache;
+import com.soa.rs.discordbot.v3.usertrack.RecentCache;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -16,10 +16,12 @@ public class ReactionAddEventHandlerTest {
 
 	@Test
 	public void testReactionAddEventWithGuild() {
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
+		RecentCache lastActiveCache = Mockito.mock(RecentCache.class);
 
 		ReactionAddEventHandler handler = new ReactionAddEventHandler();
-		handler.setCache(cache);
+		handler.setLastSeenCache(cache);
+		handler.setLastActiveCache(lastActiveCache);
 
 		ReactionAddEvent event = Mockito.mock(ReactionAddEvent.class);
 		MessageChannel channel = Mockito.mock(MessageChannel.class);
@@ -29,14 +31,17 @@ public class ReactionAddEventHandlerTest {
 
 		handler.handle(event).block();
 		Mockito.verify(cache).updateCacheForGuildUser(6789L, 1234L);
+		Mockito.verify(lastActiveCache).updateCacheForGuildUser(6789L, 1234L);
 	}
 
 	@Test
 	public void testReactionAddEventWithoutGuild() {
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
+		RecentCache lastActiveCache = Mockito.mock(RecentCache.class);
 
 		ReactionAddEventHandler handler = new ReactionAddEventHandler();
-		handler.setCache(cache);
+		handler.setLastSeenCache(cache);
+		handler.setLastActiveCache(lastActiveCache);
 
 		ReactionAddEvent event = Mockito.mock(ReactionAddEvent.class);
 		MessageChannel channel = Mockito.mock(MessageChannel.class);

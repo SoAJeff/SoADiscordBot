@@ -77,6 +77,7 @@ public class GuildCreateMemberReviewer {
 		}
 		//We will see if this needs to be updated after, make it equal for now...
 		newUser.setLastSeen(user.getLastSeen());
+		newUser.setLastActive(user.getLastActive());
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
 
 		List<String> nickNames = this.nicknameUtility

@@ -11,34 +11,35 @@ public class GuildUserUtility {
 
 	public void createUsersTable() {
 		JdbiWrapper.getInstance().getJdbi().useHandle(handle -> handle.execute(
-				"create table users(snowflake bigint, guildsnowflake bigint, username varchar(255) not null, knownname varchar(255), displayname varchar(255) not null, lastseen timestamp, joinedserver timestamp, leftserver datetime, constraint unique_user primary key(snowflake, guildsnowflake))"));
+				"create table users(snowflake bigint, guildsnowflake bigint, username varchar(255) not null, knownname varchar(255), displayname varchar(255) not null, lastseen timestamp, joinedserver timestamp, leftserver datetime, lastactive timestamp, constraint unique_user primary key(snowflake, guildsnowflake))"));
 	}
 
 	public void addNewUser(GuildUser user) {
 		JdbiWrapper.getInstance().getJdbi().useHandle(handle -> handle.createUpdate(
-				"insert into users (snowflake, guildsnowflake, username, knownname, displayname, lastseen, joinedserver, leftserver) values (:snowflake, :guildSnowflake, :username, :knownName, :displayName, :lastSeen, :joinedServer, :leftServer)")
+				"insert into users (snowflake, guildsnowflake, username, knownname, displayname, lastseen, joinedserver, leftserver, lastactive) values (:snowflake, :guildSnowflake, :username, :knownName, :displayName, :lastSeen, :joinedServer, :leftServer, :lastActive)")
 				.bindBean(user).execute());
 	}
 
 	public void updateExistingUser(GuildUser user) {
 		JdbiWrapper.getInstance().getJdbi().useHandle(handle -> handle.createUpdate(
-				"update users set username = :username, knownname = :knownname, displayname = :displayname, lastseen = :lastseen, joinedserver = :joinedserver, leftserver = :leftserver where snowflake = :snowflake and guildsnowflake = :guildsnowflake")
+				"update users set username = :username, knownname = :knownname, displayname = :displayname, lastseen = :lastseen, joinedserver = :joinedserver, leftserver = :leftserver, lastactive = :lastactive where snowflake = :snowflake and guildsnowflake = :guildsnowflake")
 				.bind("username", user.getUsername()).bind("knownname", user.getKnownName())
 				.bind("displayname", user.getDisplayName()).bind("lastseen", user.getLastSeen())
 				.bind("joinedserver", user.getJoinedServer()).bind("leftserver", user.getLeftServer())
-				.bind("snowflake", user.getSnowflake()).bind("guildsnowflake", user.getGuildSnowflake()).execute());
+				.bind("lastactive", user.getLastActive()).bind("snowflake", user.getSnowflake())
+				.bind("guildsnowflake", user.getGuildSnowflake()).execute());
 	}
 
 	public void updateExistingUsers(List<GuildUser> users) {
 		JdbiWrapper.getInstance().getJdbi().useHandle(handle -> {
 			for (GuildUser user : users) {
 				handle.createUpdate(
-						"update users set username = :username, knownname = :knownname, displayname = :displayname, lastseen = :lastseen, joinedserver = :joinedserver, leftserver = :leftserver where snowflake = :snowflake and guildsnowflake = :guildsnowflake")
+						"update users set username = :username, knownname = :knownname, displayname = :displayname, lastseen = :lastseen, joinedserver = :joinedserver, leftserver = :leftserver, lastactive = :lastactive where snowflake = :snowflake and guildsnowflake = :guildsnowflake")
 						.bind("username", user.getUsername()).bind("knownname", user.getKnownName())
 						.bind("displayname", user.getDisplayName()).bind("lastseen", user.getLastSeen())
 						.bind("joinedserver", user.getJoinedServer()).bind("leftserver", user.getLeftServer())
-						.bind("snowflake", user.getSnowflake()).bind("guildsnowflake", user.getGuildSnowflake())
-						.execute();
+						.bind("lastactive", user.getLastActive()).bind("snowflake", user.getSnowflake())
+						.bind("guildsnowflake", user.getGuildSnowflake()).execute();
 			}
 		});
 	}
@@ -75,6 +76,31 @@ public class GuildUserUtility {
 				handle.createUpdate(
 						"update users set lastseen = :lastSeen where snowflake = :snowflake and guildsnowflake = :guildsnowflake")
 						.bind("lastSeen", userMap.get(userSnowflake)).bind("snowflake", userSnowflake)
+						.bind("guildsnowflake", guildSnowflake).execute();
+			}
+		});
+	}
+
+	public void updateLastActiveForUser(GuildUser user) {
+		JdbiWrapper.getInstance().getJdbi().useHandle(handle -> handle.createUpdate(
+				"update users set lastactive = :lastActive where snowflake = :snowflake and guildsnowflake = :guildsnowflake")
+				.bind("lastActive", user.getLastActive()).bind("snowflake", user.getSnowflake())
+				.bind("guildsnowflake", user.getGuildSnowflake()).execute());
+	}
+
+	public void updateLastActiveForUser(Date lastActive, long snowflake, long guildSnowflake) {
+		JdbiWrapper.getInstance().getJdbi().useHandle(handle -> handle.createUpdate(
+				"update users set lastactive = :lastActive where snowflake = :snowflake and guildsnowflake = :guildsnowflake")
+				.bind("lastActive", lastActive).bind("snowflake", snowflake).bind("guildsnowflake", guildSnowflake)
+				.execute());
+	}
+
+	public void updateLastActiveForUser(long guildSnowflake, Map<Long, Date> userMap) {
+		JdbiWrapper.getInstance().getJdbi().useHandle(handle -> {
+			for (long userSnowflake : userMap.keySet()) {
+				handle.createUpdate(
+						"update users set lastactive = :lastActive where snowflake = :snowflake and guildsnowflake = :guildsnowflake")
+						.bind("lastActive", userMap.get(userSnowflake)).bind("snowflake", userSnowflake)
 						.bind("guildsnowflake", guildSnowflake).execute();
 			}
 		});

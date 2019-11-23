@@ -4,9 +4,8 @@ import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 import com.soa.rs.discordbot.v3.jdbi.NicknameUtility;
 import com.soa.rs.discordbot.v3.jdbi.RecentActionUtility;
-import com.soa.rs.discordbot.v3.usertrack.RecentlySeenCache;
+import com.soa.rs.discordbot.v3.usertrack.RecentCache;
 import com.soa.rs.discordbot.v3.usertrack.UserTrackMemberUpdated;
-import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.core.event.domain.PresenceUpdateEvent;
 import discord4j.core.event.domain.UserUpdateEvent;
@@ -45,7 +44,7 @@ public class MemberUpdateHandler {
 				.flatMap(member -> userTrackMemberUpdated.handlePresenceUpdate(member, event)).then();
 	}
 
-	public void setCache(RecentlySeenCache cache) {
+	public void setCache(RecentCache cache) {
 		this.userTrackMemberUpdated.setCache(cache);
 	}
 }

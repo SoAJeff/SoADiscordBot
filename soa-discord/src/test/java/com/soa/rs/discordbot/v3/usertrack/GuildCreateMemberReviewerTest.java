@@ -50,6 +50,7 @@ public class GuildCreateMemberReviewerTest {
 		newUser.setJoinedServer(Date.from(now));
 		newUser.setLastSeen(Date.from(now));
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
+		newUser.setLastActive(Date.from(now));
 
 		GuildUser user = reviewer.addNewUser(member);
 
@@ -87,6 +88,7 @@ public class GuildCreateMemberReviewerTest {
 		newUser.setJoinedServer(Date.from(now));
 		newUser.setLastSeen(Date.from(now));
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
+		newUser.setLastActive(Date.from(now));
 
 		GuildUser user = reviewer.updateExistingMember(member, newUser);
 
@@ -124,6 +126,7 @@ public class GuildCreateMemberReviewerTest {
 		newUser.setJoinedServer(Date.from(now));
 		newUser.setLastSeen(Date.from(now));
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
+		newUser.setLastActive(Date.from(now));
 
 		GuildUser user = reviewer.updateExistingMember(member, newUser);
 
@@ -160,6 +163,7 @@ public class GuildCreateMemberReviewerTest {
 		newUser.setJoinedServer(Date.from(now));
 		newUser.setLastSeen(Date.from(now));
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
+		newUser.setLastActive(Date.from(now));
 
 		GuildUser user = reviewer.updateExistingMember(member, newUser);
 
@@ -197,6 +201,7 @@ public class GuildCreateMemberReviewerTest {
 		newUser.setJoinedServer(Date.from(now));
 		newUser.setLastSeen(Date.from(now));
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
+		newUser.setLastActive(Date.from(now));
 
 		GuildUser user = reviewer.updateExistingMember(member, newUser);
 
@@ -234,6 +239,7 @@ public class GuildCreateMemberReviewerTest {
 		newUser.setJoinedServer(Date.from(Instant.parse("2007-12-03T10:15:30.00Z")));
 		newUser.setLastSeen(Date.from(now));
 		newUser.setLeftServer(Date.from(now));
+		newUser.setLastActive(Date.from(now));
 
 		GuildUser user = reviewer.updateExistingMember(member, newUser);
 
@@ -311,6 +317,7 @@ public class GuildCreateMemberReviewerTest {
 		newUser.setJoinedServer(Date.from(now));
 		newUser.setLastSeen(Date.from(Instant.EPOCH));
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
+		newUser.setLastActive(Date.from(now));
 
 		reviewer.checkLastOnlineAndSubmit(member, newUser);
 
@@ -347,6 +354,7 @@ public class GuildCreateMemberReviewerTest {
 		newUser.setJoinedServer(Date.from(now));
 		newUser.setLastSeen(Date.from(now));
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
+		newUser.setLastActive(Date.from(now));
 
 		reviewer.checkLastOnlineAndSubmit(member, newUser);
 
@@ -371,6 +379,7 @@ public class GuildCreateMemberReviewerTest {
 		newUser.setJoinedServer(Date.from(now));
 		newUser.setLastSeen(Date.from(now));
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
+		newUser.setLastActive(Date.from(now));
 
 		List<GuildUser> users = new ArrayList<>();
 		users.add(newUser);
@@ -442,6 +451,7 @@ public class GuildCreateMemberReviewerTest {
 		newUser.setJoinedServer(Date.from(now));
 		newUser.setLastSeen(Date.from(now));
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
+		newUser.setLastActive(Date.from(now));
 
 		List<GuildUser> users = new ArrayList<>();
 		GuildUser newUser2 = new GuildUser();
@@ -489,6 +499,7 @@ public class GuildCreateMemberReviewerTest {
 		newUser.setJoinedServer(Date.from(now));
 		newUser.setLastSeen(Date.from(now));
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
+		newUser.setLastActive(Date.from(now));
 
 		List<GuildUser> users = new ArrayList<>();
 		users.add(newUser);

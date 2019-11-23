@@ -1,6 +1,6 @@
 package com.soa.rs.discordbot.v3.bot;
 
-import com.soa.rs.discordbot.v3.usertrack.RecentlySeenCache;
+import com.soa.rs.discordbot.v3.usertrack.RecentCache;
 
 import discord4j.core.event.domain.channel.TypingStartEvent;
 import discord4j.core.object.entity.Guild;
@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 public class TypingStartHandler {
 
-	private RecentlySeenCache cache;
+	private RecentCache cache;
 
 	public Mono<Void> handleTypingStart(TypingStartEvent event) {
 		Snowflake channelSnowflake = event.getChannelId();
@@ -21,7 +21,7 @@ public class TypingStartHandler {
 				.then();
 	}
 
-	public void setCache(RecentlySeenCache cache) {
+	public void setCache(RecentCache cache) {
 		this.cache = cache;
 	}
 }

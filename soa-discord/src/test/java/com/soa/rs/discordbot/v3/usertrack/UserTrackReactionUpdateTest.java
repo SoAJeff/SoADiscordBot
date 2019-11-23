@@ -9,12 +9,15 @@ public class UserTrackReactionUpdateTest {
 
 	@Test
 	public void testUserTrackReactionAdd() {
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
+		RecentCache lastActiveCache = Mockito.mock(LastActiveCache.class);
 		UserTrackReactionUpdate utru = new UserTrackReactionUpdate();
-		utru.setCache(cache);
+		utru.setLastSeenCache(cache);
+		utru.setLastActiveCache(lastActiveCache);
 
 		utru.handle(Snowflake.of(6789L), Snowflake.of(1234L));
 
 		Mockito.verify(cache).updateCacheForGuildUser(6789L, 1234L);
+		Mockito.verify(lastActiveCache).updateCacheForGuildUser(6789L, 1234L);
 	}
 }

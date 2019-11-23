@@ -48,8 +48,8 @@ public class UserTrackGuildCreateTest {
 	public void testGuildMatchesNoUpdateNeeded() {
 		UserTrackGuildCreate guildCreate = new UserTrackGuildCreate();
 		GuildUtility util = Mockito.mock(GuildUtility.class);
-		RecentlySeenCache cache = new RecentlySeenCache();
-		guildCreate.setCache(cache);
+		RecentCache cache = new LastSeenCache();
+		guildCreate.setLastSeenCache(cache);
 
 		List<GuildEntry> guildEntries = new ArrayList<>();
 		GuildEntry entry = new GuildEntry();
@@ -69,8 +69,8 @@ public class UserTrackGuildCreateTest {
 	public void testGuildNameDoesntMatchAndIsUpdated() {
 		UserTrackGuildCreate guildCreate = new UserTrackGuildCreate();
 		GuildUtility util = Mockito.mock(GuildUtility.class);
-		RecentlySeenCache cache = new RecentlySeenCache();
-		guildCreate.setCache(cache);
+		RecentCache cache = new LastSeenCache();
+		guildCreate.setLastSeenCache(cache);
 
 		List<GuildEntry> guildEntries = new ArrayList<>();
 		GuildEntry entry = new GuildEntry();
@@ -90,8 +90,8 @@ public class UserTrackGuildCreateTest {
 	public void testGuildWasntBeingTracked() {
 		UserTrackGuildCreate guildCreate = new UserTrackGuildCreate();
 		GuildUtility util = Mockito.mock(GuildUtility.class);
-		RecentlySeenCache cache = new RecentlySeenCache();
-		guildCreate.setCache(cache);
+		RecentCache cache = new LastSeenCache();
+		guildCreate.setLastSeenCache(cache);
 
 		List<GuildEntry> guildEntries = new ArrayList<>();
 		Mockito.when(util.getGuildById(67890)).thenReturn(guildEntries);
@@ -106,8 +106,10 @@ public class UserTrackGuildCreateTest {
 	public void testHandleJoinGuild() {
 		UserTrackGuildCreate guildCreate = Mockito.spy(UserTrackGuildCreate.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
-		RecentlySeenCache cache = new RecentlySeenCache();
-		guildCreate.setCache(cache);
+		RecentCache cache = new LastSeenCache();
+		guildCreate.setLastSeenCache(cache);
+		RecentCache lastActiveCache = new LastActiveCache();
+		guildCreate.setLastActiveCache(lastActiveCache);
 		guildCreate.setRecentActionUtility(recentActionUtility);
 		GuildCreateMemberReviewer reviewer = Mockito.mock(GuildCreateMemberReviewer.class);
 		Mockito.when(reviewer.reviewMember(Mockito.any(Member.class))).thenReturn(Mono.empty());
@@ -154,8 +156,10 @@ public class UserTrackGuildCreateTest {
 		GuildCreateMemberReviewer reviewer = Mockito.mock(GuildCreateMemberReviewer.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
 		guildCreate.setRecentActionUtility(recentActionUtility);
-		RecentlySeenCache cache = new RecentlySeenCache();
-		guildCreate.setCache(cache);
+		RecentCache cache = new LastSeenCache();
+		guildCreate.setLastSeenCache(cache);
+		RecentCache lastActiveCache = new LastActiveCache();
+		guildCreate.setLastActiveCache(lastActiveCache);
 		Mockito.when(reviewer.reviewMember(Mockito.any(Member.class))).thenReturn(Mono.empty());
 		Mockito.when(reviewer.removeRemainingUsers()).thenReturn(Mono.empty());
 		Mockito.when(guildCreate.createReviewer()).thenReturn(reviewer);

@@ -25,7 +25,7 @@ public class UserTrackMemberUpdatedTest {
 		GuildUserUtility guildUserUtility = Mockito.mock(GuildUserUtility.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
 		NicknameUtility nicknameUtility = Mockito.mock(NicknameUtility.class);
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
 
 		GuildUser user = new GuildUser();
 		user.setSnowflake(1234);
@@ -72,7 +72,7 @@ public class UserTrackMemberUpdatedTest {
 		GuildUserUtility guildUserUtility = Mockito.mock(GuildUserUtility.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
 		NicknameUtility nicknameUtility = Mockito.mock(NicknameUtility.class);
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
 
 		GuildUser user = new GuildUser();
 		user.setSnowflake(1234);
@@ -120,7 +120,7 @@ public class UserTrackMemberUpdatedTest {
 		GuildUserUtility guildUserUtility = Mockito.mock(GuildUserUtility.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
 		NicknameUtility nicknameUtility = Mockito.mock(NicknameUtility.class);
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
 
 		GuildUser user = new GuildUser();
 		user.setSnowflake(1234);
@@ -167,7 +167,7 @@ public class UserTrackMemberUpdatedTest {
 		GuildUserUtility guildUserUtility = Mockito.mock(GuildUserUtility.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
 		NicknameUtility nicknameUtility = Mockito.mock(NicknameUtility.class);
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
 
 		GuildUser guildUser = new GuildUser();
 		guildUser.setSnowflake(1234);
@@ -208,7 +208,7 @@ public class UserTrackMemberUpdatedTest {
 		GuildUserUtility guildUserUtility = Mockito.mock(GuildUserUtility.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
 		NicknameUtility nicknameUtility = Mockito.mock(NicknameUtility.class);
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
 
 		GuildUser guildUser = new GuildUser();
 		guildUser.setSnowflake(1234);
@@ -249,7 +249,7 @@ public class UserTrackMemberUpdatedTest {
 		GuildUserUtility guildUserUtility = Mockito.mock(GuildUserUtility.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
 		NicknameUtility nicknameUtility = Mockito.mock(NicknameUtility.class);
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
 
 		GuildUser guildUser = new GuildUser();
 		guildUser.setSnowflake(1234);
@@ -300,7 +300,7 @@ public class UserTrackMemberUpdatedTest {
 	public void testPresenceUpdateUserNotChanged() {
 		GuildUserUtility guildUserUtility = Mockito.mock(GuildUserUtility.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
 
 		UserTrackMemberUpdated utmu = new UserTrackMemberUpdated();
 		utmu.setGuildUserUtility(guildUserUtility);
@@ -331,7 +331,7 @@ public class UserTrackMemberUpdatedTest {
 	public void testPresenceUpdateUsernameChangedNotDiscriminator() {
 		GuildUserUtility guildUserUtility = Mockito.mock(GuildUserUtility.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
 
 		UserTrackMemberUpdated utmu = new UserTrackMemberUpdated();
 		utmu.setGuildUserUtility(guildUserUtility);
@@ -376,7 +376,7 @@ public class UserTrackMemberUpdatedTest {
 	public void testPresenceUpdateDiscriminatorChangedNotUsername() {
 		GuildUserUtility guildUserUtility = Mockito.mock(GuildUserUtility.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
 
 		UserTrackMemberUpdated utmu = new UserTrackMemberUpdated();
 		utmu.setGuildUserUtility(guildUserUtility);
@@ -421,7 +421,7 @@ public class UserTrackMemberUpdatedTest {
 	public void testPresenceUpdateUsernameAndDiscriminator() {
 		GuildUserUtility guildUserUtility = Mockito.mock(GuildUserUtility.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
 
 		UserTrackMemberUpdated utmu = new UserTrackMemberUpdated();
 		utmu.setGuildUserUtility(guildUserUtility);
@@ -466,7 +466,7 @@ public class UserTrackMemberUpdatedTest {
 	public void testPresenceUpdateUsernameAndDiscriminatorButMatchesUsernameOnFile() {
 		GuildUserUtility guildUserUtility = Mockito.mock(GuildUserUtility.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
 
 		UserTrackMemberUpdated utmu = new UserTrackMemberUpdated();
 		utmu.setGuildUserUtility(guildUserUtility);
@@ -511,7 +511,7 @@ public class UserTrackMemberUpdatedTest {
 	public void testPresenceUpdateNoUserOnFile() {
 		GuildUserUtility guildUserUtility = Mockito.mock(GuildUserUtility.class);
 		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
-		RecentlySeenCache cache = Mockito.mock(RecentlySeenCache.class);
+		RecentCache cache = Mockito.mock(RecentCache.class);
 
 		UserTrackMemberUpdated utmu = new UserTrackMemberUpdated();
 		utmu.setGuildUserUtility(guildUserUtility);

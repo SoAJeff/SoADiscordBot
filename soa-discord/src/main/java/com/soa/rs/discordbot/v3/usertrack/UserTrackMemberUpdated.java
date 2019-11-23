@@ -19,7 +19,7 @@ public class UserTrackMemberUpdated {
 	private GuildUserUtility guildUserUtility;
 	private RecentActionUtility recentActionUtility;
 	private NicknameUtility nicknameUtility;
-	private RecentlySeenCache cache;
+	private RecentCache cache;
 
 	/**
 	 * A user update processes whether the user has changed their
@@ -124,7 +124,7 @@ public class UserTrackMemberUpdated {
 		this.nicknameUtility = nicknameUtility;
 	}
 
-	public void setCache(RecentlySeenCache cache) {
+	public void setCache(RecentCache cache) {
 		this.cache = cache;
 	}
 }

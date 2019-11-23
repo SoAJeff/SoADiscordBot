@@ -5,7 +5,8 @@ import java.time.Duration;
 import com.soa.rs.discordbot.v3.api.command.CommandInitializer;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
-import com.soa.rs.discordbot.v3.usertrack.RecentlySeenCache;
+import com.soa.rs.discordbot.v3.usertrack.LastActiveCache;
+import com.soa.rs.discordbot.v3.usertrack.LastSeenCache;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.core.DiscordClient;
@@ -31,7 +32,8 @@ import reactor.core.publisher.Flux;
 public class SoaDiscordBot {
 
 	private DiscordClient client;
-	private RecentlySeenCache cache;
+	private LastSeenCache lastSeenCache;
+	private LastActiveCache lastActiveCache;
 
 	public void start() {
 		SoaLogging.getLogger(this)
@@ -59,9 +61,11 @@ public class SoaDiscordBot {
 	}
 
 	public void disconnect() {
-		//Try to write cache to DB before shutting down if possible
-		if (cache != null)
-			cache.writeCacheToDatabase();
+		//Try to write caches to DB before shutting down if possible
+		if (lastSeenCache != null)
+			lastSeenCache.writeCacheToDatabase();
+		if (lastActiveCache != null)
+			lastActiveCache.writeCacheToDatabase();
 		client.logout().block();
 	}
 
@@ -77,19 +81,27 @@ public class SoaDiscordBot {
 		ReactionAddEventHandler reactionAddEventHandler = new ReactionAddEventHandler();
 
 		if (DiscordCfgFactory.getInstance().isUserTrackingEnabled()) {
-			cache = new RecentlySeenCache();
+			lastSeenCache = new LastSeenCache();
+			lastActiveCache = new LastActiveCache();
 			GuildUserUtility guildUserUtility = new GuildUserUtility();
-			cache.setGuildUserUtility(guildUserUtility);
-			messageCreateHandler.setCache(cache);
-			guildCreateHandler.setCache(cache);
-			typingStartHandler.setCache(cache);
-			memberUpdateHandler.setCache(cache);
-			voiceStateUpdateHandler.setCache(cache);
-			reactionAddEventHandler.setCache(cache);
+			lastSeenCache.setGuildUserUtility(guildUserUtility);
+			lastActiveCache.setGuildUserUtility(guildUserUtility);
+			messageCreateHandler.setLastSeenCache(lastSeenCache);
+			messageCreateHandler.setLastActiveCache(lastActiveCache);
+			guildCreateHandler.setLastSeenCache(lastSeenCache);
+			guildCreateHandler.setLastActiveCache(lastActiveCache);
+			typingStartHandler.setCache(lastSeenCache);
+			memberUpdateHandler.setCache(lastSeenCache);
+			voiceStateUpdateHandler.setLastSeenCache(lastSeenCache);
+			voiceStateUpdateHandler.setLastActiveCache(lastActiveCache);
+			reactionAddEventHandler.setLastSeenCache(lastSeenCache);
+			reactionAddEventHandler.setLastActiveCache(lastActiveCache);
 
-			Flux.interval(Duration.ofMinutes(1)).doOnNext(ignored -> cache.writeCacheToDatabase()).subscribe(null,
-					err -> SoaLogging.getLogger(this)
-							.error("Error when running write cache task:" + err.getMessage(), err));
+			Flux.interval(Duration.ofMinutes(1)).doOnNext(ignored -> {
+				lastSeenCache.writeCacheToDatabase();
+				lastActiveCache.writeCacheToDatabase();
+			}).subscribe(null, err -> SoaLogging.getLogger(this)
+					.error("Error when running write cache task:" + err.getMessage(), err));
 		}
 
 		client.getEventDispatcher().on(ReadyEvent.class) // Listen for ReadyEvent(s)

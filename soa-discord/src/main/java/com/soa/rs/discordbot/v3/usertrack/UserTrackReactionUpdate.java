@@ -4,13 +4,19 @@ import discord4j.core.object.util.Snowflake;
 
 public class UserTrackReactionUpdate {
 
-	private RecentlySeenCache cache;
+	private RecentCache lastSeenCache;
+	private RecentCache lastActiveCache;
 
 	public void handle(Snowflake guild, Snowflake user) {
-		cache.updateCacheForGuildUser(guild.asLong(), user.asLong());
+		lastSeenCache.updateCacheForGuildUser(guild.asLong(), user.asLong());
+		lastActiveCache.updateCacheForGuildUser(guild.asLong(), user.asLong());
 	}
 
-	public void setCache(RecentlySeenCache cache) {
-		this.cache = cache;
+	public void setLastSeenCache(RecentCache lastSeenCache) {
+		this.lastSeenCache = lastSeenCache;
+	}
+
+	public void setLastActiveCache(RecentCache lastActiveCache) {
+		this.lastActiveCache = lastActiveCache;
 	}
 }

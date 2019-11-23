@@ -21,6 +21,8 @@ public class GuildUser {
 
 	private Date leftServer;
 
+	private Date lastActive;
+
 	public long getSnowflake() {
 		return snowflake;
 	}
@@ -85,6 +87,14 @@ public class GuildUser {
 		this.leftServer = leftServer;
 	}
 
+	public Date getLastActive() {
+		return lastActive;
+	}
+
+	public void setLastActive(Date lastActive) {
+		this.lastActive = lastActive;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof GuildUser))
@@ -97,6 +107,8 @@ public class GuildUser {
 		if (!(comparedUser.getGuildSnowflake() == getGuildSnowflake()))
 			return false;
 		if (!(sdf.format(comparedUser.getJoinedServer()).equals(sdf.format(getJoinedServer()))))
+			return false;
+		if(!(sdf.format(comparedUser.getLastActive()).equals(sdf.format(getLastActive()))))
 			return false;
 
 		//KnownName can be null

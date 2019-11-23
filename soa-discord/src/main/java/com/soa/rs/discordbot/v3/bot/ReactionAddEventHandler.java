@@ -1,6 +1,6 @@
 package com.soa.rs.discordbot.v3.bot;
 
-import com.soa.rs.discordbot.v3.usertrack.RecentlySeenCache;
+import com.soa.rs.discordbot.v3.usertrack.RecentCache;
 import com.soa.rs.discordbot.v3.usertrack.UserTrackReactionUpdate;
 
 import discord4j.core.event.domain.message.ReactionAddEvent;
@@ -16,7 +16,12 @@ public class ReactionAddEventHandler {
 				.then();
 	}
 
-	public void setCache(RecentlySeenCache cache) {
-		this.userTrackReactionUpdate.setCache(cache);
+	public void setLastSeenCache(RecentCache cache) {
+		this.userTrackReactionUpdate.setLastSeenCache(cache);
+	}
+
+	public void setLastActiveCache(RecentCache cache)
+	{
+		this.userTrackReactionUpdate.setLastActiveCache(cache);
 	}
 }

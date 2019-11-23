@@ -19,6 +19,7 @@ public class NewUserUtility {
 		newUser.setJoinedServer(Date.from(member.getJoinTime()));
 		newUser.setLastSeen(Date.from(member.getJoinTime()));
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
+		newUser.setLastActive(Date.from(member.getJoinTime()));
 
 		return newUser;
 	}

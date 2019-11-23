@@ -55,9 +55,6 @@
       <role>Lian</role>
     </can-disable-rank-check>
   </music-player>
-  <trivia>
-    <enabled>true</enabled>
-  </trivia>
   <dj-pls-event>
     <enabled>true</enabled>
   </dj-pls-event>

@@ -2,7 +2,6 @@ package com.soa.rs.discordbot.v3.usertrack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 import com.soa.rs.discordbot.v3.jdbi.entities.GuildUser;
@@ -11,11 +10,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class RecentlySeenCacheTest {
+public class LastSeenCacheTest {
 
 	@Test
 	public void addUserToCache() {
-		RecentlySeenCache cache = new RecentlySeenCache();
+		LastSeenCache cache = new LastSeenCache();
 		cache.addNewGuild(6789);
 		cache.updateCacheForGuildUser(6789, 1234);
 
@@ -25,7 +24,7 @@ public class RecentlySeenCacheTest {
 
 	@Test
 	public void addUserToNullCache() {
-		RecentlySeenCache cache = new RecentlySeenCache();
+		LastSeenCache cache = new LastSeenCache();
 
 		cache.updateCacheForGuildUser(6789, 1234);
 
@@ -40,7 +39,7 @@ public class RecentlySeenCacheTest {
 
 	@Test
 	public void writeToDatabase() {
-		RecentlySeenCache cache = new RecentlySeenCache();
+		LastSeenCache cache = new LastSeenCache();
 		GuildUserUtility util = Mockito.mock(GuildUserUtility.class);
 
 		GuildUser user = new GuildUser();
@@ -63,7 +62,7 @@ public class RecentlySeenCacheTest {
 
 	@Test
 	public void writeZeroUsersToDatabase() {
-		RecentlySeenCache cache = new RecentlySeenCache();
+		LastSeenCache cache = new LastSeenCache();
 		GuildUserUtility util = Mockito.mock(GuildUserUtility.class);
 
 		cache.setGuildUserUtility(util);
@@ -77,7 +76,7 @@ public class RecentlySeenCacheTest {
 
 	@Test
 	public void writeToDatabaseException() {
-		RecentlySeenCache cache = new RecentlySeenCache();
+		LastSeenCache cache = new LastSeenCache();
 		GuildUserUtility util = Mockito.mock(GuildUserUtility.class);
 
 		GuildUser user = new GuildUser();
@@ -97,7 +96,7 @@ public class RecentlySeenCacheTest {
 
 	@Test
 	public void writeToDatabaseNullUser() {
-		RecentlySeenCache cache = new RecentlySeenCache();
+		LastSeenCache cache = new LastSeenCache();
 		GuildUserUtility util = Mockito.mock(GuildUserUtility.class);
 
 		GuildUser user = new GuildUser();

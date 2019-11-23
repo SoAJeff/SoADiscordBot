@@ -20,7 +20,8 @@ public class UserTrackGuildCreate {
 	private GuildUserUtility userUtility;
 	private NicknameUtility nicknameUtility;
 	private RecentActionUtility recentActionUtility;
-	private RecentlySeenCache cache;
+	private RecentCache lastSeenCache;
+	private RecentCache lastActiveCache;
 
 	public void setGuildUtil(GuildUtility guildUtil) {
 		this.guildUtil = guildUtil;
@@ -34,8 +35,12 @@ public class UserTrackGuildCreate {
 		this.nicknameUtility = nicknameUtility;
 	}
 
-	public void setCache(RecentlySeenCache cache) {
-		this.cache = cache;
+	public void setLastSeenCache(RecentCache lastSeenCache) {
+		this.lastSeenCache = lastSeenCache;
+	}
+
+	public void setLastActiveCache(RecentCache lastActiveCache) {
+		this.lastActiveCache = lastActiveCache;
 	}
 
 	public void setRecentActionUtility(RecentActionUtility recentActionUtility) {
@@ -47,7 +52,8 @@ public class UserTrackGuildCreate {
 		SoaLogging.getLogger(this).info("Joined server [" + guild.getName() + ", " + guild.getId().asLong() + "]");
 		checkAndUpdateGuildDb(guild.getId().asLong(), guild.getName());
 		GuildCreateMemberReviewer reviewer = createReviewer();
-		cache.addNewGuild(guild.getId().asLong());
+		lastSeenCache.addNewGuild(guild.getId().asLong());
+		lastActiveCache.addNewGuild(guild.getId().asLong());
 		reviewer.setUserUtility(userUtility);
 		reviewer.setNicknameUtility(nicknameUtility);
 		reviewer.setRecentActionUtility(recentActionUtility);
