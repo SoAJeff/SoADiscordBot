@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 /**
  * This class schedules tracks for the audio player. It contains the queue of
@@ -19,6 +20,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 public class TrackScheduler extends AudioEventAdapter {
 	private final AudioPlayer player;
 	private final BlockingQueue<AudioTrack> queue;
+	private long guildId;
 
 	private Optional<AudioTrack> currentTrack;
 
@@ -26,9 +28,10 @@ public class TrackScheduler extends AudioEventAdapter {
 	 * @param player
 	 *            The audio player this scheduler uses
 	 */
-	public TrackScheduler(AudioPlayer player) {
+	public TrackScheduler(AudioPlayer player, long guildId) {
 		this.player = player;
 		this.queue = new LinkedBlockingQueue<>();
+		this.guildId = guildId;
 	}
 
 	/**
@@ -58,8 +61,15 @@ public class TrackScheduler extends AudioEventAdapter {
 		// or not. In case queue was empty, we are
 		// giving null to startTrack, which is a valid argument and will simply
 		// stop the player.
-		currentTrack = Optional.ofNullable(queue.poll().makeClone());
-		player.startTrack(currentTrack.orElse(null), false);
+		if (queue.peek() != null) {
+			currentTrack = Optional.of(queue.poll().makeClone());
+			player.startTrack(currentTrack.orElse(null), false);
+		} else {
+			currentTrack = Optional.empty();
+			player.startTrack(null, false);
+			SoaLogging.getLogger(this)
+					.debug("Track queue is now empty, stopping playback for guild [" + guildId + "].");
+		}
 	}
 
 	public void skipNumTracks(int num) {

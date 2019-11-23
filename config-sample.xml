@@ -8,7 +8,7 @@
   </staff-roles>
   <default-guild-id>252267969617461248</default-guild-id>
   <guild-abbreviation>SoA</guild-abbreviation>
-  <default-status>Jeff_Test</default-status>
+  <default-status>Sample</default-status>
   <db-connection>
     <jdbc-url>Put your URL here</jdbc-url>
     <db-username>Database Username</db-username>

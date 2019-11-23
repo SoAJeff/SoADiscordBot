@@ -24,9 +24,9 @@ public class GuildMusicManager {
 	 * Creates a player and a track scheduler.
 	 * @param manager Audio player manager to use for creating the player.
 	 */
-	public GuildMusicManager(AudioPlayerManager manager) {
+	public GuildMusicManager(AudioPlayerManager manager, long guildId) {
 		player = manager.createPlayer();
-		scheduler = new TrackScheduler(player);
+		scheduler = new TrackScheduler(player, guildId);
 		player.addListener(scheduler);
 		provider = new D4jAudioProvider(player);
 	}

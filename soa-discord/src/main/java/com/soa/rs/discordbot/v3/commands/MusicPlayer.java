@@ -367,9 +367,10 @@ public class MusicPlayer extends AbstractCommand {
 
 			if (DiscordCfgFactory.getConfig().getMusicPlayer().getAllowedRoles() != null) {
 				sb.append(
-						"Note - This menu and these commands will only work for users assigned one of the following roles: "
-								+ DiscordUtils.translateRoleList(
-								DiscordCfgFactory.getConfig().getMusicPlayer().getAllowedRoles().getRole()) + "\n\n");
+						"Note - This menu and these commands will only work for users assigned one of the following roles: ")
+						.append(DiscordUtils.translateRoleList(
+								DiscordCfgFactory.getConfig().getMusicPlayer().getAllowedRoles().getRole()))
+						.append("\n\n");
 
 			}
 
@@ -377,7 +378,7 @@ public class MusicPlayer extends AbstractCommand {
 		sb.append(".music join - Bot joins the voice channel you are in.\n");
 		sb.append(".music play <url> - Bot queues up the URL provided.\n");
 		sb.append(
-				".music search <search term> - Bot searches Youtube for the given search term and plays the first result.");
+				".music play <search term> - Bot searches Youtube for the given search term and plays the first result.\n");
 		sb.append(
 				".music play <attachment> - Bot will play uploaded file; comment with attachment must be the play command.  Discord enforces an 8mb max file size.\n");
 		sb.append(".music pause - Bot pauses playback.\n");
@@ -416,7 +417,7 @@ public class MusicPlayer extends AbstractCommand {
 		GuildMusicManager musicManager = musicManagers.get(guildId);
 
 		if (musicManager == null) {
-			musicManager = new GuildMusicManager(playerManager);
+			musicManager = new GuildMusicManager(playerManager, guildId);
 			musicManagers.put(guildId, musicManager);
 		}
 
@@ -446,7 +447,7 @@ public class MusicPlayer extends AbstractCommand {
 		private Message message;
 		private String musicArg;
 
-		public DefaultAudioLoadResultHandler(GuildMusicManager manager, Message message, String musicArg) {
+		DefaultAudioLoadResultHandler(GuildMusicManager manager, Message message, String musicArg) {
 			this.musicManager = manager;
 			this.message = message;
 			if (musicArg != null) {
@@ -541,10 +542,7 @@ public class MusicPlayer extends AbstractCommand {
 		} catch (Exception e) {
 			return false;
 		}
-		if (url.toLowerCase().startsWith("https://www.youtube") || url.toLowerCase().startsWith("https://youtube")
-				|| url.toLowerCase().startsWith("https://youtu.be")) {
-			return true;
-		} else
-			return false;
+		return url.toLowerCase().startsWith("https://www.youtube") || url.toLowerCase().startsWith("https://youtube")
+				|| url.toLowerCase().startsWith("https://youtu.be");
 	}
 }
