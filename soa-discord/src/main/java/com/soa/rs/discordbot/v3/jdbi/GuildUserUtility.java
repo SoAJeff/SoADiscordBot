@@ -1,9 +1,12 @@
 package com.soa.rs.discordbot.v3.jdbi;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import com.soa.rs.discordbot.v3.jdbi.entities.GuildUser;
 
@@ -165,5 +168,47 @@ public class GuildUserUtility {
 		return JdbiWrapper.getInstance().getJdbi().withHandle(
 				handle -> handle.createQuery("select * from users where snowflake = :snowflake")
 						.bind("snowflake", snowflake).mapToBean(GuildUser.class).list());
+	}
+
+	public List<String> getUserActivityDatesForUsername(List<String> usernames, long guildSnowflake) {
+		return JdbiWrapper.getInstance().getJdbi().withHandle(handle -> {
+			List<String> activityEntries = new ArrayList<>();
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm.ss z");
+			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+			StringBuilder sb = new StringBuilder();
+			for (String name : usernames) {
+				List<GuildUser> userEntries = handle.createQuery(
+						"select * from users where (lower(username) like '%" + name.toLowerCase()
+								+ "%' or lower(knownname) like '%" + name.toLowerCase()
+								+ "%' or lower(displayname) like '%" + name.toLowerCase()
+								+ "%') and guildsnowflake = :guildSnowflake").bind("guildSnowflake", guildSnowflake)
+						.mapToBean(GuildUser.class).list();
+				if (userEntries.size() == 0) {
+					sb.append("**");
+					sb.append(name);
+					sb.append("**");
+					sb.append(": No activity data found.");
+					activityEntries.add(sb.toString());
+					sb.setLength(0);
+				} else {
+					sb.append("**");
+					sb.append(name);
+					sb.append("**");
+					sb.append(": ");
+					for (int i = 0; i < userEntries.size(); i++) {
+						GuildUser entry = userEntries.get(i);
+						sb.append(entry.getUsername());
+						sb.append(": ");
+						sb.append(sdf.format(entry.getLastActive()));
+						//Check if there's another entry
+						if(i + 1 < userEntries.size())
+							sb.append(", ");
+					}
+					activityEntries.add(sb.toString());
+					sb.setLength(0);
+				}
+			}
+			return activityEntries;
+		});
 	}
 }

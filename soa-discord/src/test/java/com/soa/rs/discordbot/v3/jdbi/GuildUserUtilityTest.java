@@ -1,5 +1,6 @@
 package com.soa.rs.discordbot.v3.jdbi;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -7,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import com.soa.rs.discordbot.v3.jdbi.entities.GuildUser;
 
@@ -839,6 +841,195 @@ public class GuildUserUtilityTest {
 		List<GuildUser> users = userUtility.getUsersCurrentlyInGuildForGuildId(6789);
 
 		Assert.assertEquals(users.size(), 2);
+	}
+
+	@Test
+	public void searchUserActivityUserNotInDB()
+	{
+		GuildUser user = new GuildUser();
+		user.setSnowflake(1234);
+		user.setGuildSnowflake(6789);
+		user.setUsername("@User#1234");
+		user.setKnownName("KnownNameTest");
+		user.setDisplayName("User");
+		user.setJoinedServer(new Date());
+		user.setLastSeen(new Date());
+		user.setLeftServer(Date.from(Instant.EPOCH));
+		user.setLastActive(new Date());
+
+		userUtility.addNewUser(user);
+
+		List<String> searchUsers = new ArrayList<>();
+		searchUsers.add("SearchUsr");
+		List<String> results = userUtility.getUserActivityDatesForUsername(searchUsers, 6789);
+
+		Assert.assertEquals(1, results.size());
+
+		Assert.assertEquals("**SearchUsr**: No activity data found.", results.get(0));
+	}
+
+	@Test
+	public void searchUserActivityUserInDB()
+	{
+		GuildUser user = new GuildUser();
+		user.setSnowflake(1234);
+		user.setGuildSnowflake(6789);
+		user.setUsername("@User#1234");
+		user.setKnownName("KnownNameTest");
+		user.setDisplayName("User");
+		user.setJoinedServer(new Date());
+		user.setLastSeen(new Date());
+		user.setLeftServer(Date.from(Instant.EPOCH));
+		//Use Epoch so we can easily find it :)
+		user.setLastActive(Date.from(Instant.EPOCH));
+
+		userUtility.addNewUser(user);
+
+		List<String> searchUsers = new ArrayList<>();
+		searchUsers.add("KnownNameTest");
+		List<String> results = userUtility.getUserActivityDatesForUsername(searchUsers, 6789);
+
+		Assert.assertEquals(1, results.size());
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm.ss z");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		Assert.assertEquals("**KnownNameTest**: @User#1234: " + sdf.format(Date.from(Instant.EPOCH)), results.get(0));
+	}
+
+	@Test
+	public void searchUserActivityUserInDBFind2UsersForSingleSearch()
+	{
+		GuildUser user = new GuildUser();
+		user.setSnowflake(1234);
+		user.setGuildSnowflake(6789);
+		user.setUsername("@User#1234");
+		user.setKnownName("KnownNameTest");
+		user.setDisplayName("User");
+		user.setJoinedServer(new Date());
+		user.setLastSeen(new Date());
+		user.setLeftServer(Date.from(Instant.EPOCH));
+		//Use Epoch so we can easily find it :)
+		user.setLastActive(Date.from(Instant.EPOCH));
+
+		userUtility.addNewUser(user);
+
+		user = new GuildUser();
+		user.setSnowflake(5678);
+		user.setGuildSnowflake(6789);
+		user.setUsername("@User#5678");
+		user.setKnownName("KnownName");
+		user.setDisplayName("User");
+		user.setJoinedServer(new Date());
+		user.setLastSeen(new Date());
+		user.setLeftServer(Date.from(Instant.EPOCH));
+		//Use Epoch so we can easily find it :)
+		user.setLastActive(Date.from(Instant.EPOCH));
+
+		userUtility.addNewUser(user);
+
+		List<String> searchUsers = new ArrayList<>();
+		searchUsers.add("KnownName");
+		List<String> results = userUtility.getUserActivityDatesForUsername(searchUsers, 6789);
+
+		Assert.assertEquals(1, results.size());
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm.ss z");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		Assert.assertEquals("**KnownName**: @User#1234: " + sdf.format(Date.from(Instant.EPOCH)) + ", @User#5678: " + sdf.format(Date.from(Instant.EPOCH)), results.get(0));
+	}
+
+	@Test
+	public void searchUserActivityUserInDBFind2Users2Searches()
+	{
+		GuildUser user = new GuildUser();
+		user.setSnowflake(1234);
+		user.setGuildSnowflake(6789);
+		user.setUsername("@User#1234");
+		user.setKnownName("KnownNameTest");
+		user.setDisplayName("User");
+		user.setJoinedServer(new Date());
+		user.setLastSeen(new Date());
+		user.setLeftServer(Date.from(Instant.EPOCH));
+		//Use Epoch so we can easily find it :)
+		user.setLastActive(Date.from(Instant.EPOCH));
+
+		userUtility.addNewUser(user);
+
+		user = new GuildUser();
+		user.setSnowflake(5678);
+		user.setGuildSnowflake(6789);
+		user.setUsername("@User#5678");
+		user.setKnownName("NewName");
+		user.setDisplayName("User");
+		user.setJoinedServer(new Date());
+		user.setLastSeen(new Date());
+		user.setLeftServer(Date.from(Instant.EPOCH));
+		//Use Epoch so we can easily find it :)
+		user.setLastActive(Date.from(Instant.EPOCH));
+
+		userUtility.addNewUser(user);
+
+		List<String> searchUsers = new ArrayList<>();
+		searchUsers.add("KnownNameTest");
+		searchUsers.add("NewName");
+		List<String> results = userUtility.getUserActivityDatesForUsername(searchUsers, 6789);
+
+		Assert.assertEquals(2, results.size());
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm.ss z");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		Assert.assertEquals("**KnownNameTest**: @User#1234: " + sdf.format(Date.from(Instant.EPOCH)), results.get(0));
+		Assert.assertEquals("**NewName**: @User#5678: " + sdf.format(Date.from(Instant.EPOCH)), results.get(1));
+
+	}
+
+	@Test
+	public void searchUserActivityUserInDBFind1Users2SearchesAndOneDoesntExist()
+	{
+		GuildUser user = new GuildUser();
+		user.setSnowflake(1234);
+		user.setGuildSnowflake(6789);
+		user.setUsername("@User#1234");
+		user.setKnownName("KnownNameTest");
+		user.setDisplayName("User");
+		user.setJoinedServer(new Date());
+		user.setLastSeen(new Date());
+		user.setLeftServer(Date.from(Instant.EPOCH));
+		//Use Epoch so we can easily find it :)
+		user.setLastActive(Date.from(Instant.EPOCH));
+
+		userUtility.addNewUser(user);
+
+		user = new GuildUser();
+		user.setSnowflake(5678);
+		user.setGuildSnowflake(6789);
+		user.setUsername("@User#5678");
+		user.setKnownName("NewName");
+		user.setDisplayName("User");
+		user.setJoinedServer(new Date());
+		user.setLastSeen(new Date());
+		user.setLeftServer(Date.from(Instant.EPOCH));
+		//Use Epoch so we can easily find it :)
+		user.setLastActive(Date.from(Instant.EPOCH));
+
+		userUtility.addNewUser(user);
+
+		List<String> searchUsers = new ArrayList<>();
+		searchUsers.add("KnownNameTest");
+		searchUsers.add("SearchName");
+		List<String> results = userUtility.getUserActivityDatesForUsername(searchUsers, 6789);
+
+		Assert.assertEquals(2, results.size());
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm.ss z");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		Assert.assertEquals("**KnownNameTest**: @User#1234: " + sdf.format(Date.from(Instant.EPOCH)), results.get(0));
+		Assert.assertEquals("**SearchName**: No activity data found.", results.get(1));
+
 	}
 
 }
