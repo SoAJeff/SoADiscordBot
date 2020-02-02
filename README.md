@@ -3,7 +3,7 @@ Version: 3.0:  [![Build Status](https://travis-ci.org/SoAJeff/SoADiscordBot.svg?
 
 A (mostly) Reactive Discord Bot written using the [Discord4J](https://github.com/Discord4J/Discord4J) v3 Java library for use by the Spirits of Arianwyn RuneScape clan's Discord Server.
 
-Version 3 of the SoA Discord Bot is a complete rewrite to accomodate the new Project Reactor framework used within Discord4J.  The new bot is within the soa-discord module.  The older modules, discordbot and triviacreator, are not presently being built and will be removed from the repository in the future.
+Version 3 of the SoA Discord Bot is a complete rewrite to accomodate the new Project Reactor framework used within Discord4J.  The new bot is within the soa-discord module. 
 
 ## Building the Bot
 To build the bot it is recommended to have:
