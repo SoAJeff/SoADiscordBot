@@ -22,12 +22,5 @@
           <module>soa-discord</module>
         </modules>
     </profile>
-    <profile>
-      <id>v2</id>
-      <modules>
-        <module>triviacreator</module>
-        <module>discordbot</module>
-      </modules>
-    </profile>
   </profiles>
 </project>

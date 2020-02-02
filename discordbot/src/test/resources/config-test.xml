@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<discordConfiguration>
-    <discordToken>DToken6</discordToken>
-    <eventUrl>http://forums.soa-rs.com/</eventUrl>
-    <newsUrl>http://forums.soa-rs.com/news</newsUrl>
-    <trackingFile>/home/</trackingFile>
-</discordConfiguration>
