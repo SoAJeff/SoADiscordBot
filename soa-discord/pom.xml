@@ -58,7 +58,7 @@
         <dependency>
             <groupId>org.jvnet.jaxb2_commons</groupId>
             <artifactId>jaxb2-basics-runtime</artifactId>
-            <version>0.12.0</version>
+            <version>1.11.1-PUBLISHED-BY-MISTAKE</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
