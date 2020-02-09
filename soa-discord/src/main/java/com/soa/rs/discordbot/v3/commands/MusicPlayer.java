@@ -177,7 +177,7 @@ public class MusicPlayer extends AbstractCommand {
 								new DefaultAudioLoadResultHandler(guildMusicManager, event.getMessage(), argument));
 					})).then();
 
-		} else if (args.length < 2 && event.getMessage().getAttachments().isEmpty()) {
+		} else if (event.getMessage().getAttachments().isEmpty()) {
 			SoaLogging.getLogger(this).info("Attempted to run play with invalid number of args");
 			return sendMessageToChannelReactively(event.getMessage(), "Invalid args provided - use `.music play <url>`")
 					.then();
