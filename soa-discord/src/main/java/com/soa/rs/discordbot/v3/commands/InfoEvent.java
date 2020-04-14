@@ -3,7 +3,6 @@ package com.soa.rs.discordbot.v3.commands;
 import java.lang.management.ManagementFactory;
 import java.text.NumberFormat;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Locale;
 
 import javax.management.Attribute;
@@ -51,7 +50,7 @@ public class InfoEvent extends AbstractCommand {
 		sb.append("My Uptime: " + uptime.toDays() + " days, " + (uptime.toHours() % 24) + " hours, " + (uptime.toMinutes()
 				% 60) + " minutes");
 		sb.append("\n");
-		if (event.getMessage().getContent().get().startsWith(".debug")) {
+		if (event.getMessage().getContent().startsWith(".debug")) {
 			sb.append("\nJVM Statistics:");
 			sb.append(String.format("%nMemory: %s/%s MB", formatNumber(usedMemory), formatNumber(maxMemory)));
 			sb.append(String.format("%nCPU Usage: %.1f%%", getProcessCpuLoad()));

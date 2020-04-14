@@ -3,19 +3,18 @@ package com.soa.rs.discordbot.v3.schedule;
 import java.net.MalformedURLException;
 import java.util.Date;
 
-import com.soa.rs.discordbot.v3.cfg.DiscordCfg;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.rssfeeds.ForumNewsListParser;
 import com.soa.rs.discordbot.v3.util.DiscordUtils;
 
-import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.Channel;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.channel.Channel;
+import discord4j.core.object.entity.channel.MessageChannel;
 
 public class ForumNewsTask implements Runnable {
 
-	private DiscordClient client;
+	private GatewayDiscordClient client;
 	private ForumNewsListParser parser;
 
 	public boolean initialize() {
@@ -34,7 +33,7 @@ public class ForumNewsTask implements Runnable {
 		return false;
 	}
 
-	public void setClient(DiscordClient client) {
+	public void setClient(GatewayDiscordClient client) {
 		this.client = client;
 	}
 

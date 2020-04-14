@@ -2,6 +2,7 @@ package com.soa.rs.discordbot.v3.commands;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import com.soa.rs.discordbot.v3.api.annotation.Command;
@@ -32,7 +33,7 @@ public class UserActivityCommand extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
 		if (event.getGuildId().isPresent()) {
-			List<String> names = parseNames(event.getMessage().getContent().orElse("").trim());
+			List<String> names = parseNames(Optional.of(event.getMessage().getContent()).orElse("").trim());
 			if (names.size() == 0) {
 				return event.getMessage().getChannel().flatMap(messageChannel -> messageChannel
 						.createMessage("No names were provided to search for activity results.")).then();

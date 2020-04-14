@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -73,7 +74,7 @@ public class MusicPlayer extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
-		String[] args = event.getMessage().getContent().orElse("").trim().split(" ");
+		String[] args = Optional.of(event.getMessage().getContent()).orElse("").trim().split(" ");
 		if (args.length <= 1) {
 			return handleHelp(event);
 		}

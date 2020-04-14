@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Snowflake;
 
 public class NewUserUtilityTest {
 

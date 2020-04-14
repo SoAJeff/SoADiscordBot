@@ -1,16 +1,13 @@
 package com.soa.rs.discordbot.v3.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import discord4j.core.object.util.Image;
+import discord4j.rest.util.Image;
 
 /**
  * Utility class to generate an InputStream from an external file on the internet

@@ -4,25 +4,25 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.function.Consumer;
 
-import discord4j.core.object.entity.Channel;
-import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.MessageChannel;
-import discord4j.core.object.entity.PrivateChannel;
-import discord4j.core.object.util.Permission;
-import discord4j.core.object.util.Snowflake;
+import discord4j.core.object.entity.channel.Channel;
+import discord4j.core.object.entity.channel.GuildChannel;
+import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.core.object.entity.channel.PrivateChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
+import discord4j.rest.util.Permission;
+import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 public class DiscordUtils {
 
-	public static Mono<Boolean> hasPermission(Channel channel, Snowflake userId, Permission permission) {
+	public static Mono<Boolean> hasPermission(Channel channel, Mono<Snowflake> userId, Permission permission) {
 		// An user has all the permissions in a private channel
 		if (channel instanceof PrivateChannel) {
 			return Mono.just(true);
 		}
-		return GuildChannel.class.cast(channel).getEffectivePermissions(userId)
+		return userId.flatMap(snowflake -> GuildChannel.class.cast(channel).getEffectivePermissions(snowflake))
 				.map(permissions -> permissions.contains(permission));
 	}
 
@@ -35,7 +35,7 @@ public class DiscordUtils {
 	}
 
 	public static Mono<Message> sendMessage(String content, Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
-		final Snowflake selfId = channel.getClient().getSelfId().get();
+		final Mono<Snowflake> selfId = channel.getClient().getSelfId();
 		return Mono.zip(DiscordUtils.hasPermission(channel, selfId, Permission.SEND_MESSAGES),
 				DiscordUtils.hasPermission(channel, selfId, Permission.EMBED_LINKS)).flatMap(tuple -> {
 			final boolean canSendMessage = tuple.getT1();
@@ -65,7 +65,7 @@ public class DiscordUtils {
 	}
 
 	public static Mono<Message> sendMessage(String content, InputStream file, String filename, MessageChannel channel) {
-		final Snowflake selfId = channel.getClient().getSelfId().get();
+		final Mono<Snowflake> selfId = channel.getClient().getSelfId();
 		return Mono.zip(DiscordUtils.hasPermission(channel, selfId, Permission.SEND_MESSAGES),
 				DiscordUtils.hasPermission(channel, selfId, Permission.ATTACH_FILES)).flatMap(tuple -> {
 			final boolean canSendMessage = tuple.getT1();

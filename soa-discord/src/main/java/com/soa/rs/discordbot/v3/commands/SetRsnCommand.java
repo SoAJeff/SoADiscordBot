@@ -1,5 +1,7 @@
 package com.soa.rs.discordbot.v3.commands;
 
+import java.util.Optional;
+
 import com.soa.rs.discordbot.v3.api.annotation.Command;
 import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
@@ -33,7 +35,7 @@ public class SetRsnCommand extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
-		String content = event.getMessage().getContent().orElse("").trim();
+		String content = Optional.of(event.getMessage().getContent()).orElse("").trim();
 		String name = content.substring(len).trim();
 		success = false;
 		event.getMember().ifPresent(member -> {

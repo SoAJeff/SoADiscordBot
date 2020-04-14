@@ -1,7 +1,6 @@
 package com.soa.rs.discordbot.v3.util;
 
 import java.io.File;
-import java.io.IOException;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -11,9 +10,10 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import com.soa.rs.discordbot.v3.jaxb.DiscordConfiguration;
-//import com.soa.rs.discordbot.jaxb.TrackedInformation;
 
 import org.xml.sax.SAXException;
+
+//import com.soa.rs.discordbot.jaxb.TrackedInformation;
 
 /**
  * The XmlReader reads in a XML configuration file and marshalls it into a

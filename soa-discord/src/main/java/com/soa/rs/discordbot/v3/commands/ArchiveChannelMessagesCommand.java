@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 import com.soa.rs.discordbot.v3.api.annotation.Command;
@@ -112,7 +113,7 @@ public class ArchiveChannelMessagesCommand extends AbstractCommand {
 		sb.append("[").append(formatter.format(message.getTimestamp())).append("] @")
 				.append(message.getAuthor().get().getUsername()).append("#")
 				.append(message.getAuthor().get().getDiscriminator()).append(": ");
-		message.getContent().ifPresent(sb::append);
+		Optional.of(message.getContent()).ifPresent(sb::append);
 		sb.append(System.lineSeparator());
 		if(attaches.size() > 0) {
 			sb.append("Included attachments: ");

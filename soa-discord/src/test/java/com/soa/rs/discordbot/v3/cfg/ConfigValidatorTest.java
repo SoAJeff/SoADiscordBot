@@ -1,8 +1,11 @@
 package com.soa.rs.discordbot.v3.cfg;
 
-import java.io.File;
-
-import com.soa.rs.discordbot.v3.jaxb.*;
+import com.soa.rs.discordbot.v3.jaxb.AdminEvent;
+import com.soa.rs.discordbot.v3.jaxb.DiscordConfiguration;
+import com.soa.rs.discordbot.v3.jaxb.EventListingEvent;
+import com.soa.rs.discordbot.v3.jaxb.MusicPlayer;
+import com.soa.rs.discordbot.v3.jaxb.RankList;
+import com.soa.rs.discordbot.v3.jaxb.UserTrackingEvent;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import org.junit.Assert;

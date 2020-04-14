@@ -8,15 +8,15 @@ import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.rssfeeds.RsNewsParser;
 import com.soa.rs.discordbot.v3.util.DiscordUtils;
 
-import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.Channel;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.channel.Channel;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 
 public class RsNewsTask implements Runnable {
 
-	private DiscordClient client;
+	private GatewayDiscordClient client;
 	private RsNewsParser parser;
 
 	public boolean initialize() {
@@ -35,7 +35,7 @@ public class RsNewsTask implements Runnable {
 		return false;
 	}
 
-	public void setClient(DiscordClient client) {
+	public void setClient(GatewayDiscordClient client) {
 		this.client = client;
 	}
 

@@ -15,18 +15,16 @@ import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import org.apache.commons.io.IOUtils;
 
-import discord4j.core.DiscordClient;
-import discord4j.core.object.presence.Activity;
-import discord4j.core.object.presence.Presence;
-import discord4j.core.object.util.Image;
+import discord4j.core.GatewayDiscordClient;
+import discord4j.rest.util.Image;
 import reactor.core.publisher.Flux;
 
 public class ReadyEventHandler {
 
-	private DiscordClient client;
+	private final GatewayDiscordClient client;
 	private boolean initialized = false;
 
-	public ReadyEventHandler(DiscordClient client) {
+	public ReadyEventHandler(GatewayDiscordClient client) {
 		this.client = client;
 	}
 

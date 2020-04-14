@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Consumer;
@@ -82,12 +83,12 @@ public class UserSearchCommand extends AbstractCommand {
 	}
 
 	public Search determineSearch(MessageCreateEvent event) {
-		if (!event.getMessage().getContent().isPresent()) {
+		if (!Optional.of(event.getMessage().getContent()).isPresent()) {
 			return new Search("");
 		}
 
 		int i = 1;
-		String[] content = event.getMessage().getContent().get().trim().split(" ");
+		String[] content = event.getMessage().getContent().trim().split(" ");
 		StringBuilder sb = new StringBuilder();
 		StringBuilder serverBuilder = new StringBuilder();
 		long id = 0;

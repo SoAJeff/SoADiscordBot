@@ -6,7 +6,7 @@ import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 @Command(triggers = { ".ban" })
@@ -27,8 +27,8 @@ public class UserBanEvent extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
 		SoaLogging.getLogger(this).info("Attempting to ban user from server");
-		if (event.getMessage().getContent().get().contains("-id")) {
-			String[] args = event.getMessage().getContent().get().trim().split(" ");
+		if (event.getMessage().getContent().contains("-id")) {
+			String[] args = event.getMessage().getContent().trim().split(" ");
 			return permittedToExecuteEvent(event.getMember().get())
 					.flatMapMany(ignored -> event.getGuild())
 					.flatMap(guildld -> guildld.ban(Snowflake.of(args[args.length - 1]),

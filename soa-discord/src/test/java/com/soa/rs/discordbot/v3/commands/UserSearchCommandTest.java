@@ -17,7 +17,7 @@ public class UserSearchCommandTest {
 		UserSearchCommand command = new UserSearchCommand();
 		MessageCreateEvent event = Mockito.mock(MessageCreateEvent.class);
 		Message message = Mockito.mock(Message.class);
-		Mockito.when(message.getContent()).thenReturn(Optional.of(".usersearch Apple SoA"));
+		Mockito.when(message.getContent()).thenReturn(".usersearch Apple SoA");
 		Mockito.when(event.getMessage()).thenReturn(message);
 
 		UserSearchCommand.Search search = command.determineSearch(event);
@@ -32,7 +32,7 @@ public class UserSearchCommandTest {
 		UserSearchCommand command = new UserSearchCommand();
 		MessageCreateEvent event = Mockito.mock(MessageCreateEvent.class);
 		Message message = Mockito.mock(Message.class);
-		Mockito.when(message.getContent()).thenReturn(Optional.of(".usersearch Apple SoA -server Spirits of Arianwyn"));
+		Mockito.when(message.getContent()).thenReturn(".usersearch Apple SoA -server Spirits of Arianwyn");
 		Mockito.when(event.getMessage()).thenReturn(message);
 
 		UserSearchCommand.Search search = command.determineSearch(event);
@@ -47,7 +47,7 @@ public class UserSearchCommandTest {
 		UserSearchCommand command = new UserSearchCommand();
 		MessageCreateEvent event = Mockito.mock(MessageCreateEvent.class);
 		Message message = Mockito.mock(Message.class);
-		Mockito.when(message.getContent()).thenReturn(Optional.of(".usersearch"));
+		Mockito.when(message.getContent()).thenReturn(".usersearch");
 		Mockito.when(event.getMessage()).thenReturn(message);
 
 		UserSearchCommand.Search search = command.determineSearch(event);
@@ -61,7 +61,7 @@ public class UserSearchCommandTest {
 		UserSearchCommand command = new UserSearchCommand();
 		MessageCreateEvent event = Mockito.mock(MessageCreateEvent.class);
 		Message message = Mockito.mock(Message.class);
-		Mockito.when(message.getContent()).thenReturn(Optional.empty());
+		Mockito.when(message.getContent()).thenReturn("");
 		Mockito.when(event.getMessage()).thenReturn(message);
 
 		UserSearchCommand.Search search = command.determineSearch(event);
@@ -75,7 +75,7 @@ public class UserSearchCommandTest {
 		UserSearchCommand command = new UserSearchCommand();
 		MessageCreateEvent event = Mockito.mock(MessageCreateEvent.class);
 		Message message = Mockito.mock(Message.class);
-		Mockito.when(message.getContent()).thenReturn(Optional.of(".usersearch Apple SoA -serverid 1234"));
+		Mockito.when(message.getContent()).thenReturn(".usersearch Apple SoA -serverid 1234");
 		Mockito.when(event.getMessage()).thenReturn(message);
 
 		UserSearchCommand.Search search = command.determineSearch(event);
@@ -90,7 +90,7 @@ public class UserSearchCommandTest {
 		UserSearchCommand command = new UserSearchCommand();
 		MessageCreateEvent event = Mockito.mock(MessageCreateEvent.class);
 		Message message = Mockito.mock(Message.class);
-		Mockito.when(message.getContent()).thenReturn(Optional.of(".usersearch Apple SoA -serverid JUNK"));
+		Mockito.when(message.getContent()).thenReturn(".usersearch Apple SoA -serverid JUNK");
 		Mockito.when(event.getMessage()).thenReturn(message);
 
 		UserSearchCommand.Search search = command.determineSearch(event);
@@ -105,7 +105,7 @@ public class UserSearchCommandTest {
 		UserSearchCommand command = new UserSearchCommand();
 		MessageCreateEvent event = Mockito.mock(MessageCreateEvent.class);
 		Message message = Mockito.mock(Message.class);
-		Mockito.when(message.getContent()).thenReturn(Optional.of(".usersearch Apple SoA -serverid 1234 -server This should never be seen"));
+		Mockito.when(message.getContent()).thenReturn(".usersearch Apple SoA -serverid 1234 -server This should never be seen");
 		Mockito.when(event.getMessage()).thenReturn(message);
 
 		UserSearchCommand.Search search = command.determineSearch(event);
@@ -121,7 +121,7 @@ public class UserSearchCommandTest {
 		UserSearchCommand command = new UserSearchCommand();
 		MessageCreateEvent event = Mockito.mock(MessageCreateEvent.class);
 		Message message = Mockito.mock(Message.class);
-		Mockito.when(message.getContent()).thenReturn(Optional.of(".usersearch Apple SoA -server Spirits of Arianwyn -serverid 1234"));
+		Mockito.when(message.getContent()).thenReturn(".usersearch Apple SoA -server Spirits of Arianwyn -serverid 1234");
 		Mockito.when(event.getMessage()).thenReturn(message);
 
 		UserSearchCommand.Search search = command.determineSearch(event);

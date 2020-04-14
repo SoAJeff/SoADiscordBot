@@ -2,6 +2,7 @@ package com.soa.rs.discordbot.v3.commands;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 import com.soa.rs.discordbot.v3.api.annotation.Command;
 import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
@@ -13,13 +14,12 @@ import com.soa.rs.discordbot.v3.util.SoaLogging;
 import org.apache.commons.io.IOUtils;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.channel.Channel;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
-import discord4j.core.object.util.Image;
+import discord4j.rest.util.Image;
 import reactor.core.publisher.Mono;
 
 @Command(triggers = { ".admin" })
@@ -39,7 +39,7 @@ public class AdminEvent extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
-		String[] args = event.getMessage().getContent().orElse("").trim().split(" ");
+		String[] args = Optional.of(event.getMessage().getContent()).orElse("").trim().split(" ");
 
 		if (args.length > 2) {
 			String action = args[1];

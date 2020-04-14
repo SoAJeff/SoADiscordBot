@@ -1,5 +1,7 @@
 package com.soa.rs.discordbot.v3.commands;
 
+import java.util.Optional;
+
 import com.soa.rs.discordbot.v3.api.annotation.Command;
 import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
@@ -65,10 +67,10 @@ public class UserSetKnownNameCommand extends AbstractCommand {
 		String search = null;
 		String name = null;
 		int i = 1;
-		if (!event.getMessage().getContent().isPresent()) {
+		if (!Optional.of(event.getMessage().getContent()).isPresent()) {
 			throw new Exception("No message provided");
 		}
-		String[] args = event.getMessage().getContent().get().trim().split(" ");
+		String[] args = event.getMessage().getContent().trim().split(" ");
 
 		StringBuilder sb = new StringBuilder();
 

@@ -4,14 +4,14 @@ import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.ipb.events.IpbEventListParser;
 import com.soa.rs.discordbot.v3.util.DiscordUtils;
 
-import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.Channel;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.channel.Channel;
+import discord4j.core.object.entity.channel.MessageChannel;
 
 public class EventListTask implements Runnable {
 
-	private DiscordClient client;
+	private GatewayDiscordClient client;
 	private IpbEventListParser parser;
 
 	public boolean initialize() {
@@ -37,7 +37,7 @@ public class EventListTask implements Runnable {
 		}
 	}
 
-	public void setClient(DiscordClient client) {
+	public void setClient(GatewayDiscordClient client) {
 		this.client = client;
 	}
 }

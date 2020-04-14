@@ -1,5 +1,7 @@
 package com.soa.rs.discordbot.v3.api.command;
 
+import java.util.Optional;
+
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.usertrack.RecentCache;
 import com.soa.rs.discordbot.v3.util.SoaDiscordBotConstants;
@@ -15,7 +17,7 @@ public class CommandProcessor {
 	private RecentCache lastActiveCache;
 
 	public Mono<Void> processMessageEvent(MessageCreateEvent event) {
-		String content = event.getMessage().getContent().orElse("").trim().toLowerCase();
+		String content = Optional.of(event.getMessage().getContent()).orElse("").trim().toLowerCase();
 		User member = event.getMessage().getAuthor().orElse(null);
 
 		if (member != null && !member.isBot() && !(content.isEmpty())) {

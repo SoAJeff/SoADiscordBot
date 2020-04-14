@@ -11,10 +11,10 @@ import org.mockito.Mockito;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
-import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 public class SetRsnCommandTest {
@@ -37,7 +37,7 @@ public class SetRsnCommandTest {
 		Mockito.when(event.getMember()).thenReturn(Optional.of(member));
 
 		Message message = Mockito.mock(Message.class);
-		Mockito.when(message.getContent()).thenReturn(Optional.of("!setrsn noob"));
+		Mockito.when(message.getContent()).thenReturn("!setrsn noob");
 		Mockito.when(message.addReaction(ReactionEmoji.unicode(thumbsUp))).thenReturn(Mono.empty());
 		Mockito.when(event.getMessage()).thenReturn(message);
 		Mockito.when(member.edit(Mockito.any(Consumer.class))).thenReturn(Mono.empty());
@@ -63,7 +63,7 @@ public class SetRsnCommandTest {
 		Mockito.when(event.getMember()).thenReturn(Optional.of(member));
 
 		Message message = Mockito.mock(Message.class);
-		Mockito.when(message.getContent()).thenReturn(Optional.of("!setrsn noob"));
+		Mockito.when(message.getContent()).thenReturn("!setrsn noob");
 		Mockito.when(message.addReaction(ReactionEmoji.unicode(thumbsUp))).thenReturn(Mono.empty());
 		Mockito.when(event.getMessage()).thenReturn(message);
 		Mockito.when(member.edit(Mockito.any(Consumer.class))).thenReturn(Mono.error(new Throwable("Tested error.")));
@@ -85,7 +85,7 @@ public class SetRsnCommandTest {
 		Mockito.when(event.getMember()).thenReturn(Optional.empty());
 
 		Message message = Mockito.mock(Message.class);
-		Mockito.when(message.getContent()).thenReturn(Optional.of("!setrsn noob"));
+		Mockito.when(message.getContent()).thenReturn("!setrsn noob");
 		Mockito.when(message.addReaction(ReactionEmoji.unicode(caution))).thenReturn(Mono.empty());
 		Mockito.when(event.getMessage()).thenReturn(message);
 
@@ -113,7 +113,7 @@ public class SetRsnCommandTest {
 		Mockito.when(event.getMember()).thenReturn(Optional.empty());
 
 		Message message = Mockito.mock(Message.class);
-		Mockito.when(message.getContent()).thenReturn(Optional.of("!setrsn noob"));
+		Mockito.when(message.getContent()).thenReturn("!setrsn noob");
 		Mockito.when(message.addReaction(ReactionEmoji.unicode(caution))).thenReturn(Mono.empty());
 		Mockito.when(event.getMessage()).thenReturn(message);
 

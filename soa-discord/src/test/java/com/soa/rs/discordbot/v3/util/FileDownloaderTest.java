@@ -3,7 +3,7 @@ package com.soa.rs.discordbot.v3.util;
 import org.junit.Assert;
 import org.junit.Test;
 
-import discord4j.core.object.util.Image;
+import discord4j.rest.util.Image;
 
 public class FileDownloaderTest {
 

@@ -8,8 +8,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import discord4j.core.event.domain.message.ReactionAddEvent;
-import discord4j.core.object.entity.MessageChannel;
-import discord4j.core.object.util.Snowflake;
+import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 public class ReactionAddEventHandlerTest {
