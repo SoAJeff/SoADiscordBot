@@ -6,7 +6,7 @@ import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Member;
+import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 @Command(triggers = { ".ban" })
@@ -27,14 +27,27 @@ public class UserBanEvent extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
 		SoaLogging.getLogger(this).info("Attempting to ban user from server");
-		return permittedToExecuteEvent(event.getMember().get())
-				.flatMapMany(ignored -> event.getMessage().getUserMentions())
-				.flatMap(user -> user.asMember(event.getGuildId().get()))
-				.flatMap(member1 -> member1
-						.ban(banQuerySpec -> banQuerySpec.setReason("Ban issued via admin ban request")
-								.setDeleteMessageDays(7)).onErrorResume(err -> {
-							SoaLogging.getLogger(this).error("Failed to ban user: " + err.getMessage());
-							return Mono.empty();
-						})).then(event.getMessage().delete()).then();
+		if (event.getMessage().getContent().get().contains("-id")) {
+			String[] args = event.getMessage().getContent().get().split(" ");
+			return permittedToExecuteEvent(event.getMember().get())
+					.flatMapMany(ignored -> event.getGuild())
+					.flatMap(guildld -> guildld.ban(Snowflake.of(args[args.length - 1]),
+							banQuerySpec -> banQuerySpec.setReason("Ban issued via admin ban request")
+									.setDeleteMessageDays(7))
+							.onErrorResume(err -> {
+						SoaLogging.getLogger(this).error("Failed to ban user: " + err.getMessage());
+						return Mono.empty();
+					})).then(event.getMessage().delete()).then();
+		} else {
+			return permittedToExecuteEvent(event.getMember().get())
+					.flatMapMany(ignored -> event.getMessage().getUserMentions())
+					.flatMap(user -> user.asMember(event.getGuildId().get()))
+					.flatMap(member1 -> member1.ban(banQuerySpec -> banQuerySpec.setReason("Ban issued via admin ban request")
+									.setDeleteMessageDays(7))
+							.onErrorResume(err -> {
+								SoaLogging.getLogger(this).error("Failed to ban user: " + err.getMessage());
+								return Mono.empty();
+							})).then(event.getMessage().delete()).then();
+		}
 	}
 }
