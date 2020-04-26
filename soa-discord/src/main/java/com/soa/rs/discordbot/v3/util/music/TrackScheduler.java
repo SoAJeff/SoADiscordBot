@@ -20,7 +20,7 @@ import com.soa.rs.discordbot.v3.util.SoaLogging;
 public class TrackScheduler extends AudioEventAdapter {
 	private final AudioPlayer player;
 	private final BlockingQueue<AudioTrack> queue;
-	private long guildId;
+	private final long guildId;
 
 	private Optional<AudioTrack> currentTrack;
 
@@ -81,6 +81,12 @@ public class TrackScheduler extends AudioEventAdapter {
 
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+		// Log if moving to next track because this one failed to load
+		if (endReason == AudioTrackEndReason.LOAD_FAILED) {
+			SoaLogging.getLogger(this)
+					.warn("Attempted to start track [" + track.getInfo().title + "] for guild [" + guildId
+							+ "] but it failed to load.");
+		}
 		// Only start the next track if the end reason is suitable for it
 		// (FINISHED or LOAD_FAILED)
 		if (endReason.mayStartNext) {
