@@ -31,8 +31,6 @@ import reactor.core.publisher.Flux;
 
 public class SoaDiscordBot {
 
-	private DiscordClient client;
-	private GatewayDiscordClient gatewayDiscordClient;
 	private LastSeenCache lastSeenCache;
 	private LastActiveCache lastActiveCache;
 
@@ -40,13 +38,13 @@ public class SoaDiscordBot {
 		CommandInitializer.init();
 		SoaLogging.getLogger(this)
 				.info("Logging-in bot with Token: " + DiscordCfgFactory.getConfig().getDiscordToken());
-		client = DiscordClient.create(DiscordCfgFactory.getConfig().getDiscordToken());
-		client.withGateway(gatewayDiscordClient -> {
-			registerEvents(gatewayDiscordClient);
-			setInitialStatus(gatewayDiscordClient);
-			setGatewayDiscordClient(gatewayDiscordClient);
-			return gatewayDiscordClient.onDisconnect();
-		}).block();
+		DiscordClient client = DiscordClient.create(DiscordCfgFactory.getConfig().getDiscordToken());
+		client.gateway().setInitialStatus(
+				shardInfo -> Presence.online(Activity.playing(DiscordCfgFactory.getConfig().getDefaultStatus())))
+				.withGateway(gatewayDiscordClient -> {
+					registerEvents(gatewayDiscordClient);
+					return gatewayDiscordClient.onDisconnect();
+				}).block();
 
 	}
 
@@ -56,15 +54,6 @@ public class SoaDiscordBot {
 			lastSeenCache.writeCacheToDatabase();
 		if (lastActiveCache != null)
 			lastActiveCache.writeCacheToDatabase();
-	}
-
-	public void setInitialStatus(GatewayDiscordClient gatewayDiscordClient) {
-		if (DiscordCfgFactory.getConfig().getDefaultStatus() != null && !DiscordCfgFactory.getConfig()
-				.getDefaultStatus().trim().isEmpty()) {
-			SoaLogging.getLogger(this).info("Setting Discord Initial Presence");
-			gatewayDiscordClient.updatePresence(
-					Presence.online(Activity.playing(DiscordCfgFactory.getConfig().getDefaultStatus())));
-		}
 	}
 
 	private void registerEvents(GatewayDiscordClient gatewayDiscordClient) {
@@ -161,7 +150,4 @@ public class SoaDiscordBot {
 
 	}
 
-	public void setGatewayDiscordClient(GatewayDiscordClient gatewayDiscordClient) {
-		this.gatewayDiscordClient = gatewayDiscordClient;
-	}
 }
