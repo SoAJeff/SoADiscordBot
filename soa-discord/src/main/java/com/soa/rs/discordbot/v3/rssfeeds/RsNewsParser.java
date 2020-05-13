@@ -1,6 +1,5 @@
 package com.soa.rs.discordbot.v3.rssfeeds;
 
-import java.awt.Color;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Color;
 
 public class RsNewsParser extends AbstractRssParser {
 
@@ -128,7 +128,7 @@ public class RsNewsParser extends AbstractRssParser {
 					.setAuthor("RuneScape News", DiscordCfgFactory.getConfig().getRsNewsTask().getRsNewsArchiveLink(),
 							DiscordCfgFactory.getConfig().getRsNewsTask().getRsNewsArchiveImage());
 			embedCreateSpec.setTitle(entry.getTitle()).setUrl(entry.getUri());
-			embedCreateSpec.setColor(Color.darkGray);
+			embedCreateSpec.setColor(new Color(64, 64, 64));
 			if (entry.getEnclosures().size() > 0 && (entry.getEnclosures().get(0).getType().equals("image/png") || entry
 					.getEnclosures().get(0).getType().equals("image/jpeg")))
 				embedCreateSpec.setImage(entry.getEnclosures().get(0).getUrl());
