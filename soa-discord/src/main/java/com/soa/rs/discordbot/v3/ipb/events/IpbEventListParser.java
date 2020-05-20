@@ -1,6 +1,10 @@
 package com.soa.rs.discordbot.v3.ipb.events;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,7 +22,12 @@ import javax.ws.rs.core.MediaType;
 
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.util.DateAnalyzer;
+import com.soa.rs.discordbot.v3.util.SoaLogging;
 
+import org.dmfs.rfc5545.DateTime;
+import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
+import org.dmfs.rfc5545.recur.RecurrenceRule;
+import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 
@@ -107,15 +116,45 @@ public class IpbEventListParser {
 				sb.append("\nFor details, visit: <" + event.getUrl() + ">");
 				sb.append("\n\n");
 			} else {
-				//TODO: This needs to understand weekly recurring events instead of reporting dates in the past.
 				sb.append("Event Title: " + event.getTitle());
-				sb.append("\nEvent Date: " + DateAnalyzer.showMultipleTimezonesForEvent(event.getStart()));
+				if (event.getRecurrence() != null && !event.getRecurrence().startsWith(DAILY_RECURRING)) {
+					Date recurringDate = getDateForRecurringEvent(event, today);
+					sb.append("\nEvent Date: " + DateAnalyzer.showMultipleTimezonesForEvent(recurringDate));
+				} else {
+					sb.append("\nEvent Date: " + DateAnalyzer.showMultipleTimezonesForEvent(event.getStart()));
+				}
 				sb.append("\nPosted by: " + event.getAuthor().getName());
 				sb.append("\nFor details, visit: <" + event.getUrl() + ">");
 				sb.append("\n\n");
 			}
 		}
 		return sb.toString();
+	}
+
+	Date getDateForRecurringEvent(Event event, Date today) {
+		LocalDate ld1 = LocalDateTime.ofInstant(today.toInstant(), TimeZone.getTimeZone("UTC").toZoneId())
+				.toLocalDate();
+		RecurrenceRule rule;
+		try {
+			rule = new RecurrenceRule(event.getRecurrence());
+		} catch (InvalidRecurrenceRuleException e) {
+			SoaLogging.getLogger(this).error("Failed to parse recurrence rule, just returning midnight tonight.", e);
+			return new Date(ld1.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli());
+		}
+		DateTime startDate = new DateTime(event.getStart().toInstant().toEpochMilli());
+		RecurrenceRuleIterator it = rule.iterator(startDate);
+		int maxInstances = 300; //Likely overkill, but covers our bases
+
+		while (it.hasNext() && (!rule.isInfinite() || maxInstances-- > 0)) {
+			DateTime nextInstance = it.nextDateTime();
+			LocalDate ld2 = LocalDateTime.ofInstant(Instant.ofEpochMilli(nextInstance.getTimestamp()),
+					TimeZone.getTimeZone("UTC").toZoneId()).toLocalDate();
+
+			if (ld1.equals(ld2))
+				return new Date(nextInstance.getTimestamp());
+		}
+		//Unable to determine, just return today
+		return new Date(ld1.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli());
 	}
 
 	boolean isOngoingEvent(Event event, Date today) {
