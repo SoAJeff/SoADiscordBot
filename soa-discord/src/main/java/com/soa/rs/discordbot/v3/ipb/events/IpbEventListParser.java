@@ -36,13 +36,39 @@ public class IpbEventListParser {
 	private static final String DAILY_RECURRING = "FREQ=DAILY;INTERVAL=1;";
 
 	public String generateListing() {
-		CalendarResults results = downloadCalendarResults();
 		Map<Integer, List<Event>> eventsPerCategory = new TreeMap<>();
 		Map<Integer, String> calendarType = new HashMap<>();
+		CalendarResults results = downloadAndSeparateEvents(eventsPerCategory, calendarType);
+		return buildEventsString(eventsPerCategory, calendarType, results);
+	}
+
+	CalendarResults downloadAndSeparateEvents(Map<Integer, List<Event>> eventsPerCategory,
+			Map<Integer, String> calendarType) {
+		CalendarResults results = downloadCalendarResults(1);
 		separateEvents(eventsPerCategory, calendarType, results);
 		if (results.getTotalPages() > 1) {
-			//TODO: Handle getting another page...
+			for (int i = 2; i <= results.getTotalPages(); i++) {
+				separateEvents(eventsPerCategory, calendarType, downloadCalendarResults(i));
+			}
 		}
+		//Return first set of results, just need something to verify total results > 0
+		return results;
+	}
+
+	void separateEvents(Map<Integer, List<Event>> eventsPerCategory, Map<Integer, String> calendarType,
+			CalendarResults results) {
+		for (Event event : results.getResults()) {
+			int calendarId = event.getCalendar().getId();
+			if (!eventsPerCategory.containsKey(calendarId)) {
+				eventsPerCategory.put(calendarId, new ArrayList<>());
+				calendarType.put(calendarId, event.getCalendar().getName());
+			}
+			eventsPerCategory.get(calendarId).add(event);
+		}
+	}
+
+	String buildEventsString(Map<Integer, List<Event>> eventsPerCategory, Map<Integer, String> calendarType,
+			CalendarResults results) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(generateHeader());
 		if (results.getTotalResults() == 0) {
@@ -58,18 +84,6 @@ public class IpbEventListParser {
 		}
 		sb.append(generateFooter());
 		return sb.toString();
-	}
-
-	void separateEvents(Map<Integer, List<Event>> eventsPerCategory, Map<Integer, String> calendarType,
-			CalendarResults results) {
-		for (Event event : results.getResults()) {
-			int calendarId = event.getCalendar().getId();
-			if (!eventsPerCategory.containsKey(calendarId)) {
-				eventsPerCategory.put(calendarId, new ArrayList<>());
-				calendarType.put(calendarId, event.getCalendar().getName());
-			}
-			eventsPerCategory.get(calendarId).add(event);
-		}
 	}
 
 	String generateHeader() {
@@ -164,10 +178,12 @@ public class IpbEventListParser {
 		cal2.setTimeZone(TimeZone.getTimeZone("UTC"));
 		cal2.setTime(today);
 		cal1.setTime(event.getStart());
+		//Daily recurring event
 		if (event.getRecurrence() != null && event.getRecurrence().startsWith(DAILY_RECURRING) && !DateAnalyzer
 				.isSameDay(cal1, cal2)) {
 			return true;
 		}
+		//Multi-day event
 		if (DateAnalyzer.isBeforeDay(cal1, cal2) && event.getRecurrence() == null) {
 			return true;
 		}
@@ -178,7 +194,7 @@ public class IpbEventListParser {
 		return false;
 	}
 
-	private CalendarResults downloadCalendarResults() {
+	CalendarResults downloadCalendarResults(int page) {
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -189,7 +205,7 @@ public class IpbEventListParser {
 		client.register(JacksonJsonProvider.class);
 		WebTarget target = client.target(DiscordCfgFactory.getConfig().getEventListingEvent().getUrl())
 				.queryParam("rangeStart", sdf.format(date)).queryParam("rangeEnd", sdf.format(date))
-				.queryParam("sortBy", "start");
+				.queryParam("sortBy", "start").queryParam("page", page);
 		return target.request(MediaType.APPLICATION_JSON_TYPE).get(CalendarResults.class);
 	}
 }
