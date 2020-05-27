@@ -48,6 +48,7 @@ public class IpbEventListParser {
 		separateEvents(eventsPerCategory, calendarType, results);
 		if (results.getTotalPages() > 1) {
 			for (int i = 2; i <= results.getTotalPages(); i++) {
+				SoaLogging.getLogger(this).debug("Multiple pages of results, downloading page " + i);
 				separateEvents(eventsPerCategory, calendarType, downloadCalendarResults(i));
 			}
 		}
@@ -58,6 +59,8 @@ public class IpbEventListParser {
 	void separateEvents(Map<Integer, List<Event>> eventsPerCategory, Map<Integer, String> calendarType,
 			CalendarResults results) {
 		for (Event event : results.getResults()) {
+			SoaLogging.getLogger(this)
+					.debug("Event: " + event.getTitle() + " found in calendar " + event.getCalendar().getName());
 			int calendarId = event.getCalendar().getId();
 			if (!eventsPerCategory.containsKey(calendarId)) {
 				eventsPerCategory.put(calendarId, new ArrayList<>());
@@ -164,8 +167,11 @@ public class IpbEventListParser {
 			LocalDate ld2 = LocalDateTime.ofInstant(Instant.ofEpochMilli(nextInstance.getTimestamp()),
 					TimeZone.getTimeZone("UTC").toZoneId()).toLocalDate();
 
-			if (ld1.equals(ld2))
+			if (ld1.equals(ld2)) {
+				SoaLogging.getLogger(this)
+						.debug("Date for recurring event " + event.getTitle() + " found to be " + ld2.toString());
 				return new Date(nextInstance.getTimestamp());
+			}
 		}
 		//Unable to determine, just return today
 		return new Date(ld1.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli());
@@ -181,14 +187,12 @@ public class IpbEventListParser {
 		//Daily recurring event
 		if (event.getRecurrence() != null && event.getRecurrence().startsWith(DAILY_RECURRING) && !DateAnalyzer
 				.isSameDay(cal1, cal2)) {
+			SoaLogging.getLogger(this).debug("Event is daily recurring event: " + event.getTitle());
 			return true;
 		}
 		//Multi-day event
 		if (DateAnalyzer.isBeforeDay(cal1, cal2) && event.getRecurrence() == null) {
-			return true;
-		}
-		if (DateAnalyzer.isBeforeDay(cal1, cal2) && event.getEnd() != null && !event.getRecurrence()
-				.startsWith(DAILY_RECURRING)) {
+			SoaLogging.getLogger(this).debug("Event is multi-day event: " + event.getTitle());
 			return true;
 		}
 		return false;

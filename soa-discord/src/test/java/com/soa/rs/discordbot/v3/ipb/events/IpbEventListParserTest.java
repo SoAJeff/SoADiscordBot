@@ -107,8 +107,7 @@ public class IpbEventListParserTest {
 	}
 
 	@Test
-	public void testBuildEventsStringWithNoEvents()
-	{
+	public void testBuildEventsStringWithNoEvents() {
 		DiscordCfgFactory.getConfig().setGuildAbbreviation("SoA");
 		EventListingEvent ele = new EventListingEvent();
 		ele.getEventEndline().add("Line 1");
@@ -122,11 +121,99 @@ public class IpbEventListParserTest {
 	}
 
 	@Test
+	public void testBuildEventsStringWithEvents() throws ParseException {
+		DiscordCfgFactory.getConfig().setGuildAbbreviation("SoA");
+		EventListingEvent ele = new EventListingEvent();
+		ele.getEventEndline().add("Line 1");
+		ele.getEventEndline().add("Line 2");
+		DiscordCfgFactory.getConfig().setEventListingEvent(ele);
+		IpbEventListParser parser = new IpbEventListParser();
+		CalendarResults results = buildBaseCalendarResults();
+		Map<Integer, List<Event>> eventsPerCategory = new TreeMap<>();
+		Map<Integer, String> calendarType = new HashMap<>();
+		List<Event> event = new ArrayList<>();
+		event.add(results.getResults().get(0));
+		eventsPerCategory.put(1, event);
+		calendarType.put(1, "Game Events");
+		Assert.assertTrue(
+				parser.buildEventsString(eventsPerCategory, calendarType, results).contains("**__Game Events__**"));
+	}
+
+	@Test
 	public void testGenerateFooterNoLines() {
 		EventListingEvent ele = new EventListingEvent();
 		DiscordCfgFactory.getConfig().setEventListingEvent(ele);
 		IpbEventListParser parser = new IpbEventListParser();
 		Assert.assertEquals("", parser.generateFooter());
+	}
+
+	@Test
+	public void handleEventsOngoingEvent() throws ParseException {
+		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Event event2 = new Event();
+		event2.setStart(inputFormat.parse("2019-11-05T04:00:00Z"));
+		event2.setTitle("Forum Event 1");
+		event2.setUrl("https://discord.bot");
+		Member member1 = new Member();
+		member1.setName("Applejuiceaj");
+		event2.setAuthor(member1);
+		Date date = new Date();
+		IpbEventListParser parser = Mockito.spy(IpbEventListParser.class);
+		Mockito.doReturn(true).when(parser).isOngoingEvent(event2, date);
+		List<Event> events = new ArrayList<>();
+		events.add(event2);
+		String result = parser.handleEvents(events, date);
+
+		Assert.assertEquals(
+				"The following event is ongoing!\nForum Event 1\nPosted by: Applejuiceaj\nFor details, visit: <https://discord.bot>\n\n",
+				result);
+	}
+
+	@Test
+	public void handleCompOngoingEvent() throws ParseException {
+		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Event event2 = new Event();
+		event2.setStart(inputFormat.parse("2019-11-05T04:00:00Z"));
+		event2.setTitle("Forum Competition 1");
+		event2.setUrl("https://discord.bot");
+		Member member1 = new Member();
+		member1.setName("Applejuiceaj");
+		event2.setAuthor(member1);
+		Date date = new Date();
+		IpbEventListParser parser = Mockito.spy(IpbEventListParser.class);
+		Mockito.doReturn(true).when(parser).isOngoingEvent(event2, date);
+		List<Event> events = new ArrayList<>();
+		events.add(event2);
+		String result = parser.handleEvents(events, date);
+
+		Assert.assertEquals(
+				"The following competition is ongoing!\nForum Competition 1\nPosted by: Applejuiceaj\nFor details, visit: <https://discord.bot>\n\n",
+				result);
+	}
+
+	@Test
+	public void handleEventsNormalEvent() throws ParseException {
+		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Event event2 = new Event();
+		event2.setStart(inputFormat.parse("2019-11-05T04:00:00Z"));
+		event2.setTitle("Forum Event 1");
+		event2.setUrl("https://discord.bot");
+		Member member1 = new Member();
+		member1.setName("Applejuiceaj");
+		event2.setAuthor(member1);
+		Date date = new Date();
+		IpbEventListParser parser = Mockito.spy(IpbEventListParser.class);
+		Mockito.doReturn(false).when(parser).isOngoingEvent(event2, date);
+		List<Event> events = new ArrayList<>();
+		events.add(event2);
+		String result = parser.handleEvents(events, date);
+
+		Assert.assertEquals(
+				"Event Title: Forum Event 1\nEvent Date: 04-Nov 23:00 EST | 05-Nov 04:00 UTC (Game time) | 05-Nov 15:00 AEDT\nPosted by: Applejuiceaj\nFor details, visit: <https://discord.bot>\n\n",
+				result);
 	}
 
 	@Test
