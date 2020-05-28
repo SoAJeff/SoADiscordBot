@@ -31,11 +31,12 @@
   </db-connection>
   <event-listing-event>
     <enabled>true</enabled>
-    <url>https://forums.soa-rs.com/calendar/events.xml</url>
+    <url>https://forums.soa-rs.com/api/calendar/events</url>
     <channel>events</channel>
     <event-endline>For more event information and upcoming events, check out the</event-endline>
     <event-endline>Events Forum: https://forums.soa-rs.com/forum/9-events/</event-endline>
     <event-endline>Events Calendar: https://forums.soa-rs.com/calendar/</event-endline>
+    <api-key>[Insert API key here]</api-key>
   </event-listing-event>
   <news-listing-event>
     <enabled>true</enabled>
