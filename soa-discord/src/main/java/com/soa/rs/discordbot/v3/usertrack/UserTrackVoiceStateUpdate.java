@@ -1,6 +1,6 @@
 package com.soa.rs.discordbot.v3.usertrack;
 
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 
 public class UserTrackVoiceStateUpdate {
 

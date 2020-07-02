@@ -8,13 +8,13 @@ import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
-import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 public class SetRsnCommandTest {

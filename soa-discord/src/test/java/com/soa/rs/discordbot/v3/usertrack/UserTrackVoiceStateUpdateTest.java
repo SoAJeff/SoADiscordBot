@@ -3,7 +3,7 @@ package com.soa.rs.discordbot.v3.usertrack;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 
 public class UserTrackVoiceStateUpdateTest {
 

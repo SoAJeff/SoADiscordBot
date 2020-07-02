@@ -5,8 +5,8 @@ import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 @Command(triggers = { ".ban" })

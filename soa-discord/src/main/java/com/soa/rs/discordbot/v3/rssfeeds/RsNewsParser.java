@@ -128,7 +128,7 @@ public class RsNewsParser extends AbstractRssParser {
 					.setAuthor("RuneScape News", DiscordCfgFactory.getConfig().getRsNewsTask().getRsNewsArchiveLink(),
 							DiscordCfgFactory.getConfig().getRsNewsTask().getRsNewsArchiveImage());
 			embedCreateSpec.setTitle(entry.getTitle()).setUrl(entry.getUri());
-			embedCreateSpec.setColor(new Color(64, 64, 64));
+			embedCreateSpec.setColor(Color.DARK_GRAY);
 			if (entry.getEnclosures().size() > 0 && (entry.getEnclosures().get(0).getType().equals("image/png") || entry
 					.getEnclosures().get(0).getType().equals("image/jpeg")))
 				embedCreateSpec.setImage(entry.getEnclosures().get(0).getUrl());

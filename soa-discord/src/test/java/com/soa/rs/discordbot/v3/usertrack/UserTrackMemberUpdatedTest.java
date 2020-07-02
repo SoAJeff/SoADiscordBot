@@ -13,10 +13,10 @@ import com.soa.rs.discordbot.v3.jdbi.entities.GuildUser;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.PresenceUpdateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
-import discord4j.rest.util.Snowflake;
 
 public class UserTrackMemberUpdatedTest {
 

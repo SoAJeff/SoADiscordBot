@@ -15,10 +15,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.presence.Status;
-import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 public class GuildCreateMemberReviewerTest {
