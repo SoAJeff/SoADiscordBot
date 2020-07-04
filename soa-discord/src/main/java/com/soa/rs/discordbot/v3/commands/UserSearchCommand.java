@@ -87,7 +87,7 @@ public class UserSearchCommand extends AbstractCommand {
 		}
 
 		int i = 1;
-		String[] content = event.getMessage().getContent().get().split(" ");
+		String[] content = event.getMessage().getContent().get().trim().split(" ");
 		StringBuilder sb = new StringBuilder();
 		StringBuilder serverBuilder = new StringBuilder();
 		long id = 0;

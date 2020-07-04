@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 
 public class MessageCreateHandler {
 
-	private CommandProcessor processor = new CommandProcessor();
+	private final CommandProcessor processor = new CommandProcessor();
 
 	public Mono<Void> handle(MessageCreateEvent event) {
 		return processor.processMessageEvent(event).onErrorResume(throwable -> Mono.fromRunnable(

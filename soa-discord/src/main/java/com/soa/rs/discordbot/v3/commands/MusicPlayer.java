@@ -73,7 +73,7 @@ public class MusicPlayer extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
-		String[] args = event.getMessage().getContent().orElse("").split(" ");
+		String[] args = event.getMessage().getContent().orElse("").trim().split(" ");
 		if (args.length <= 1) {
 			return handleHelp(event);
 		}

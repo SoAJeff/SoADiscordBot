@@ -39,7 +39,7 @@ public class AdminEvent extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
-		String[] args = event.getMessage().getContent().orElse("").split(" ");
+		String[] args = event.getMessage().getContent().orElse("").trim().split(" ");
 
 		if (args.length > 2) {
 			String action = args[1];

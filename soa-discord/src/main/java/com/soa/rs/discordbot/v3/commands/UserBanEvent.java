@@ -28,7 +28,7 @@ public class UserBanEvent extends AbstractCommand {
 	public Mono<Void> execute(MessageCreateEvent event) {
 		SoaLogging.getLogger(this).info("Attempting to ban user from server");
 		if (event.getMessage().getContent().get().contains("-id")) {
-			String[] args = event.getMessage().getContent().get().split(" ");
+			String[] args = event.getMessage().getContent().get().trim().split(" ");
 			return permittedToExecuteEvent(event.getMember().get())
 					.flatMapMany(ignored -> event.getGuild())
 					.flatMap(guildld -> guildld.ban(Snowflake.of(args[args.length - 1]),

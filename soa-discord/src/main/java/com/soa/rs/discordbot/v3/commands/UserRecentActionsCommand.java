@@ -25,7 +25,7 @@ public class UserRecentActionsCommand extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
-		String[] args = event.getMessage().getContent().get().split(" ");
+		String[] args = event.getMessage().getContent().get().trim().split(" ");
 		int num = 15;
 		if (args.length == 2) {
 			try {

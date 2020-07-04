@@ -32,7 +32,7 @@ public class UserActivityCommand extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
 		if (event.getGuildId().isPresent()) {
-			List<String> names = parseNames(event.getMessage().getContent().orElse(""));
+			List<String> names = parseNames(event.getMessage().getContent().orElse("").trim());
 			if (names.size() == 0) {
 				return event.getMessage().getChannel().flatMap(messageChannel -> messageChannel
 						.createMessage("No names were provided to search for activity results.")).then();
