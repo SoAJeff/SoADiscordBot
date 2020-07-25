@@ -83,10 +83,6 @@ public class UserSearchCommand extends AbstractCommand {
 	}
 
 	public Search determineSearch(MessageCreateEvent event) {
-		if (!Optional.of(event.getMessage().getContent()).isPresent()) {
-			return new Search("");
-		}
-
 		int i = 1;
 		String[] content = event.getMessage().getContent().trim().split(" ");
 		StringBuilder sb = new StringBuilder();

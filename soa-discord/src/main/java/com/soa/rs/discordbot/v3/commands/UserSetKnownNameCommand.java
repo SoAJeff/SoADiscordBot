@@ -67,9 +67,6 @@ public class UserSetKnownNameCommand extends AbstractCommand {
 		String search = null;
 		String name = null;
 		int i = 1;
-		if (!Optional.of(event.getMessage().getContent()).isPresent()) {
-			throw new Exception("No message provided");
-		}
 		String[] args = event.getMessage().getContent().trim().split(" ");
 
 		StringBuilder sb = new StringBuilder();
