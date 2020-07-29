@@ -3,6 +3,7 @@ package com.soa.rs.discordbot.v3.commands;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +30,10 @@ import com.soa.rs.discordbot.v3.util.music.EmptyAudioTrack;
 import com.soa.rs.discordbot.v3.util.music.GuildMusicManager;
 
 import org.apache.commons.io.IOUtils;
+import org.reactivestreams.Publisher;
 
+import discord4j.common.util.Snowflake;
+import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Attachment;
@@ -37,6 +41,7 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.core.spec.MessageCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -123,14 +128,46 @@ public class MusicPlayer extends AbstractCommand {
 				.flatMap(VoiceState::getChannel)
 				// join returns a VoiceConnection which would be required if we were
 				// adding disconnection features, but for now we are just ignoring it.
-				.flatMap(channel -> event.getGuild().map(this::getGuildAudioPlayer).flatMap(
-						guildMusicManager -> channel.join(spec -> spec.setProvider(guildMusicManager.provider))))
-				.flatMap(voiceConnection -> event.getGuild().map(this::getGuildAudioPlayer)
-						.flatMap(guildMusicManager -> Mono.fromRunnable(() -> {
-							SoaLogging.getLogger(this).debug("Joined voice channel");
-							guildMusicManager.setVoiceConnection(voiceConnection);
-							guildMusicManager.player.setVolume(15);
-						}))).then();
+				.flatMap(channel -> event.getGuild().map(this::getGuildAudioPlayer).flatMap(guildMusicManager -> {
+					guildMusicManager.setVoiceChannel(channel);
+					return channel.join(spec -> spec.setProvider(guildMusicManager.provider));
+				})).flatMap(connection -> {
+					SoaLogging.getLogger(this).debug("Joined voice channel");
+					GuildMusicManager guildMusicManager = musicManagers
+							.get(event.getGuildId().orElse(Snowflake.of(1L)).asLong());
+					guildMusicManager.setVoiceConnection(connection);
+					guildMusicManager.player.setVolume(15);
+					final VoiceChannel channel = guildMusicManager.getVoiceChannel();
+
+					// The bot itself has a VoiceState; 1 VoiceState signals bot is alone
+					final Publisher<Boolean> voiceStateCounter = channel.getVoiceStates().count()
+							.map(count -> 1L == count);
+
+					// After 10 seconds, check if the bot is alone. This is useful if
+					// the bot joined alone, but no one else joined since connecting
+					final Mono<Void> onDelay = Mono.delay(Duration.ofSeconds(10L))
+							.filterWhen(ignored -> voiceStateCounter).switchIfEmpty(Mono.never()).then();
+
+					// As people join and leave `channel`, check if the bot is alone.
+					// Note the first filter is not strictly necessary, but it does prevent many unnecessary cache calls
+					final Mono<Void> onEvent = channel.getClient().getEventDispatcher().on(VoiceStateUpdateEvent.class)
+							.filter(event1 -> event1.getOld().flatMap(VoiceState::getChannelId)
+									.map(channel.getId()::equals).orElse(false))
+							.filterWhen(ignored -> voiceStateCounter).next().then();
+
+					// Disconnect the bot if either onDelay or onEvent are completed!
+					return Mono.first(onDelay, onEvent).then(connection.disconnect()).then(Mono.fromRunnable(
+							() -> handleDisconnection(event.getGuildId().orElse(Snowflake.of(1L)).asLong())));
+				}).then();
+	}
+
+	private void handleDisconnection(long guildId) {
+		GuildMusicManager manager = musicManagers.get(guildId);
+		manager.player.stopTrack();
+		manager.scheduler.emptyQueue();
+		if (manager.getVoiceChannel() != null)
+			SoaLogging.getLogger(this).debug("Automatically left voice channel for guild [" + guildId + "] as channel was empty");
+		manager.setVoiceChannel(null);
 	}
 
 	private Mono<Void> handleLeave(MessageCreateEvent event) {
@@ -138,16 +175,18 @@ public class MusicPlayer extends AbstractCommand {
 			SoaLogging.getLogger(this)
 					.info("User attempted to run the leave command but the user did not have permission to.");
 			sendMissingRoleMessage(event.getMessage()).subscribe();
-		})).flatMap(ignored -> event.getGuild()).map(this::getGuildAudioPlayer)
-				.flatMap(guildMusicManager -> Mono.fromRunnable(() -> {
-					if (guildMusicManager.getVoiceConnection() != null) {
-						guildMusicManager.getVoiceConnection().disconnect();
-						guildMusicManager.player.stopTrack();
-						guildMusicManager.scheduler.emptyQueue();
-						SoaLogging.getLogger(this).debug("Left voice channel");
-					} else
-						SoaLogging.getLogger(this).debug("Voice connection is null?");
-				})).then();
+		})).flatMap(ignored -> event.getGuild()).map(this::getGuildAudioPlayer).flatMap(guildMusicManager -> {
+			if (guildMusicManager.getVoiceConnection() != null) {
+				guildMusicManager.player.stopTrack();
+				guildMusicManager.scheduler.emptyQueue();
+				guildMusicManager.setVoiceChannel(null);
+				SoaLogging.getLogger(this).debug("Left voice channel");
+				return guildMusicManager.getVoiceConnection().disconnect();
+			} else {
+				SoaLogging.getLogger(this).debug("Voice connection is null?");
+				return Mono.empty();
+			}
+		}).then();
 	}
 
 	private Mono<Void> handlePlay(MessageCreateEvent event, String[] args) {
@@ -168,8 +207,8 @@ public class MusicPlayer extends AbstractCommand {
 				SoaLogging.getLogger(this)
 						.info("User attempted to add a track to the queue but the user did not have permission to.");
 				sendMissingRoleMessage(event.getMessage()).subscribe();
-			})).flatMap(ignored -> event.getGuild()).map(this::getGuildAudioPlayer).flatMap(guildMusicManager -> Mono
-					.fromRunnable(() -> {
+			})).flatMap(ignored -> event.getGuild()).map(this::getGuildAudioPlayer)
+					.flatMap(guildMusicManager -> Mono.fromRunnable(() -> {
 						String argument = args[2];
 						if (!isValidUrl(args[2])) {
 							argument = getYoutubeSearchString(args);
@@ -191,6 +230,7 @@ public class MusicPlayer extends AbstractCommand {
 
 	/**
 	 * Format of Youtube search string is "ytsearch: Title of track here"
+	 *
 	 * @param args Arguments that will be searched
 	 * @return Properly formatted YT search string
 	 */
@@ -298,9 +338,6 @@ public class MusicPlayer extends AbstractCommand {
 						String message = finalSkipVal + " track(s) skipped";
 						try {
 							guildMusicManager.scheduler.skipNumTracks(finalSkipVal);
-//							for (int i = 0; i < finalSkipVal; i++) {
-//								guildMusicManager.scheduler.nextTrack();
-//							}
 						} catch (Exception e) {
 							SoaLogging.getLogger(this).error("Attempted to skip tracks but hit an error", e);
 							guildMusicManager.scheduler.nextTrack();
@@ -391,7 +428,7 @@ public class MusicPlayer extends AbstractCommand {
 		sb.append(".music nowplaying - Bot lists currently playing track.\n");
 		sb.append(".music playing - Bot lists currently playing track.\n");
 		sb.append(".music volume <0-100> - Sets volume to appropriate level.\n");
-		sb.append(".music leave - Bot leaves the voice channel.\n");
+		sb.append(".music leave - Bot leaves the voice channel.  Bot will also leave automatically if no one is left in the voice channel.\n");
 		sb.append(".music help - Bot displays this menu.```");
 
 		return sendMessageToChannelReactively(event.getMessage(), sb.toString()).then();
@@ -408,7 +445,8 @@ public class MusicPlayer extends AbstractCommand {
 					})).then(sendMessageToChannelReactively(event.getMessage(),
 							"Settings updated, disableRankCheck set to " + disableRankCheck)).then();
 		} else {
-			SoaLogging.getLogger(this).error("Error encountered when updating disableRankCheck property - not sent in ");
+			SoaLogging.getLogger(this)
+					.error("Error encountered when updating disableRankCheck property - not sent in ");
 			return Mono.empty();
 		}
 	}
@@ -444,9 +482,9 @@ public class MusicPlayer extends AbstractCommand {
 	}
 
 	class DefaultAudioLoadResultHandler implements AudioLoadResultHandler {
-		private GuildMusicManager musicManager;
-		private Message message;
-		private String musicArg;
+		private final GuildMusicManager musicManager;
+		private final Message message;
+		private final String musicArg;
 
 		DefaultAudioLoadResultHandler(GuildMusicManager manager, Message message, String musicArg) {
 			this.musicManager = manager;

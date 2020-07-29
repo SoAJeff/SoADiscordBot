@@ -3,6 +3,7 @@ package com.soa.rs.discordbot.v3.util.music;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 
+import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.voice.VoiceConnection;
 
 public class GuildMusicManager {
@@ -18,6 +19,8 @@ public class GuildMusicManager {
 	public final D4jAudioProvider provider;
 
 	private volatile VoiceConnection voiceConnection;
+
+	private VoiceChannel voiceChannel;
 
 
 	/**
@@ -37,5 +40,13 @@ public class GuildMusicManager {
 
 	public void setVoiceConnection(VoiceConnection voiceConnection) {
 		this.voiceConnection = voiceConnection;
+	}
+
+	public VoiceChannel getVoiceChannel() {
+		return voiceChannel;
+	}
+
+	public void setVoiceChannel(VoiceChannel voiceChannel) {
+		this.voiceChannel = voiceChannel;
 	}
 }
