@@ -8,8 +8,10 @@ public class UserTrackVoiceStateUpdate {
 	private RecentCache lastActiveCache;
 
 	public void handleVoiceStateUpdate(Snowflake user, Snowflake guild) {
-		lastSeenCache.updateCacheForGuildUser(guild.asLong(), user.asLong());
-		lastActiveCache.updateCacheForGuildUser(guild.asLong(), user.asLong());
+		if(lastSeenCache != null && lastActiveCache != null) {
+			lastSeenCache.updateCacheForGuildUser(guild.asLong(), user.asLong());
+			lastActiveCache.updateCacheForGuildUser(guild.asLong(), user.asLong());
+		}
 	}
 
 	public void setLastSeenCache(RecentCache lastSeenCache) {

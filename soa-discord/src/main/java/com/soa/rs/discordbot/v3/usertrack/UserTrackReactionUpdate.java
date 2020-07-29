@@ -8,8 +8,10 @@ public class UserTrackReactionUpdate {
 	private RecentCache lastActiveCache;
 
 	public void handle(Snowflake guild, Snowflake user) {
-		lastSeenCache.updateCacheForGuildUser(guild.asLong(), user.asLong());
-		lastActiveCache.updateCacheForGuildUser(guild.asLong(), user.asLong());
+		if(lastSeenCache != null && lastActiveCache != null) {
+			lastSeenCache.updateCacheForGuildUser(guild.asLong(), user.asLong());
+			lastActiveCache.updateCacheForGuildUser(guild.asLong(), user.asLong());
+		}
 	}
 
 	public void setLastSeenCache(RecentCache lastSeenCache) {

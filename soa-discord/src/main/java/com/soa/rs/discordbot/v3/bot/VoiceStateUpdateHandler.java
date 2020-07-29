@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 
 public class VoiceStateUpdateHandler {
 
-	private UserTrackVoiceStateUpdate userTrackVoiceStateUpdate = new UserTrackVoiceStateUpdate();
+	private final UserTrackVoiceStateUpdate userTrackVoiceStateUpdate = new UserTrackVoiceStateUpdate();
 
 	public Mono<Void> handle(VoiceStateUpdateEvent event) {
 		return event.getCurrent().getUser().filter(ignored -> DiscordCfgFactory.getInstance().isUserTrackingEnabled())

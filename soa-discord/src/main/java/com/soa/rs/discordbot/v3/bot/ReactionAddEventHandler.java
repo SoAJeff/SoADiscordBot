@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 
 public class ReactionAddEventHandler {
 
-	private UserTrackReactionUpdate userTrackReactionUpdate = new UserTrackReactionUpdate();
+	private final UserTrackReactionUpdate userTrackReactionUpdate = new UserTrackReactionUpdate();
 
 	public Mono<Void> handle(ReactionAddEvent event) {
 		return event.getChannel().filter(ignored -> event.getGuildId().isPresent()).flatMap(ignored -> Mono
