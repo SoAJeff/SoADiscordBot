@@ -27,6 +27,8 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
+import discord4j.gateway.intent.Intent;
+import discord4j.gateway.intent.IntentSet;
 import reactor.core.publisher.Flux;
 
 public class SoaDiscordBot {
@@ -41,6 +43,10 @@ public class SoaDiscordBot {
 		DiscordClient client = DiscordClient.create(DiscordCfgFactory.getConfig().getDiscordToken());
 		client.gateway().setInitialStatus(
 				shardInfo -> Presence.online(Activity.playing(DiscordCfgFactory.getConfig().getDefaultStatus())))
+				.setEnabledIntents(IntentSet
+						.of(Intent.GUILDS, Intent.GUILD_MEMBERS, Intent.GUILD_BANS, Intent.GUILD_VOICE_STATES,
+								Intent.GUILD_PRESENCES, Intent.GUILD_MESSAGES, Intent.GUILD_MESSAGE_REACTIONS,
+								Intent.GUILD_MESSAGE_TYPING, Intent.DIRECT_MESSAGES))
 				.withGateway(gatewayDiscordClient -> {
 					registerEvents(gatewayDiscordClient);
 					return gatewayDiscordClient.onDisconnect();
