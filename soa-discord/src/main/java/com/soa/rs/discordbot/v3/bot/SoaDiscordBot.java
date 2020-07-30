@@ -35,6 +35,7 @@ public class SoaDiscordBot {
 
 	private LastSeenCache lastSeenCache;
 	private LastActiveCache lastActiveCache;
+	private GatewayDiscordClient discordClient;
 
 	public void start() {
 		CommandInitializer.init();
@@ -48,6 +49,7 @@ public class SoaDiscordBot {
 								Intent.GUILD_PRESENCES, Intent.GUILD_MESSAGES, Intent.GUILD_MESSAGE_REACTIONS,
 								Intent.GUILD_MESSAGE_TYPING, Intent.DIRECT_MESSAGES))
 				.withGateway(gatewayDiscordClient -> {
+					this.discordClient = gatewayDiscordClient;
 					registerEvents(gatewayDiscordClient);
 					return gatewayDiscordClient.onDisconnect();
 				}).block();
@@ -55,6 +57,7 @@ public class SoaDiscordBot {
 	}
 
 	public void disconnect() {
+		this.discordClient.logout().block();
 		//Try to write caches to DB before shutting down if possible
 		if (lastSeenCache != null)
 			lastSeenCache.writeCacheToDatabase();
