@@ -30,6 +30,7 @@ import discord4j.core.object.presence.Presence;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
 import reactor.core.publisher.Flux;
+import reactor.util.retry.Retry;
 
 public class SoaDiscordBot {
 
@@ -52,7 +53,12 @@ public class SoaDiscordBot {
 					this.discordClient = gatewayDiscordClient;
 					registerEvents(gatewayDiscordClient);
 					return gatewayDiscordClient.onDisconnect();
-				}).block();
+				})
+				/* Retry backoff is in place for if login fails due to some kind of exception (no internet)?
+				 * Note: Will not try indefinitely, will try only 20 times, but this is only with initial startup
+				 * Once logged in, if disconnected will try indefinitely
+				 */
+				.retryWhen(Retry.backoff(20, Duration.ofSeconds(5))).block();
 
 	}
 
