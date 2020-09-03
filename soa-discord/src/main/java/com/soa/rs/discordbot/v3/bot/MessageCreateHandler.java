@@ -12,9 +12,14 @@ public class MessageCreateHandler {
 	private final CommandProcessor processor = new CommandProcessor();
 
 	public Mono<Void> handle(MessageCreateEvent event) {
-		return processor.processMessageEvent(event).onErrorResume(throwable -> Mono.fromRunnable(
-				() -> SoaLogging.getLogger(this)
-						.error("Error when processing message create event: " + throwable.getMessage(), throwable))).then();
+		try {
+			return processor.processMessageEvent(event).onErrorResume(throwable -> Mono.fromRunnable(
+					() -> SoaLogging.getLogger(this)
+							.error("Error when processing message create event: " + throwable.getMessage(), throwable)))
+					.then();
+		} catch (Exception e) {
+			return Mono.error(e);
+		}
 	}
 
 	public void setLastSeenCache(RecentCache cache) {

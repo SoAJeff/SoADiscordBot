@@ -284,15 +284,21 @@ public class MusicPlayer extends AbstractCommand {
 
 	private Mono<Void> handleVolume(MessageCreateEvent event, String[] args) {
 		if (args.length == 3) {
-			final int volume = Integer.parseInt(args[2]);
-			return checkMusicRoles(event).switchIfEmpty(Mono.fromRunnable(() -> {
-				SoaLogging.getLogger(this)
-						.info("User attempted to change the player volume command but the user did not have permission to.");
-				sendMissingRoleMessage(event.getMessage()).subscribe();
-			})).flatMap(ignored -> event.getGuild()).map(this::getGuildAudioPlayer)
-					.flatMap(guildMusicManager -> Mono.fromRunnable(() -> guildMusicManager.player.setVolume(volume)))
-					.flatMap(ignored -> sendMessageToChannelReactively(event.getMessage(), "Volume set to " + volume))
-					.then();
+			try {
+				final int volume = Integer.parseInt(args[2]);
+				return checkMusicRoles(event).switchIfEmpty(Mono.fromRunnable(() -> {
+					SoaLogging.getLogger(this).info("User attempted to change the player volume command but the user did not have permission to.");
+					sendMissingRoleMessage(event.getMessage()).subscribe();
+				})).flatMap(ignored -> event.getGuild()).map(this::getGuildAudioPlayer).flatMap(
+						guildMusicManager -> Mono.fromRunnable(() -> guildMusicManager.player.setVolume(volume)))
+						.flatMap(ignored -> sendMessageToChannelReactively(event.getMessage(),
+								"Volume set to " + volume)).then();
+			}
+			//If someone for some odd reason gives something that isn't a number
+			catch (NumberFormatException e) {
+				return sendMessageToChannelReactively(event.getMessage(),
+						"Please provide a valid volume - a number 1-150.").then();
+			}
 		} else if (args.length == 2) {
 			return event.getGuild().map(this::getGuildAudioPlayer).flatMap(
 					guildMusicManager -> sendMessageToChannelReactively(event.getMessage(),
@@ -304,7 +310,13 @@ public class MusicPlayer extends AbstractCommand {
 	private Mono<Void> handleSkip(MessageCreateEvent event, String[] args) {
 		int skipVal = 1;
 		if (args.length == 3) {
-			skipVal = Integer.parseInt(args[2]);
+			try {
+				skipVal = Integer.parseInt(args[2]);
+			} catch (NumberFormatException e) {
+				//Keep at 1, send message.
+				sendMessageToChannel(event.getMessage(),
+						"`" + args[2] + "` is not a number of tracks to skip, defaulting to 1.");
+			}
 		}
 		final int finalSkipVal = skipVal;
 
@@ -335,7 +347,7 @@ public class MusicPlayer extends AbstractCommand {
 				sendMissingRoleMessage(event.getMessage()).subscribe();
 			})).flatMap(ignored -> event.getGuild()).map(this::getGuildAudioPlayer)
 					.flatMap(guildMusicManager -> Mono.fromCallable(() -> {
-						String message = finalSkipVal + " track(s) skipped";
+						String message = finalSkipVal + " track(s) skipped.";
 						try {
 							guildMusicManager.scheduler.skipNumTracks(finalSkipVal);
 						} catch (Exception e) {

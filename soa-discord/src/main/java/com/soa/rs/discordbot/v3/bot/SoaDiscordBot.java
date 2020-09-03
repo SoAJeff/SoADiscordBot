@@ -30,6 +30,7 @@ import discord4j.core.object.presence.Presence;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
 public class SoaDiscordBot {
@@ -128,8 +129,10 @@ public class SoaDiscordBot {
 						Presence.online(Activity.playing(DiscordCfgFactory.getConfig().getDefaultStatus())));
 		});
 
-		gatewayDiscordClient.on(MessageCreateEvent.class).flatMap(messageCreateHandler::handle).subscribe(null,
-				err -> SoaLogging.getLogger(this).error("Unexpected error occurred during message create event.", err));
+		gatewayDiscordClient.on(MessageCreateEvent.class).flatMap(event -> messageCreateHandler.handle(event)
+				.onErrorResume(err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred during message create event.", err)
+				))).subscribe();
 
 		gatewayDiscordClient.on(GuildCreateEvent.class).subscribe(guildCreateHandler::handleGuildCreate,
 				err -> SoaLogging.getLogger(this).error("Unexpected error occurred during guild create event.", err));
