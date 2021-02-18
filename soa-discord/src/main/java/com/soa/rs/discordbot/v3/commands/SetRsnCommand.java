@@ -1,6 +1,8 @@
 package com.soa.rs.discordbot.v3.commands;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.soa.rs.discordbot.v3.api.annotation.Command;
 import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
@@ -19,8 +21,13 @@ public class SetRsnCommand extends AbstractCommand {
 	private GuildUserUtility userUtility;
 	private final String thumbsUp = "👍";
 	private final String caution = "⚠";
-	private int len = "!setrsn".length();
+	private final int len = "!setrsn".length();
 	private boolean success;
+	private final Pattern rsnPattern;
+
+	public SetRsnCommand() {
+		rsnPattern = Pattern.compile("^[A-Za-z0-9]+([ _-]{0,10}[A-Za-z0-9]+)*$");
+	}
 
 	@Override
 	public void initialize() {
@@ -37,6 +44,18 @@ public class SetRsnCommand extends AbstractCommand {
 	public Mono<Void> execute(MessageCreateEvent event) {
 		String content = Optional.of(event.getMessage().getContent()).orElse("").trim();
 		String name = content.substring(len).trim();
+		if (!isValidRsn(name)) {
+			StringBuilder sb = new StringBuilder();
+			event.getMessage().getAuthor().ifPresent(user -> sb.append(user.getMention()));
+			sb.append(", ");
+			sb.append(" the name entered does not appear to be a valid RSN.  ");
+			sb.append("If you are using this command to attempt to set your server nickname to ");
+			sb.append("something that isn't your RSN (e.g., to add an emoji or also add your IRL name),");
+			sb.append(" then contact a member of staff for assistance.");
+			return event.getMessage().getChannel().flatMap(channel -> DiscordUtils.sendMessage(sb.toString(), channel))
+					.then();
+		}
+		SoaLogging.getLogger(this).debug("RuneScape name was determined to be valid, continuing...");
 		success = false;
 		event.getMember().ifPresent(member -> {
 			SoaLogging.getLogger(this)
@@ -67,6 +86,21 @@ public class SetRsnCommand extends AbstractCommand {
 				return Mono.empty();
 			}
 		}
+	}
+
+	boolean isValidRsn(String name) {
+		boolean isValid = false;
+		if (name.length() <= 12) {
+			Matcher matcher = rsnPattern.matcher(name);
+			if (matcher.matches()) {
+				isValid = true;
+			} else {
+				SoaLogging.getLogger(this).error("RuneScape name does not match RSN regex.");
+			}
+		} else {
+			SoaLogging.getLogger(this).error("RuneScape name provided is longer than 12 chars");
+		}
+		return isValid;
 	}
 
 	void setUserUtility(GuildUserUtility utility) {

@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -128,5 +129,32 @@ public class SetRsnCommandTest {
 		Mockito.verify(message, Mockito.times(0)).addReaction(ReactionEmoji.unicode(thumbsUp));
 		Mockito.verify(message, Mockito.times(0)).addReaction(ReactionEmoji.unicode(caution));
 
+	}
+
+	@Test
+	public void testValidRsn() {
+		SetRsnCommand command = new SetRsnCommand();
+		Assert.assertTrue(command.isValidRsn("Applejuiceaj"));
+	}
+
+	@Test
+	public void testValidRsn1or2Letters() {
+		SetRsnCommand command = new SetRsnCommand();
+		Assert.assertTrue(command.isValidRsn("E"));
+		Assert.assertTrue(command.isValidRsn("1"));
+		Assert.assertTrue(command.isValidRsn("12"));
+		Assert.assertTrue(command.isValidRsn("Ae"));
+	}
+
+	@Test
+	public void testInvalidRsns() {
+		SetRsnCommand command = new SetRsnCommand();
+		Assert.assertFalse(command.isValidRsn("Apple_"));
+		Assert.assertFalse(command.isValidRsn("Apple "));
+		Assert.assertFalse(command.isValidRsn("Apple-"));
+		Assert.assertFalse(command.isValidRsn("_Apple"));
+		Assert.assertFalse(command.isValidRsn("-Apple"));
+		Assert.assertFalse(command.isValidRsn("ApplejuiceajA"));
+		Assert.assertFalse(command.isValidRsn("Jeff | Apple"));
 	}
 }
