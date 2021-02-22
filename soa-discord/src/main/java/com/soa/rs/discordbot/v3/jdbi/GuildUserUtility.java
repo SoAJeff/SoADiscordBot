@@ -164,6 +164,13 @@ public class GuildUserUtility {
 				.mapToBean(GuildUser.class).list());
 	}
 
+	public List<GuildUser> getLeftUsersInGuildForGuildId(long guildSnowflake) {
+		return JdbiWrapper.getInstance().getJdbi().withHandle(handle -> handle
+				.createQuery("select * from users where guildsnowflake = :guildSnowflake and leftserver <> :date")
+				.bind("guildSnowflake", guildSnowflake).bind("date", Date.from(Instant.EPOCH))
+				.mapToBean(GuildUser.class).list());
+	}
+
 	public List<GuildUser> getUsersForUserId(long snowflake) {
 		return JdbiWrapper.getInstance().getJdbi().withHandle(
 				handle -> handle.createQuery("select * from users where snowflake = :snowflake")
@@ -201,7 +208,7 @@ public class GuildUserUtility {
 						sb.append(": ");
 						sb.append(sdf.format(entry.getLastActive()));
 						//Check if there's another entry
-						if(i + 1 < userEntries.size())
+						if (i + 1 < userEntries.size())
 							sb.append(", ");
 					}
 					activityEntries.add(sb.toString());

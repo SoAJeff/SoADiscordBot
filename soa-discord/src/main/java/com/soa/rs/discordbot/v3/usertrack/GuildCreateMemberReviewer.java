@@ -25,6 +25,7 @@ public class GuildCreateMemberReviewer {
 	private RecentActionUtility recentActionUtility;
 	private List<Long> guildUsers;
 	private List<GuildUser> allUsers;
+	private List<GuildUser> leftUsers;
 	private List<GuildUser> usersToSubmit = new ArrayList<>();
 	private long guildId;
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -41,8 +42,22 @@ public class GuildCreateMemberReviewer {
 			GuildUser user = updateExistingMember(member, listUser.get(0));
 			checkLastOnlineAndSubmit(member, user);
 		} else {
-			//New user
-			GuildUser user = addNewUser(member);
+			List<GuildUser> leftUser = this.leftUsers.stream()
+					.filter(guildUser -> guildUser.getSnowflake() == member.getId().asLong())
+					.collect(Collectors.toList());
+			GuildUser user;
+			if (leftUser.size() > 0) {
+				SoaLogging.getLogger(this)
+						.debug("Member [" + getMemberName(member) + ", " + member.getGuildId().asLong()
+								+ "] previously left server and has returned.");
+				user = updateExistingMember(member, leftUser.get(0));
+				this.recentActionUtility
+						.addRecentAction(member.getGuildId().asLong(), member.getId().asLong(), "Rejoined the server");
+				//Rejoined user
+			} else {
+				//New user
+				user = addNewUser(member);
+			}
 			checkLastOnlineAndSubmit(member, user);
 		}
 		return Mono.empty();
@@ -180,5 +195,9 @@ public class GuildCreateMemberReviewer {
 
 	public void setGuildId(long guildId) {
 		this.guildId = guildId;
+	}
+
+	public void setLeftUsers(List<GuildUser> leftUsers) {
+		this.leftUsers = leftUsers;
 	}
 }

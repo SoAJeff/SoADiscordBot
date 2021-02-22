@@ -61,6 +61,7 @@ public class UserTrackGuildCreate {
 		reviewer.setGuildUsers(userUtility.getUsersCurrentlyInGuildForGuildId(guild.getId().asLong()).stream()
 				.map(GuildUser::getSnowflake).collect(Collectors.toList()));
 		reviewer.setAllUsers(userUtility.getUsersCurrentlyInGuildForGuildId(guild.getId().asLong()));
+		reviewer.setLeftUsers(userUtility.getLeftUsersInGuildForGuildId(guild.getId().asLong()));
 		guild.getMembers().filter(member -> !member.isBot()).flatMap(reviewer::reviewMember)
 				.doOnComplete(reviewer::submitUsers).doOnComplete(reviewer::removeRemainingUsers).subscribe();
 

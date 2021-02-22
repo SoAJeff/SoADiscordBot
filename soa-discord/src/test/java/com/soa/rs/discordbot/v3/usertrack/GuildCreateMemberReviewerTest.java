@@ -462,6 +462,7 @@ public class GuildCreateMemberReviewerTest {
 		reviewer.setUserUtility(userUtility);
 		reviewer.setNicknameUtility(nicknameUtility);
 		reviewer.setRecentActionUtility(recentActionUtility);
+		reviewer.setLeftUsers(new ArrayList<>());
 
 		reviewer.reviewMember(member1);
 
@@ -528,8 +529,57 @@ public class GuildCreateMemberReviewerTest {
 	}
 
 	@Test
-	public void testGetMemberName()
-	{
+	public void testUserLeftAndRejoined() {
+		GuildCreateMemberReviewer reviewer = new GuildCreateMemberReviewer();
+		GuildUserUtility userUtility = Mockito.mock(GuildUserUtility.class);
+		NicknameUtility nicknameUtility = Mockito.mock(NicknameUtility.class);
+		RecentActionUtility recentActionUtility = Mockito.mock(RecentActionUtility.class);
+		Instant now = Instant.now();
+
+		Member member1 = Mockito.mock(Member.class);
+		Mockito.when(member1.getId()).thenReturn(Snowflake.of(1234));
+		Mockito.when(member1.getGuildId()).thenReturn(Snowflake.of(6789));
+		Mockito.when(member1.getUsername()).thenReturn("User1");
+		Mockito.when(member1.getDiscriminator()).thenReturn("5678");
+		Mockito.when(member1.getDisplayName()).thenReturn("User1");
+		Mockito.when(member1.getJoinTime()).thenReturn(now);
+		Presence presence = Mockito.mock(Presence.class);
+		Mockito.when(presence.getStatus()).thenReturn(Status.OFFLINE);
+		Mockito.when(member1.getPresence()).thenReturn(Mono.just(presence));
+
+		GuildUser newUser = new GuildUser();
+		newUser.setSnowflake(1234);
+		newUser.setGuildSnowflake(6789);
+		newUser.setUsername("@User1#5678");
+		newUser.setDisplayName("User1");
+		newUser.setJoinedServer(Date.from(now));
+		newUser.setLastSeen(Date.from(now));
+		newUser.setLeftServer(Date.from(Instant.EPOCH));
+		newUser.setLastActive(Date.from(now));
+
+		List<GuildUser> users = new ArrayList<>();
+		GuildUser newUser2 = new GuildUser();
+		newUser2.setSnowflake(5678);
+		users.add(newUser2);
+		reviewer.setAllUsers(users);
+
+		reviewer.setUserUtility(userUtility);
+		reviewer.setNicknameUtility(nicknameUtility);
+		reviewer.setRecentActionUtility(recentActionUtility);
+		List<GuildUser> leftUsers = new ArrayList<>();
+		leftUsers.add(newUser);
+		reviewer.setLeftUsers(leftUsers);
+
+		reviewer.reviewMember(member1);
+		reviewer.submitUsers();
+
+		Assert.assertEquals(1, reviewer.getUsersToSubmit().size());
+		Mockito.verify(userUtility).updateExistingUsers(Mockito.anyList());
+		Mockito.verify(recentActionUtility).addRecentAction(6789, 1234, "Rejoined the server");
+	}
+
+	@Test
+	public void testGetMemberName() {
 		Member member1 = Mockito.mock(Member.class);
 		Mockito.when(member1.getUsername()).thenReturn("User1");
 		Mockito.when(member1.getDiscriminator()).thenReturn("5678");
