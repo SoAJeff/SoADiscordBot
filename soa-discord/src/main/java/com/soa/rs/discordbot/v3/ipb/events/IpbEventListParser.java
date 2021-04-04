@@ -28,7 +28,7 @@ public class IpbEventListParser {
 
 	private static final String DAILY_RECURRING = "FREQ=DAILY;INTERVAL=1;";
 
-	public String generateListing() {
+	public List<String> generateListing() {
 		Map<Integer, List<Event>> eventsPerCategory = new TreeMap<>();
 		Map<Integer, String> calendarType = new HashMap<>();
 		CalendarResults results = downloadAndSeparateEvents(eventsPerCategory, calendarType);
@@ -63,9 +63,10 @@ public class IpbEventListParser {
 		}
 	}
 
-	String buildEventsString(Map<Integer, List<Event>> eventsPerCategory, Map<Integer, String> calendarType,
+	List<String> buildEventsString(Map<Integer, List<Event>> eventsPerCategory, Map<Integer, String> calendarType,
 			CalendarResults results) {
 		StringBuilder sb = new StringBuilder();
+		List<String> eventMessages = new ArrayList<>();
 		sb.append(generateHeader());
 		if (results.getTotalResults() == 0) {
 			sb.append("No events to show for today.\n\n");
@@ -75,11 +76,26 @@ public class IpbEventListParser {
 				sb.append(calendarType.get(entrySet.getKey()));
 				sb.append("__**");
 				sb.append("\n");
-				sb.append(handleEvents(entrySet.getValue(), new Date()));
+				List<String> msgs = handleEvents(entrySet.getValue(), new Date());
+
+				Iterator<String> iter = msgs.iterator();
+				String msg = iter.next();
+				sb.append(msg);
+				while (iter.hasNext()) {
+					if (sb.length() > 1500) {
+						eventMessages.add(sb.toString());
+						sb.setLength(0);
+					} else
+						sb.append("\n\n");
+
+					sb.append(iter.next());
+				}
+				sb.append("\n\n");
 			}
 		}
 		sb.append(generateFooter());
-		return sb.toString();
+		eventMessages.add(sb.toString());
+		return eventMessages;
 	}
 
 	String generateHeader() {
@@ -107,9 +123,10 @@ public class IpbEventListParser {
 		return sb.toString();
 	}
 
-	String handleEvents(List<Event> events, Date today) {
+	List<String> handleEvents(List<Event> events, Date today) {
 		StringBuilder sb = new StringBuilder();
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
+		List<String> messages = new ArrayList<>();
 		for (Event event : events) {
 			//Check if ongoing
 			boolean isOngoing = isOngoingEvent(event, today);
@@ -119,22 +136,26 @@ public class IpbEventListParser {
 				sb.append(event.getTitle());
 				sb.append("\nPosted by: " + event.getAuthor().getName());
 				sb.append("\nFor details, visit: <" + event.getUrl() + ">");
-				sb.append("\n\n");
+				messages.add(sb.toString());
+				sb.setLength(0);
+
 			} else if (isOngoing) {
 				sb.append("The following event is ongoing!\n");
 				sb.append(event.getTitle());
 				sb.append("\nPosted by: " + event.getAuthor().getName());
 				sb.append("\nFor details, visit: <" + event.getUrl() + ">");
-				sb.append("\n\n");
+				messages.add(sb.toString());
+				sb.setLength(0);
 			} else {
 				calendarEvents.add(new CalendarEvent(event, today));
 			}
 		}
 
 		Collections.sort(calendarEvents);
-		for (CalendarEvent e : calendarEvents)
-			sb.append(e.getEventInfo());
-		return sb.toString();
+		for (CalendarEvent e : calendarEvents) {
+			messages.add(e.getEventInfo());
+		}
+		return messages;
 	}
 
 	boolean isOngoingEvent(Event event, Date today) {

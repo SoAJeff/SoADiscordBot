@@ -116,7 +116,7 @@ public class IpbEventListParserTest {
 		IpbEventListParser parser = new IpbEventListParser();
 		CalendarResults results = new CalendarResults();
 		results.setTotalResults(0);
-		String eventsString = parser.buildEventsString(null, null, results);
+		String eventsString = parser.buildEventsString(null, null, results).get(0);
 		Assert.assertTrue(eventsString.contains("No events to show for today."));
 	}
 
@@ -136,7 +136,7 @@ public class IpbEventListParserTest {
 		eventsPerCategory.put(1, event);
 		calendarType.put(1, "Game Events");
 		Assert.assertTrue(
-				parser.buildEventsString(eventsPerCategory, calendarType, results).contains("**__Game Events__**"));
+				parser.buildEventsString(eventsPerCategory, calendarType, results).get(0).contains("**__Game Events__**"));
 	}
 
 	@Test
@@ -163,10 +163,10 @@ public class IpbEventListParserTest {
 		Mockito.doReturn(true).when(parser).isOngoingEvent(event2, date);
 		List<Event> events = new ArrayList<>();
 		events.add(event2);
-		String result = parser.handleEvents(events, date);
+		String result = parser.handleEvents(events, date).get(0);
 
 		Assert.assertEquals(
-				"The following event is ongoing!\nForum Event 1\nPosted by: Applejuiceaj\nFor details, visit: <https://discord.bot>\n\n",
+				"The following event is ongoing!\nForum Event 1\nPosted by: Applejuiceaj\nFor details, visit: <https://discord.bot>",
 				result);
 	}
 
@@ -186,10 +186,10 @@ public class IpbEventListParserTest {
 		Mockito.doReturn(true).when(parser).isOngoingEvent(event2, date);
 		List<Event> events = new ArrayList<>();
 		events.add(event2);
-		String result = parser.handleEvents(events, date);
+		String result = parser.handleEvents(events, date).get(0);
 
 		Assert.assertEquals(
-				"The following competition is ongoing!\nForum Competition 1\nPosted by: Applejuiceaj\nFor details, visit: <https://discord.bot>\n\n",
+				"The following competition is ongoing!\nForum Competition 1\nPosted by: Applejuiceaj\nFor details, visit: <https://discord.bot>",
 				result);
 	}
 
@@ -209,10 +209,10 @@ public class IpbEventListParserTest {
 		Mockito.doReturn(false).when(parser).isOngoingEvent(event2, date);
 		List<Event> events = new ArrayList<>();
 		events.add(event2);
-		String result = parser.handleEvents(events, date);
+		String result = parser.handleEvents(events, date).get(0);
 
 		Assert.assertEquals(
-				"Event Title: Forum Event 1\nEvent Date: 04-Nov 23:00 EST | 05-Nov 04:00 UTC (Game time) | 05-Nov 15:00 AEDT\nPosted by: Applejuiceaj\nFor details, visit: <https://discord.bot>\n\n",
+				"Event Title: Forum Event 1\nEvent Date: 04-Nov 23:00 EST | 05-Nov 04:00 UTC (Game time) | 05-Nov 15:00 AEDT\nPosted by: Applejuiceaj\nFor details, visit: <https://discord.bot>",
 				result);
 	}
 

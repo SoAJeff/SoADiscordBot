@@ -37,7 +37,6 @@ public class CalendarEvent implements Comparable<CalendarEvent> {
 		sb.append("\nEvent Date: " + DateAnalyzer.showMultipleTimezonesForEvent(this.date));
 		sb.append("\nPosted by: " + event.getAuthor().getName());
 		sb.append("\nFor details, visit: <" + event.getUrl() + ">");
-		sb.append("\n\n");
 		this.eventInfo = sb.toString();
 	}
 
@@ -54,6 +53,7 @@ public class CalendarEvent implements Comparable<CalendarEvent> {
 				.toLocalDate();
 		RecurrenceRule rule;
 		try {
+			SoaLogging.getLogger(this).debug("Recurrence Rule for event ["+event.getTitle() + "]: " + event.getRecurrence());
 			rule = new RecurrenceRule(event.getRecurrence());
 		} catch (InvalidRecurrenceRuleException e) {
 			SoaLogging.getLogger(this).error("Failed to parse recurrence rule, just returning midnight tonight.", e);

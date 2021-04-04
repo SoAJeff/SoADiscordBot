@@ -73,7 +73,7 @@ public class CalendarEventTest {
 		CalendarEvent event = new CalendarEvent(event2, date);
 
 		Assert.assertEquals(
-				"Event Title: Forum Event 1\nEvent Date: 04-Nov 23:00 EST | 05-Nov 04:00 UTC (Game time) | 05-Nov 15:00 AEDT\nPosted by: Applejuiceaj\nFor details, visit: <https://discord.bot>\n\n",
+				"Event Title: Forum Event 1\nEvent Date: 04-Nov 23:00 EST | 05-Nov 04:00 UTC (Game time) | 05-Nov 15:00 AEDT\nPosted by: Applejuiceaj\nFor details, visit: <https://discord.bot>",
 				event.getEventInfo());
 	}
 
