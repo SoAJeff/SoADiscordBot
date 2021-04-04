@@ -140,6 +140,27 @@ public class IpbEventListParserTest {
 	}
 
 	@Test
+	public void testBuildEventsStringWithManyEvents() throws ParseException {
+		DiscordCfgFactory.getConfig().setGuildAbbreviation("SoA");
+		EventListingEvent ele = new EventListingEvent();
+		ele.getEventEndline().add("Line 1");
+		ele.getEventEndline().add("Line 2");
+		DiscordCfgFactory.getConfig().setEventListingEvent(ele);
+		IpbEventListParser parser = new IpbEventListParser();
+		CalendarResults results = buildBaseCalendarResults();
+		Map<Integer, List<Event>> eventsPerCategory = new TreeMap<>();
+		Map<Integer, String> calendarType = new HashMap<>();
+		List<Event> event = new ArrayList<>();
+		for(int i = 0; i < 15; i++) {
+			event.add(results.getResults().get(0));
+		}
+		eventsPerCategory.put(1, event);
+		calendarType.put(1, "Game Events");
+		//Should require more than 1 msg due to length.
+		Assert.assertTrue(parser.buildEventsString(eventsPerCategory, calendarType, results).size() > 1);
+	}
+
+	@Test
 	public void testGenerateFooterNoLines() {
 		EventListingEvent ele = new EventListingEvent();
 		DiscordCfgFactory.getConfig().setEventListingEvent(ele);
