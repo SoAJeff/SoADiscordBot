@@ -19,6 +19,7 @@ public class CalendarEvent implements Comparable<CalendarEvent> {
 
 	private Date date;
 	private String eventInfo;
+	private boolean validEvent = true;
 
 	private static final String DAILY_RECURRING = "FREQ=DAILY;INTERVAL=1;";
 
@@ -30,13 +31,19 @@ public class CalendarEvent implements Comparable<CalendarEvent> {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Event Title: " + event.getTitle());
 		if (event.getRecurrence() != null && !event.getRecurrence().startsWith(DAILY_RECURRING)) {
-			this.date = getDateForRecurringEvent(event, today);
+			try {
+				this.date = getDateForRecurringEvent(event, today);
+			} catch (Exception e) {
+				this.validEvent = false;
+			}
 		} else {
 			this.date = event.getStart();
 		}
-		sb.append("\nEvent Date: " + DateAnalyzer.showMultipleTimezonesForEvent(this.date));
-		sb.append("\nPosted by: " + event.getAuthor().getName());
-		sb.append("\nFor details, visit: <" + event.getUrl() + ">");
+		if (validEvent) {
+			sb.append("\nEvent Date: " + DateAnalyzer.showMultipleTimezonesForEvent(this.date));
+			sb.append("\nPosted by: " + event.getAuthor().getName());
+			sb.append("\nFor details, visit: <" + event.getUrl() + ">");
+		}
 		this.eventInfo = sb.toString();
 	}
 
@@ -48,12 +55,17 @@ public class CalendarEvent implements Comparable<CalendarEvent> {
 		return eventInfo;
 	}
 
-	Date getDateForRecurringEvent(Event event, Date today) {
+	public boolean isValidEvent() {
+		return validEvent;
+	}
+
+	Date getDateForRecurringEvent(Event event, Date today) throws Exception {
 		LocalDate ld1 = LocalDateTime.ofInstant(today.toInstant(), TimeZone.getTimeZone("UTC").toZoneId())
 				.toLocalDate();
 		RecurrenceRule rule;
 		try {
-			SoaLogging.getLogger(this).debug("Recurrence Rule for event ["+event.getTitle() + "]: " + event.getRecurrence());
+			SoaLogging.getLogger(this)
+					.debug("Recurrence Rule for event [" + event.getTitle() + "]: " + event.getRecurrence());
 			rule = new RecurrenceRule(event.getRecurrence());
 		} catch (InvalidRecurrenceRuleException e) {
 			SoaLogging.getLogger(this).error("Failed to parse recurrence rule, just returning midnight tonight.", e);
@@ -75,7 +87,9 @@ public class CalendarEvent implements Comparable<CalendarEvent> {
 			}
 		}
 		//Unable to determine, just return today
-		return new Date(ld1.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli());
+		SoaLogging.getLogger(this).debug("Failsafe reached for event " + event.getTitle() + ", do not display");
+		throw new Exception("Failsafe reached for event");
+		//return new Date(ld1.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli());
 	}
 
 	@Override

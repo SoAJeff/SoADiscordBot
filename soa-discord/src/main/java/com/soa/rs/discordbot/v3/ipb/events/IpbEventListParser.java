@@ -147,13 +147,18 @@ public class IpbEventListParser {
 				messages.add(sb.toString());
 				sb.setLength(0);
 			} else {
-				calendarEvents.add(new CalendarEvent(event, today));
+				CalendarEvent tempEvent = new CalendarEvent(event, today);
+				if (tempEvent.isValidEvent()) {
+					calendarEvents.add(tempEvent);
+				}
 			}
 		}
 
 		Collections.sort(calendarEvents);
 		for (CalendarEvent e : calendarEvents) {
-			messages.add(e.getEventInfo());
+			if (e.isValidEvent()) {
+				messages.add(e.getEventInfo());
+			}
 		}
 		return messages;
 	}

@@ -14,7 +14,7 @@ import org.junit.Test;
 public class CalendarEventTest {
 
 	@Test
-	public void testRecursiveEvent() throws ParseException {
+	public void testRecursiveEvent() throws ParseException, Exception {
 		CalendarEvent calendarEvent = new CalendarEvent();
 		Event event = new Event();
 		event.setRecurrence("FREQ=WEEKLY;INTERVAL=1");
@@ -29,7 +29,7 @@ public class CalendarEventTest {
 	}
 
 	@Test
-	public void testRecursiveEventWithGarbageRecurrence() throws ParseException {
+	public void testRecursiveEventWithGarbageRecurrence() throws ParseException, Exception {
 		CalendarEvent calendarEvent = new CalendarEvent();
 		Event event = new Event();
 		event.setRecurrence("this is garbage data");
@@ -54,8 +54,16 @@ public class CalendarEventTest {
 
 		Date today = inputFormat.parse("2020-05-19T00:00:00Z");
 
-		Assert.assertEquals(inputFormat.parse("2020-05-19T00:00:00Z"),
-				calendarEvent.getDateForRecurringEvent(event, today));
+		boolean exception = false;
+		try {
+			calendarEvent.getDateForRecurringEvent(event, today);
+		} catch (Exception e) {
+			exception = true;
+		}
+		Assert.assertTrue(exception);
+
+		//		Assert.assertEquals(inputFormat.parse("2020-05-19T00:00:00Z"),
+		//				calendarEvent.getDateForRecurringEvent(event, today));
 	}
 
 	@Test
