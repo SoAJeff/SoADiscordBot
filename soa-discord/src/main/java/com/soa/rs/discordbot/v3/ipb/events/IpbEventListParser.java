@@ -72,25 +72,26 @@ public class IpbEventListParser {
 			sb.append("No events to show for today.\n\n");
 		} else {
 			for (Map.Entry<Integer, List<Event>> entrySet : eventsPerCategory.entrySet()) {
-				sb.append("**__");
-				sb.append(calendarType.get(entrySet.getKey()));
-				sb.append("__**");
-				sb.append("\n");
 				List<String> msgs = handleEvents(entrySet.getValue(), new Date());
-
 				Iterator<String> iter = msgs.iterator();
-				String msg = iter.next();
-				sb.append(msg);
-				while (iter.hasNext()) {
-					if (sb.length() > 1500) {
-						eventMessages.add(sb.toString());
-						sb.setLength(0);
-					} else
-						sb.append("\n\n");
+				if(iter.hasNext()) {
+					sb.append("**__");
+					sb.append(calendarType.get(entrySet.getKey()));
+					sb.append("__**");
+					sb.append("\n");
+					String msg = iter.next();
+					sb.append(msg);
+					while (iter.hasNext()) {
+						if (sb.length() > 1500) {
+							eventMessages.add(sb.toString());
+							sb.setLength(0);
+						} else
+							sb.append("\n\n");
 
-					sb.append(iter.next());
+						sb.append(iter.next());
+					}
+					sb.append("\n\n");
 				}
-				sb.append("\n\n");
 			}
 		}
 		sb.append(generateFooter());
