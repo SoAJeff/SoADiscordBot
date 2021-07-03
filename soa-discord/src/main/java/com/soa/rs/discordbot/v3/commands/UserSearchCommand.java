@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Consumer;
@@ -15,7 +14,6 @@ import com.soa.rs.discordbot.v3.api.annotation.Command;
 import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.jdbi.GuildNicknameUtility;
-import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 import com.soa.rs.discordbot.v3.jdbi.GuildUtility;
 import com.soa.rs.discordbot.v3.jdbi.NicknameUtility;
 import com.soa.rs.discordbot.v3.jdbi.entities.GuildEntry;
@@ -30,10 +28,9 @@ import reactor.core.publisher.Mono;
 @Command(triggers = { ".usersearch", ".user-search" })
 public class UserSearchCommand extends AbstractCommand {
 
-	private GuildUserUtility guildUserUtility = new GuildUserUtility();
-	private GuildUtility guildUtility = new GuildUtility();
-	private NicknameUtility nicknameUtility = new NicknameUtility();
-	private GuildNicknameUtility guildNicknameUtility = new GuildNicknameUtility();
+	private final GuildUtility guildUtility = new GuildUtility();
+	private final NicknameUtility nicknameUtility = new NicknameUtility();
+	private final GuildNicknameUtility guildNicknameUtility = new GuildNicknameUtility();
 
 	@Override
 	public void initialize() {
@@ -174,12 +171,14 @@ public class UserSearchCommand extends AbstractCommand {
 			} else {
 				embedCreateSpec.addField("Left server date", sdf.format(user.getLeftServer()), true);
 			}
+			embedCreateSpec
+					.setFooter("User ID: " + user.getSnowflake() + " • Guild ID: " + user.getGuildSnowflake(), null);
 
 		};
 	}
 
 	class Search {
-		private String searchTerm;
+		private final String searchTerm;
 		private String serverName;
 		private long serverId;
 
