@@ -18,7 +18,8 @@ public class UserBanEvent extends AbstractCommand {
 				.isEnabled()) {
 			setEnabled(true);
 			setMustHavePermission(DiscordCfgFactory.getConfig().getAdminEvent().getAllowedRoles().getRole());
-			addHelpMsg(".ban", "Admin can tag user(s) and they will be banned from the server.");
+			addHelpMsg(".ban",
+					"Admin can tag user(s) and they will be banned from the server.  Or provide args -id and -history to ban by ID, and remove 7 days history.");
 		} else {
 			setEnabled(false);
 		}
@@ -27,7 +28,7 @@ public class UserBanEvent extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(MessageCreateEvent event) {
 		SoaLogging.getLogger(this).info("Attempting to ban user from server");
-		if (event.getMessage().getContent().contains("-id")) {
+		if (event.getMessage().getContent().contains("-id") && event.getMessage().getContent().contains("-history")) {
 			String[] args = event.getMessage().getContent().trim().split(" ");
 			return permittedToExecuteEvent(event.getMember().get())
 					.flatMapMany(ignored -> event.getGuild())
@@ -38,7 +39,17 @@ public class UserBanEvent extends AbstractCommand {
 						SoaLogging.getLogger(this).error("Failed to ban user: " + err.getMessage());
 						return Mono.empty();
 					})).then(event.getMessage().delete()).then();
-		} else {
+		} else if (event.getMessage().getContent().contains("-id")) {
+			String[] args = event.getMessage().getContent().trim().split(" ");
+			return permittedToExecuteEvent(event.getMember().get()).flatMapMany(ignored -> event.getGuild()).flatMap(
+					guildld -> guildld.ban(Snowflake.of(args[args.length - 1]),
+							banQuerySpec -> banQuerySpec.setReason("Ban issued via admin ban request"))
+							.onErrorResume(err -> {
+						SoaLogging.getLogger(this).error("Failed to ban user: " + err.getMessage());
+						return Mono.empty();
+					})).then(event.getMessage().delete()).then();
+		}
+		else {
 			return permittedToExecuteEvent(event.getMember().get())
 					.flatMapMany(ignored -> event.getMessage().getUserMentions())
 					.flatMap(user -> user.asMember(event.getGuildId().get()))
