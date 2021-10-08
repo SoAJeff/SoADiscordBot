@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.soa.rs</groupId>
         <artifactId>DISCORD</artifactId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>3.2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>soa-discord</artifactId>
@@ -32,10 +32,10 @@
             <url>https://jitpack.io</url>
         </repository>
         <!-- Temporarily needed due to bot running on a 32 bit linux platform -->
-        <repository>
+<!--        <repository>
             <id>soa</id>
             <url>http://repo.spiritsofarianwyn.com</url>
-        </repository>
+        </repository>-->
     </repositories>
 
     <properties>
@@ -53,7 +53,7 @@
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>3.1.8</version>
+            <version>3.2.0</version>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
@@ -101,11 +101,11 @@
             <version>1.3.73</version>
         </dependency>
         <!-- Temporary dependency required to restore 32 bit Linux libraries for Lavaplayer -->
-        <dependency>
+<!--        <dependency>
             <groupId>com.soa.rs</groupId>
             <artifactId>jsklavaplayer-natives-el_x86</artifactId>
             <version>1.0</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>

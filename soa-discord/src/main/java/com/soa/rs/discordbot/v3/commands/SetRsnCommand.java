@@ -13,6 +13,7 @@ import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.spec.GuildMemberEditSpec;
 import reactor.core.publisher.Mono;
 
 @Command(triggers = { "!setrsn", ".setrsn" })
@@ -68,7 +69,7 @@ public class SetRsnCommand extends AbstractCommand {
 			return event.getMessage().addReaction(ReactionEmoji.unicode(thumbsUp)).onErrorResume(throwable -> Mono
 					.fromRunnable(() -> SoaLogging.getLogger(this)
 							.error("Failed to react to the message - message deleted?")))
-					.then(event.getMember().get().edit(guildMemberEditSpec -> guildMemberEditSpec.setNickname(name))
+					.then(event.getMember().get().edit(GuildMemberEditSpec.builder().nicknameOrNull(name).build())
 							.onErrorResume(throwable -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
 									.error("Failed to change server nickname of user, don't have permission?",
 											throwable)))).then();

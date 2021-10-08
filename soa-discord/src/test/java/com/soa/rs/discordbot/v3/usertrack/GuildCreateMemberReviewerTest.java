@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 import com.soa.rs.discordbot.v3.jdbi.NicknameUtility;
@@ -40,7 +41,7 @@ public class GuildCreateMemberReviewerTest {
 		Mockito.when(member.getUsername()).thenReturn("User1");
 		Mockito.when(member.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member.getDisplayName()).thenReturn("User1");
-		Mockito.when(member.getJoinTime()).thenReturn(now);
+		Mockito.when(member.getJoinTime()).thenReturn(Optional.of(now));
 
 		GuildUser newUser = new GuildUser();
 		newUser.setSnowflake(1234);
@@ -77,7 +78,7 @@ public class GuildCreateMemberReviewerTest {
 		Mockito.when(member.getUsername()).thenReturn("User1");
 		Mockito.when(member.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member.getDisplayName()).thenReturn("User1");
-		Mockito.when(member.getJoinTime()).thenReturn(now);
+		Mockito.when(member.getJoinTime()).thenReturn(Optional.of(now));
 
 		GuildUser newUser = new GuildUser();
 		newUser.setSnowflake(1234);
@@ -115,7 +116,7 @@ public class GuildCreateMemberReviewerTest {
 		Mockito.when(member.getUsername()).thenReturn("User1");
 		Mockito.when(member.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member.getDisplayName()).thenReturn("User2");
-		Mockito.when(member.getJoinTime()).thenReturn(now);
+		Mockito.when(member.getJoinTime()).thenReturn(Optional.of(now));
 
 		GuildUser newUser = new GuildUser();
 		newUser.setSnowflake(1234);
@@ -153,7 +154,7 @@ public class GuildCreateMemberReviewerTest {
 		Mockito.when(member.getUsername()).thenReturn("User1");
 		Mockito.when(member.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member.getDisplayName()).thenReturn("User1");
-		Mockito.when(member.getJoinTime()).thenReturn(now);
+		Mockito.when(member.getJoinTime()).thenReturn(Optional.of(now));
 
 		GuildUser newUser = new GuildUser();
 		newUser.setSnowflake(1234);
@@ -190,7 +191,7 @@ public class GuildCreateMemberReviewerTest {
 		Mockito.when(member.getUsername()).thenReturn("User2");
 		Mockito.when(member.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member.getDisplayName()).thenReturn("User1");
-		Mockito.when(member.getJoinTime()).thenReturn(now);
+		Mockito.when(member.getJoinTime()).thenReturn(Optional.of(now));
 
 		GuildUser newUser = new GuildUser();
 		newUser.setSnowflake(1234);
@@ -228,7 +229,7 @@ public class GuildCreateMemberReviewerTest {
 		Mockito.when(member.getUsername()).thenReturn("User1");
 		Mockito.when(member.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member.getDisplayName()).thenReturn("User1");
-		Mockito.when(member.getJoinTime()).thenReturn(now);
+		Mockito.when(member.getJoinTime()).thenReturn(Optional.of(now));
 
 		GuildUser newUser = new GuildUser();
 		newUser.setSnowflake(1234);
@@ -438,7 +439,7 @@ public class GuildCreateMemberReviewerTest {
 		Mockito.when(member1.getUsername()).thenReturn("User1");
 		Mockito.when(member1.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member1.getDisplayName()).thenReturn("User1");
-		Mockito.when(member1.getJoinTime()).thenReturn(now);
+		Mockito.when(member1.getJoinTime()).thenReturn(Optional.of(now));
 		Presence presence = Mockito.mock(Presence.class);
 		Mockito.when(presence.getStatus()).thenReturn(Status.OFFLINE);
 		Mockito.when(member1.getPresence()).thenReturn(Mono.just(presence));
@@ -486,7 +487,7 @@ public class GuildCreateMemberReviewerTest {
 		Mockito.when(member1.getUsername()).thenReturn("User1");
 		Mockito.when(member1.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member1.getDisplayName()).thenReturn("User1");
-		Mockito.when(member1.getJoinTime()).thenReturn(now);
+		Mockito.when(member1.getJoinTime()).thenReturn(Optional.of(now));
 		Presence presence = Mockito.mock(Presence.class);
 		Mockito.when(presence.getStatus()).thenReturn(Status.OFFLINE);
 		Mockito.when(member1.getPresence()).thenReturn(Mono.just(presence));
@@ -542,7 +543,7 @@ public class GuildCreateMemberReviewerTest {
 		Mockito.when(member1.getUsername()).thenReturn("User1");
 		Mockito.when(member1.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member1.getDisplayName()).thenReturn("User1");
-		Mockito.when(member1.getJoinTime()).thenReturn(now);
+		Mockito.when(member1.getJoinTime()).thenReturn(Optional.of(now));
 		Presence presence = Mockito.mock(Presence.class);
 		Mockito.when(presence.getStatus()).thenReturn(Status.OFFLINE);
 		Mockito.when(member1.getPresence()).thenReturn(Mono.just(presence));

@@ -1,7 +1,6 @@
 package com.soa.rs.discordbot.v3.commands;
 
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 
@@ -16,6 +15,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.spec.GuildMemberEditSpec;
 import reactor.core.publisher.Mono;
 
 public class SetRsnCommandTest {
@@ -41,7 +41,7 @@ public class SetRsnCommandTest {
 		Mockito.when(message.getContent()).thenReturn("!setrsn noob");
 		Mockito.when(message.addReaction(ReactionEmoji.unicode(thumbsUp))).thenReturn(Mono.empty());
 		Mockito.when(event.getMessage()).thenReturn(message);
-		Mockito.when(member.edit(Mockito.any(Consumer.class))).thenReturn(Mono.empty());
+		Mockito.when(member.edit(Mockito.any(GuildMemberEditSpec.class))).thenReturn(Mono.empty());
 
 		command.execute(event);
 
@@ -67,7 +67,7 @@ public class SetRsnCommandTest {
 		Mockito.when(message.getContent()).thenReturn("!setrsn noob");
 		Mockito.when(message.addReaction(ReactionEmoji.unicode(thumbsUp))).thenReturn(Mono.empty());
 		Mockito.when(event.getMessage()).thenReturn(message);
-		Mockito.when(member.edit(Mockito.any(Consumer.class))).thenReturn(Mono.error(new Throwable("Tested error.")));
+		Mockito.when(member.edit(Mockito.any(GuildMemberEditSpec.class))).thenReturn(Mono.error(new Throwable("Tested error.")));
 
 		command.execute(event).block();
 

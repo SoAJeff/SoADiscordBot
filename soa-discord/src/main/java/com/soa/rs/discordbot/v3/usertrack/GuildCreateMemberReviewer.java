@@ -84,7 +84,9 @@ public class GuildCreateMemberReviewer {
 			recentActionUtility.addRecentAction(member.getGuildId().asLong(), member.getId().asLong(),
 					"Changed their display name", user.getDisplayName(), member.getDisplayName());
 		}
-		newUser.setJoinedServer(Date.from(member.getJoinTime()));
+		if(member.getJoinTime().isPresent()) {
+			newUser.setJoinedServer(Date.from(member.getJoinTime().get()));
+		}
 		if (!sdf.format(user.getJoinedServer()).equals(sdf.format(newUser.getJoinedServer()))) {
 			SoaLogging.getLogger(this).debug("Joined server times did not match, assuming rejoined server.");
 			this.recentActionUtility

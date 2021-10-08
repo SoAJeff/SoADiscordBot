@@ -2,7 +2,6 @@ package com.soa.rs.discordbot.v3.util;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.function.Consumer;
 
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Message;
@@ -11,6 +10,7 @@ import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.PrivateChannel;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.MessageCreateFields;
 import discord4j.core.spec.MessageCreateSpec;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
@@ -30,11 +30,11 @@ public class DiscordUtils {
 		return sendMessage(content, null, channel);
 	}
 
-	public static Mono<Message> sendMessage(Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
+	public static Mono<Message> sendMessage(EmbedCreateSpec embed, MessageChannel channel) {
 		return sendMessage(null, embed, channel);
 	}
 
-	public static Mono<Message> sendMessage(String content, Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
+	public static Mono<Message> sendMessage(String content, EmbedCreateSpec embed, MessageChannel channel) {
 		final Mono<Snowflake> selfId = Mono.just(channel.getClient().getSelfId());
 		return Mono.zip(DiscordUtils.hasPermission(channel, selfId, Permission.SEND_MESSAGES),
 				DiscordUtils.hasPermission(channel, selfId, Permission.EMBED_LINKS)).flatMap(tuple -> {
@@ -53,14 +53,14 @@ public class DiscordUtils {
 				return Mono.empty();
 			}
 
-			return channel.createMessage(spec -> {
-				if (content != null) {
-					spec.setContent(content);
-				}
-				if (embed != null) {
-					spec.setEmbed(embed);
-				}
-			});
+			MessageCreateSpec spec = MessageCreateSpec.create();
+			if (content != null) {
+				spec = spec.withContent(content);
+			}
+			if (embed != null) {
+				spec = spec.withEmbeds(embed);
+			}
+			return channel.createMessage(spec);
 		});
 	}
 
@@ -83,14 +83,14 @@ public class DiscordUtils {
 				return Mono.empty();
 			}
 
-			return channel.createMessage(spec -> {
-				if (content != null) {
-					spec.setContent(content);
-				}
-				if (file != null) {
-					spec.addFile(filename, file);
-				}
-			});
+			MessageCreateSpec spec = MessageCreateSpec.create();
+			if (content != null) {
+				spec = spec.withContent(content);
+			}
+			if (file != null) {
+				spec = spec.withFiles(MessageCreateFields.File.of(filename, file));
+			}
+			return channel.createMessage(spec);
 		});
 	}
 
@@ -98,7 +98,4 @@ public class DiscordUtils {
 		return String.join(", ", roles);
 	}
 
-	public static Consumer<MessageCreateSpec> createMessageSpecWithMessage(String content) {
-		return messageCreateSpec -> messageCreateSpec.setContent(content);
-	}
 }

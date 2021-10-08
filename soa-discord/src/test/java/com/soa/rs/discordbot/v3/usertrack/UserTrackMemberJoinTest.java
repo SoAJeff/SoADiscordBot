@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 import com.soa.rs.discordbot.v3.jdbi.NicknameUtility;
@@ -69,7 +70,7 @@ public class UserTrackMemberJoinTest {
 		Mockito.when(member.getUsername()).thenReturn("User1");
 		Mockito.when(member.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member.getDisplayName()).thenReturn("User1");
-		Mockito.when(member.getJoinTime()).thenReturn(now);
+		Mockito.when(member.getJoinTime()).thenReturn(Optional.of(now));
 
 		GuildUser user = new GuildUser();
 		user.setSnowflake(1234);
@@ -114,7 +115,7 @@ public class UserTrackMemberJoinTest {
 		Mockito.when(member.getUsername()).thenReturn("User1");
 		Mockito.when(member.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member.getDisplayName()).thenReturn("User1");
-		Mockito.when(member.getJoinTime()).thenReturn(now);
+		Mockito.when(member.getJoinTime()).thenReturn(Optional.of(now));
 
 		GuildUser user = new GuildUser();
 		user.setSnowflake(1234);
@@ -159,7 +160,7 @@ public class UserTrackMemberJoinTest {
 		Mockito.when(member.getUsername()).thenReturn("User1");
 		Mockito.when(member.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member.getDisplayName()).thenReturn("User1");
-		Mockito.when(member.getJoinTime()).thenReturn(now);
+		Mockito.when(member.getJoinTime()).thenReturn(Optional.of(now));
 
 		GuildUser user = new GuildUser();
 		user.setSnowflake(1234);
@@ -201,7 +202,7 @@ public class UserTrackMemberJoinTest {
 		Mockito.when(member.getUsername()).thenReturn("User1");
 		Mockito.when(member.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member.getDisplayName()).thenReturn("User1");
-		Mockito.when(member.getJoinTime()).thenReturn(now);
+		Mockito.when(member.getJoinTime()).thenReturn(Optional.of(now));
 
 		List<GuildUser> users = new ArrayList<>();
 

@@ -48,7 +48,9 @@ public class UserTrackMemberJoin {
 		String memberName = "@" + member.getUsername() + "#" + member.getDiscriminator();
 		user.setUsername(memberName);
 		user.setDisplayName(member.getDisplayName());
-		user.setJoinedServer(Date.from(member.getJoinTime()));
+		if(member.getJoinTime().isPresent()) {
+			user.setJoinedServer(Date.from(member.getJoinTime().get()));
+		}
 		user.setLastSeen(Date.from(Instant.now()));
 		user.setLeftServer(Date.from(Instant.EPOCH));
 

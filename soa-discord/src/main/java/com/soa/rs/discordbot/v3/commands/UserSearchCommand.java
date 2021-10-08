@@ -2,13 +2,13 @@ package com.soa.rs.discordbot.v3.commands;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.function.Consumer;
 
 import com.soa.rs.discordbot.v3.api.annotation.Command;
 import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
@@ -21,6 +21,7 @@ import com.soa.rs.discordbot.v3.jdbi.entities.GuildServerUser;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.spec.EmbedCreateFields;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -76,7 +77,7 @@ public class UserSearchCommand extends AbstractCommand {
 		}
 
 		return Flux.fromIterable(users).flatMap(user -> event.getMessage().getChannel()
-				.flatMap(messageChannel -> messageChannel.createEmbed(createEmbed(user)))).then();
+				.flatMap(messageChannel -> messageChannel.createMessage(createEmbed(user)))).then();
 	}
 
 	public Search determineSearch(MessageCreateEvent event) {
@@ -132,49 +133,50 @@ public class UserSearchCommand extends AbstractCommand {
 		return entries.get(0).getSnowflake();
 	}
 
-	public Consumer<EmbedCreateSpec> createEmbed(GuildServerUser user) {
-		return embedCreateSpec -> {
-			SoaLogging.getLogger(this).trace("Creating embed for user " + user.getUsername());
-			embedCreateSpec.setTitle(user.getDisplayName());
-			embedCreateSpec.setDescription(user.getUsername() + " in server: " + user.getGuildName());
+	public EmbedCreateSpec createEmbed(GuildServerUser user) {
+		EmbedCreateSpec spec = EmbedCreateSpec.create();
+		SoaLogging.getLogger(this).trace("Creating embed for user " + user.getUsername());
+		spec = spec.withTitle(user.getDisplayName())
+				.withDescription(user.getUsername() + " in server: " + user.getGuildName());
+		List<EmbedCreateFields.Field> fields = new ArrayList<>();
 
-			if (user.getKnownName() != null && user.getKnownName().trim().length() > 0) {
-				embedCreateSpec.addField("Known as", user.getKnownName(), false);
+		if (user.getKnownName() != null && user.getKnownName().trim().length() > 0) {
+			fields.add(EmbedCreateFields.Field.of("Known as", user.getKnownName(), false));
+		}
+
+		List<String> nicknames = nicknameUtility.getNicknamesForUser(user.getSnowflake(), user.getGuildSnowflake());
+		StringBuilder sb = new StringBuilder();
+		Iterator<String> iter = nicknames.iterator();
+		int nameCount = 0;
+		while (iter.hasNext()) {
+			String name = iter.next();
+			sb.append(name);
+			nameCount++;
+			if (sb.length() > 975) {
+				sb.append(", and " + (nicknames.size() - nameCount) + " additional names.");
+				break;
 			}
-			List<String> nicknames = nicknameUtility.getNicknamesForUser(user.getSnowflake(), user.getGuildSnowflake());
-			StringBuilder sb = new StringBuilder();
-			Iterator<String> iter = nicknames.iterator();
-			int nameCount = 0;
-			while (iter.hasNext()) {
-				String name = iter.next();
-				sb.append(name);
-				nameCount++;
-				if (sb.length() > 975) {
-					sb.append(", and " + (nicknames.size() - nameCount) + " additional names.");
-					break;
-				}
-				if (iter.hasNext()) {
-					sb.append(", ");
-				}
-
+			if (iter.hasNext()) {
+				sb.append(", ");
 			}
-			embedCreateSpec.addField("All Display Names", sb.toString(), false);
+		}
+		fields.add(EmbedCreateFields.Field.of("All Display Names", sb.toString(), false));
 
-			SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm.ss z");
-			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm.ss z");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-			embedCreateSpec.addField("Joined server date", sdf.format(user.getJoinedServer()), true);
+		fields.add(EmbedCreateFields.Field.of("Joined server date", sdf.format(user.getJoinedServer()), true));
+		if (sdf.format(user.getLeftServer()).equals(sdf.format(Date.from(Instant.EPOCH)))) {
+			fields.add(EmbedCreateFields.Field.of("Last seen date", sdf.format(user.getLastSeen()), true));
+			fields.add(EmbedCreateFields.Field.of("Last active date", sdf.format(user.getLastActive()), false));
 
-			if (sdf.format(user.getLeftServer()).equals(sdf.format(Date.from(Instant.EPOCH)))) {
-				embedCreateSpec.addField("Last seen date", sdf.format(user.getLastSeen()), true);
-				embedCreateSpec.addField("Last active date", sdf.format(user.getLastActive()), false);
-			} else {
-				embedCreateSpec.addField("Left server date", sdf.format(user.getLeftServer()), true);
-			}
-			embedCreateSpec
-					.setFooter("User ID: " + user.getSnowflake() + " • Guild ID: " + user.getGuildSnowflake(), null);
+		} else {
+			fields.add(EmbedCreateFields.Field.of("Left server date", sdf.format(user.getLeftServer()), true));
+		}
 
-		};
+		return spec.withFields(fields).withFooter(EmbedCreateFields.Footer.of(
+				"User ID: " + user.getSnowflake() + " • Guild ID: " + user.getGuildSnowflake(), null));
+
 	}
 
 	class Search {

@@ -3,16 +3,13 @@ package com.soa.rs.discordbot.v3.commands;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import com.soa.rs.discordbot.v3.api.annotation.Command;
 import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
-import com.soa.rs.discordbot.v3.util.DiscordUtils;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.spec.MessageCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -40,8 +37,7 @@ public class UserActivityCommand extends AbstractCommand {
 			}
 			List<String> parsedActivity = guildUserUtility
 					.getUserActivityDatesForUsername(names, event.getGuildId().get().asLong());
-			List<Consumer<MessageCreateSpec>> specs = createMsgSpecs(createParsedOutput(parsedActivity));
-			return Flux.fromIterable(specs).flatMapSequential(
+			return Flux.fromIterable(parsedActivity).flatMapSequential(
 					s -> event.getMessage().getChannel().flatMap(messageChannel -> messageChannel.createMessage(s)))
 					.then();
 		} else
@@ -98,10 +94,4 @@ public class UserActivityCommand extends AbstractCommand {
 		return messages;
 	}
 
-	private List<Consumer<MessageCreateSpec>> createMsgSpecs(List<String> messages) {
-		List<Consumer<MessageCreateSpec>> specs = new ArrayList<>();
-		for (String message : messages)
-			specs.add(DiscordUtils.createMessageSpecWithMessage(message));
-		return specs;
-	}
 }

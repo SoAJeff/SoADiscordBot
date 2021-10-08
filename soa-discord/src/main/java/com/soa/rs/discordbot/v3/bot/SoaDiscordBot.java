@@ -25,8 +25,8 @@ import discord4j.core.event.domain.lifecycle.ReconnectEvent;
 import discord4j.core.event.domain.lifecycle.ResumeEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.event.domain.message.ReactionAddEvent;
-import discord4j.core.object.presence.Activity;
-import discord4j.core.object.presence.Presence;
+import discord4j.core.object.presence.ClientActivity;
+import discord4j.core.object.presence.ClientPresence;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
 import reactor.core.publisher.Flux;
@@ -44,8 +44,8 @@ public class SoaDiscordBot {
 		SoaLogging.getLogger(this)
 				.info("Logging-in bot with Token: " + DiscordCfgFactory.getConfig().getDiscordToken());
 		DiscordClient client = DiscordClient.create(DiscordCfgFactory.getConfig().getDiscordToken());
-		client.gateway().setInitialStatus(
-				shardInfo -> Presence.online(Activity.playing(DiscordCfgFactory.getConfig().getDefaultStatus())))
+		client.gateway().setInitialPresence(
+				shardInfo -> ClientPresence.online(ClientActivity.playing(DiscordCfgFactory.getConfig().getDefaultStatus())))
 				.setEnabledIntents(IntentSet
 						.of(Intent.GUILDS, Intent.GUILD_MEMBERS, Intent.GUILD_BANS, Intent.GUILD_VOICE_STATES,
 								Intent.GUILD_PRESENCES, Intent.GUILD_MESSAGES, Intent.GUILD_MESSAGE_REACTIONS,
@@ -119,14 +119,14 @@ public class SoaDiscordBot {
 			if (DiscordCfgFactory.getConfig().getDefaultStatus() != null && !DiscordCfgFactory.getConfig()
 					.getDefaultStatus().trim().isEmpty())
 				gatewayDiscordClient.updatePresence(
-						Presence.online(Activity.playing(DiscordCfgFactory.getConfig().getDefaultStatus())));
+						ClientPresence.online(ClientActivity.playing(DiscordCfgFactory.getConfig().getDefaultStatus())));
 		});
 
 		gatewayDiscordClient.on(ResumeEvent.class).subscribe(event -> {
 			if (DiscordCfgFactory.getConfig().getDefaultStatus() != null && !DiscordCfgFactory.getConfig()
 					.getDefaultStatus().trim().isEmpty())
 				gatewayDiscordClient.updatePresence(
-						Presence.online(Activity.playing(DiscordCfgFactory.getConfig().getDefaultStatus())));
+						ClientPresence.online(ClientActivity.playing(DiscordCfgFactory.getConfig().getDefaultStatus())));
 		});
 
 		gatewayDiscordClient.on(MessageCreateEvent.class).flatMap(event -> messageCreateHandler.handle(event)
