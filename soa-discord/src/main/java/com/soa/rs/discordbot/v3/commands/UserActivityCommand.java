@@ -37,7 +37,8 @@ public class UserActivityCommand extends AbstractCommand {
 			}
 			List<String> parsedActivity = guildUserUtility
 					.getUserActivityDatesForUsername(names, event.getGuildId().get().asLong());
-			return Flux.fromIterable(parsedActivity).flatMapSequential(
+			List<String> properOutput = createParsedOutput(parsedActivity);
+			return Flux.fromIterable(properOutput).flatMapSequential(
 					s -> event.getMessage().getChannel().flatMap(messageChannel -> messageChannel.createMessage(s)))
 					.then();
 		} else
