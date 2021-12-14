@@ -63,7 +63,8 @@ public class UserTrackGuildCreate {
 		reviewer.setAllUsers(userUtility.getUsersCurrentlyInGuildForGuildId(guild.getId().asLong()));
 		reviewer.setLeftUsers(userUtility.getLeftUsersInGuildForGuildId(guild.getId().asLong()));
 		guild.getMembers().filter(member -> !member.isBot()).flatMap(reviewer::reviewMember)
-				.doOnComplete(reviewer::submitUsers).doOnComplete(reviewer::removeRemainingUsers).subscribe();
+				.doOnComplete(reviewer::submitUsers).doOnComplete(reviewer::removeRemainingUsers).subscribe(null,
+						err -> SoaLogging.getLogger(this).error("Unexpected error occurred during guild create event.", err));
 
 	}
 
