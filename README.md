@@ -1,7 +1,7 @@
 # Spirits of Arianwyn Discord Bot
-Version: 3.1:  ![Build](https://github.com/SoAJeff/SoADiscordBot/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master)
+Version: 3.2:  ![Build](https://github.com/SoAJeff/SoADiscordBot/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master)
 
-A (mostly) Reactive Discord Bot written using the [Discord4J](https://github.com/Discord4J/Discord4J) v3.1 Java library for use by the Spirits of Arianwyn RuneScape clan's Discord Server.
+A (mostly) Reactive Discord Bot written using the [Discord4J](https://github.com/Discord4J/Discord4J) v3.2 Java library for use by the Spirits of Arianwyn RuneScape clan's Discord Server.
 
 Version 3 of the SoA Discord Bot is a complete rewrite to accomodate the new Project Reactor framework used within Discord4J.  The new bot is within the soa-discord module. 
 
