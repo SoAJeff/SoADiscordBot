@@ -2,6 +2,7 @@ package com.soa.rs.discordbot.v3.usertrack;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
 
 import com.soa.rs.discordbot.v3.jdbi.entities.GuildUser;
 
@@ -26,7 +27,7 @@ public class NewUserUtilityTest {
 		Mockito.when(member.getDisplayName()).thenReturn("User1");
 		Mockito.when(member.getDiscriminator()).thenReturn("5678");
 		Mockito.when(member.getDisplayName()).thenReturn("User1");
-		Mockito.when(member.getJoinTime()).thenReturn(now);
+		Mockito.when(member.getJoinTime()).thenReturn(Optional.of(now));
 
 		GuildUser newUser = new GuildUser();
 		newUser.setSnowflake(1234);

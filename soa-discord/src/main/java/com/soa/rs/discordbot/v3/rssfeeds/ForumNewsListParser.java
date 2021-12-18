@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -65,7 +64,7 @@ public class ForumNewsListParser extends AbstractRssParser {
 	}
 
 	@Override
-	public List<Consumer<EmbedCreateSpec>> parseAsEmbed() {
+	public List<EmbedCreateSpec> parseAsEmbed() {
 		//Not used in this case
 		return null;
 	}

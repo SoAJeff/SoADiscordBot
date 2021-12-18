@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TimeZone;
-import java.util.function.Consumer;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
+import discord4j.core.spec.EmbedCreateFields;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 
@@ -60,10 +60,10 @@ public class RsNewsParser extends AbstractRssParser {
 	}
 
 	@Override
-	public List<Consumer<EmbedCreateSpec>> parseAsEmbed() {
+	public List<EmbedCreateSpec> parseAsEmbed() {
 		List<SyndEntry> entries;
 		Queue<SyndEntry> entriesToPost = new ArrayDeque<>();
-		List<Consumer<EmbedCreateSpec>> specs = new ArrayList<>();
+		List<EmbedCreateSpec> specs = new ArrayList<>();
 		if (!initialized) {
 			initialize();
 			return specs;
@@ -122,19 +122,19 @@ public class RsNewsParser extends AbstractRssParser {
 		return specs;
 	}
 
-	private Consumer<EmbedCreateSpec> createEmbed(SyndEntry entry) {
-		return embedCreateSpec -> {
-			embedCreateSpec
-					.setAuthor("RuneScape News", DiscordCfgFactory.getConfig().getRsNewsTask().getRsNewsArchiveLink(),
-							DiscordCfgFactory.getConfig().getRsNewsTask().getRsNewsArchiveImage());
-			embedCreateSpec.setTitle(entry.getTitle()).setUrl(entry.getUri());
-			embedCreateSpec.setColor(Color.DARK_GRAY);
-			if (entry.getEnclosures().size() > 0 && (entry.getEnclosures().get(0).getType().equals("image/png") || entry
-					.getEnclosures().get(0).getType().equals("image/jpeg")))
-				embedCreateSpec.setImage(entry.getEnclosures().get(0).getUrl());
-			embedCreateSpec.setDescription(entry.getDescription().getValue());
-			embedCreateSpec.setFooter("Posted at: " + sdf.format(new Date()), "https://i.imgur.com/BcdoFfR.png");
-		};
+	private EmbedCreateSpec createEmbed(SyndEntry entry) {
+		EmbedCreateSpec spec = EmbedCreateSpec.create();
+		spec = spec.withAuthor(EmbedCreateFields.Author.of("RuneScape News",
+						DiscordCfgFactory.getConfig().getRsNewsTask().getRsNewsArchiveLink(),
+						DiscordCfgFactory.getConfig().getRsNewsTask().getRsNewsArchiveImage())).withTitle(entry.getTitle())
+				.withUrl(entry.getUri()).withColor(Color.DARK_GRAY);
+		if (entry.getEnclosures().size() > 0 && (entry.getEnclosures().get(0).getType().equals("image/png")
+				|| entry.getEnclosures().get(0).getType().equals("image/jpeg"))) {
+			spec = spec.withImage(entry.getEnclosures().get(0).getUrl());
+		}
+		return spec.withDescription(entry.getDescription().getValue()).withFooter(
+				EmbedCreateFields.Footer.of("Posted at: " + sdf.format(new Date()), "https://i.imgur.com/BcdoFfR.png"));
+
 	}
 
 	Map<String, Date> getLastEventsPosted() {

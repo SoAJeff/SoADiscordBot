@@ -40,7 +40,7 @@ public class GuildCreateMemberReviewer {
 			//Existing user
 			guildUsers.remove(member.getId().asLong());
 			GuildUser user = updateExistingMember(member, listUser.get(0));
-			checkLastOnlineAndSubmit(member, user);
+			return checkLastOnlineAndSubmit(member, user);
 		} else {
 			List<GuildUser> leftUser = this.leftUsers.stream()
 					.filter(guildUser -> guildUser.getSnowflake() == member.getId().asLong())
@@ -58,9 +58,8 @@ public class GuildCreateMemberReviewer {
 				//New user
 				user = addNewUser(member);
 			}
-			checkLastOnlineAndSubmit(member, user);
+			return checkLastOnlineAndSubmit(member, user);
 		}
-		return Mono.empty();
 	}
 
 	GuildUser updateExistingMember(Member member, GuildUser user) {
@@ -84,7 +83,9 @@ public class GuildCreateMemberReviewer {
 			recentActionUtility.addRecentAction(member.getGuildId().asLong(), member.getId().asLong(),
 					"Changed their display name", user.getDisplayName(), member.getDisplayName());
 		}
-		newUser.setJoinedServer(Date.from(member.getJoinTime()));
+		if(member.getJoinTime().isPresent()) {
+			newUser.setJoinedServer(Date.from(member.getJoinTime().get()));
+		}
 		if (!sdf.format(user.getJoinedServer()).equals(sdf.format(newUser.getJoinedServer()))) {
 			SoaLogging.getLogger(this).debug("Joined server times did not match, assuming rejoined server.");
 			this.recentActionUtility
@@ -145,12 +146,18 @@ public class GuildCreateMemberReviewer {
 		return Mono.empty();
 	}
 
-	void checkLastOnlineAndSubmit(Member member, GuildUser user) {
-		member.getPresence().flatMap(this::isOnline).flatMap(aBoolean -> {
-			if (aBoolean)
+	Mono<Void> checkLastOnlineAndSubmit(Member member, GuildUser user) {
+		/*
+		 * Add all users first - since D4J 3.2, getPresence only seems to be returning online users.
+		 * If online, we will update their date prior to submission
+		 */
+		this.usersToSubmit.add(user);
+		return member.getPresence().flatMap(this::isOnline).flatMap(aBoolean -> Mono.fromRunnable(() -> {
+			SoaLogging.getLogger(this).trace("Presence (is user online) is " + aBoolean);
+			if (aBoolean) {
 				user.setLastSeen(new Date());
-			return Mono.just(user);
-		}).subscribe(finalUser -> this.usersToSubmit.add(finalUser));
+			}
+		})).then();
 	}
 
 	void submitUsers() {

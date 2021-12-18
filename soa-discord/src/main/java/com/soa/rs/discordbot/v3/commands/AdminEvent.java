@@ -1,6 +1,5 @@
 package com.soa.rs.discordbot.v3.commands;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
@@ -17,8 +16,9 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.core.object.presence.Activity;
-import discord4j.core.object.presence.Presence;
+import discord4j.core.object.presence.ClientActivity;
+import discord4j.core.object.presence.ClientPresence;
+import discord4j.core.spec.UserEditSpec;
 import discord4j.rest.util.Image;
 import reactor.core.publisher.Mono;
 
@@ -100,18 +100,9 @@ public class AdminEvent extends AbstractCommand {
 	private Mono<Void> changeAvatarEvent(MessageCreateEvent event, String[] args) {
 		if (args.length == 3 && event.getMember().isPresent()) {
 			try (InputStream is = FileDownloader.downloadFile(args[2])) {
+				Image avatar = getImage(is, args[2]);
 				return permittedToExecuteEvent(event.getMember().get())
-						.flatMap(ignored -> event.getClient().edit(userEditSpec -> {
-							try {
-								Image.Format format = FileDownloader.getFormatForProvidedURL(args[2]);
-								userEditSpec.setAvatar(Image.ofRaw(IOUtils.toByteArray(is), format));
-							} catch (IOException e) {
-								SoaLogging.getLogger(this).error("Error setting image as avatar", e);
-
-							} catch (Exception e) {
-								SoaLogging.getLogger(this).error("Error determining format of image", e);
-							}
-						})).then();
+						.flatMap(ignored -> event.getClient().edit(UserEditSpec.builder().avatar(avatar).build())).then();
 			} catch (Exception e) {
 				SoaLogging.getLogger(this).error("Error downloading the external image", e);
 				return Mono.empty();
@@ -128,10 +119,16 @@ public class AdminEvent extends AbstractCommand {
 			}
 			DiscordCfgFactory.getConfig().setDefaultStatus(sb.toString());
 			return permittedToExecuteEvent(event.getMember().get()).flatMap(
-					ignored -> event.getClient().updatePresence(Presence.online(Activity.playing(sb.toString()))))
+					ignored -> event.getClient().updatePresence(ClientPresence.online(ClientActivity.playing(sb.toString()))))
 					.then();
 		} else
 			return Mono.empty();
+	}
+
+	private Image getImage(InputStream is, String arg) throws Exception
+	{
+		Image.Format format = FileDownloader.getFormatForProvidedURL(arg);
+		return Image.ofRaw(IOUtils.toByteArray(is), format);
 	}
 
 }

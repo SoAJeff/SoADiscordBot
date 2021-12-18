@@ -2,7 +2,6 @@ package com.soa.rs.discordbot.v3.schedule;
 
 import java.net.MalformedURLException;
 import java.util.List;
-import java.util.function.Consumer;
 
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.rssfeeds.RsNewsParser;
@@ -41,8 +40,8 @@ public class RsNewsTask implements Runnable {
 
 	@Override
 	public void run() {
-		List<Consumer<EmbedCreateSpec>> specs = parser.parseAsEmbed();
-		for (Consumer<EmbedCreateSpec> spec : specs) {
+		List<EmbedCreateSpec> specs = parser.parseAsEmbed();
+		for (EmbedCreateSpec spec : specs) {
 			client.getGuilds().flatMap(Guild::getChannels).filter(guildChannel -> guildChannel.getName()
 					.equalsIgnoreCase(DiscordCfgFactory.getConfig().getRsNewsTask().getChannel()))
 					.filter(guildChannel -> guildChannel.getType().equals(Channel.Type.GUILD_TEXT))

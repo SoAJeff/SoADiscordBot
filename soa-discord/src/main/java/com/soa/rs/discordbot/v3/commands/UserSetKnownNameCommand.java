@@ -1,7 +1,5 @@
 package com.soa.rs.discordbot.v3.commands;
 
-import java.util.Optional;
-
 import com.soa.rs.discordbot.v3.api.annotation.Command;
 import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
@@ -40,7 +38,7 @@ public class UserSetKnownNameCommand extends AbstractCommand {
 			if (search.getSearch() == null) {
 				if (event.getMessage().getUserMentionIds().size() > 0) {
 					return permittedToExecuteEvent(event.getMember().get())
-							.flatMapMany(ignored -> event.getMessage().getUserMentions()).flatMap(user -> Flux
+							.flatMapIterable(ignored -> event.getMessage().getUserMentions()).flatMap(user -> Flux
 									.fromIterable(guildUserUtility
 											.getGuildUser("@" + user.getUsername() + "#" + user.getDiscriminator())))
 							.flatMap(guildUser -> Mono.fromRunnable(() -> {

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.function.Consumer;
 
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
@@ -64,5 +63,5 @@ public abstract class AbstractRssParser {
 	 */
 	public abstract String parse();
 
-	public abstract List<Consumer<EmbedCreateSpec>> parseAsEmbed();
+	public abstract List<EmbedCreateSpec> parseAsEmbed();
 }

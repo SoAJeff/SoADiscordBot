@@ -16,6 +16,7 @@ import com.soa.rs.discordbot.v3.util.SoaLogging;
 import org.apache.commons.io.IOUtils;
 
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.spec.UserEditSpec;
 import discord4j.rest.util.Image;
 import reactor.core.publisher.Flux;
 
@@ -84,18 +85,20 @@ public class ReadyEventHandler {
 			SoaLogging.getLogger(this).info("Setting bot avatar");
 
 			try (InputStream is = FileDownloader.downloadFile(DiscordCfgFactory.getInstance().getAvatarUrl())) {
-				client.edit(userEditSpec -> {
-					try {
-						Image.Format format = FileDownloader
-								.getFormatForProvidedURL(DiscordCfgFactory.getInstance().getAvatarUrl());
-						userEditSpec.setAvatar(Image.ofRaw(IOUtils.toByteArray(is), format));
-					} catch (IOException e) {
-						SoaLogging.getLogger(this).error("Error setting image as avatar", e);
+				UserEditSpec spec = null;
+				try {
+					Image.Format format = FileDownloader.getFormatForProvidedURL(
+							DiscordCfgFactory.getInstance().getAvatarUrl());
+					spec = UserEditSpec.builder().avatar(Image.ofRaw(IOUtils.toByteArray(is), format)).build();
+				} catch (IOException e) {
+					SoaLogging.getLogger(this).error("Error setting image as avatar", e);
 
-					} catch (Exception e) {
-						SoaLogging.getLogger(this).error("Error determining format of image", e);
-					}
-				}).subscribe();
+				} catch (Exception e) {
+					SoaLogging.getLogger(this).error("Error determining format of image", e);
+				}
+				if (spec != null) {
+					client.edit(spec).subscribe();
+				}
 			} catch (Exception e) {
 				SoaLogging.getLogger(this).error("Error downloading the external image", e);
 			}
@@ -105,8 +108,7 @@ public class ReadyEventHandler {
 
 			SoaLogging.getLogger(this)
 					.info("Setting bot username to '" + DiscordCfgFactory.getInstance().getBotname() + "'");
-			client.edit(userEditSpec -> userEditSpec.setUsername(DiscordCfgFactory.getInstance().getBotname()))
-					.subscribe();
+			client.edit(UserEditSpec.builder().username(DiscordCfgFactory.getInstance().getBotname()).build()).subscribe();
 		}
 
 	}

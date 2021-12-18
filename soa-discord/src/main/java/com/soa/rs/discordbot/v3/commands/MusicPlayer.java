@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -42,7 +41,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.channel.VoiceChannel;
-import discord4j.core.spec.MessageCreateSpec;
+import discord4j.core.spec.VoiceChannelJoinSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -130,7 +129,7 @@ public class MusicPlayer extends AbstractCommand {
 				// adding disconnection features, but for now we are just ignoring it.
 				.flatMap(channel -> event.getGuild().map(this::getGuildAudioPlayer).flatMap(guildMusicManager -> {
 					guildMusicManager.setVoiceChannel(channel);
-					return channel.join(spec -> spec.setProvider(guildMusicManager.provider));
+					return channel.join(VoiceChannelJoinSpec.builder().provider(guildMusicManager.provider).build());
 				})).flatMap(connection -> {
 					SoaLogging.getLogger(this).debug("Joined voice channel");
 					GuildMusicManager guildMusicManager = musicManagers
@@ -156,7 +155,7 @@ public class MusicPlayer extends AbstractCommand {
 							.filterWhen(ignored -> voiceStateCounter).next().then();
 
 					// Disconnect the bot if either onDelay or onEvent are completed!
-					return Mono.first(onDelay, onEvent).then(connection.disconnect()).then(Mono.fromRunnable(
+					return Mono.firstWithSignal(onDelay, onEvent).then(connection.disconnect()).then(Mono.fromRunnable(
 							() -> handleDisconnection(event.getGuildId().orElse(Snowflake.of(1L)).asLong())));
 				}).then();
 	}
@@ -377,7 +376,7 @@ public class MusicPlayer extends AbstractCommand {
 				.then();
 	}
 
-	private List<Consumer<MessageCreateSpec>> getAudioTrackList(GuildMusicManager guildMusicManager) {
+	private List<String> getAudioTrackList(GuildMusicManager guildMusicManager) {
 		BlockingQueue<AudioTrack> queue = guildMusicManager.scheduler.getQueue();
 		AudioTrack track;
 
@@ -387,11 +386,11 @@ public class MusicPlayer extends AbstractCommand {
 		sb.append("Currently within the Music Queue:\n\n");
 		int i = 1;
 
-		List<Consumer<MessageCreateSpec>> createSpecs = new ArrayList<>();
+		List<String> createSpecs = new ArrayList<>();
 
 		if (!iter.hasNext()) {
 			sb.append("Queue is empty.");
-			createSpecs.add(DiscordUtils.createMessageSpecWithMessage(sb.toString()));
+			createSpecs.add(sb.toString());
 
 		} else {
 			while (iter.hasNext()) {
@@ -400,11 +399,11 @@ public class MusicPlayer extends AbstractCommand {
 				i++;
 
 				if (sb.length() > 1800) {
-					createSpecs.add(DiscordUtils.createMessageSpecWithMessage(sb.toString()));
+					createSpecs.add(sb.toString());
 					sb.setLength(0);
 				}
 			}
-			createSpecs.add(DiscordUtils.createMessageSpecWithMessage(sb.toString()));
+			createSpecs.add(sb.toString());
 		}
 		SoaLogging.getLogger(this).trace("Size of createSpecs upon return: " + createSpecs.size());
 		return createSpecs;

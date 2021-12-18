@@ -7,6 +7,7 @@ import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.spec.BanQuerySpec;
 import reactor.core.publisher.Mono;
 
 @Command(triggers = { ".ban" })
@@ -33,8 +34,7 @@ public class UserBanEvent extends AbstractCommand {
 			return permittedToExecuteEvent(event.getMember().get())
 					.flatMapMany(ignored -> event.getGuild())
 					.flatMap(guildld -> guildld.ban(Snowflake.of(args[args.length - 1]),
-							banQuerySpec -> banQuerySpec.setReason("Ban issued via admin ban request")
-									.setDeleteMessageDays(7))
+							BanQuerySpec.builder().reason("Ban issued via admin ban request").deleteMessageDays(7).build())
 							.onErrorResume(err -> {
 						SoaLogging.getLogger(this).error("Failed to ban user: " + err.getMessage());
 						return Mono.empty();
@@ -43,7 +43,7 @@ public class UserBanEvent extends AbstractCommand {
 			String[] args = event.getMessage().getContent().trim().split(" ");
 			return permittedToExecuteEvent(event.getMember().get()).flatMapMany(ignored -> event.getGuild()).flatMap(
 					guildld -> guildld.ban(Snowflake.of(args[args.length - 1]),
-							banQuerySpec -> banQuerySpec.setReason("Ban issued via admin ban request"))
+							BanQuerySpec.builder().reason("Ban issued via admin ban request").build())
 							.onErrorResume(err -> {
 						SoaLogging.getLogger(this).error("Failed to ban user: " + err.getMessage());
 						return Mono.empty();
@@ -51,10 +51,9 @@ public class UserBanEvent extends AbstractCommand {
 		}
 		else {
 			return permittedToExecuteEvent(event.getMember().get())
-					.flatMapMany(ignored -> event.getMessage().getUserMentions())
+					.flatMapIterable(ignored -> event.getMessage().getUserMentions())
 					.flatMap(user -> user.asMember(event.getGuildId().get()))
-					.flatMap(member1 -> member1.ban(banQuerySpec -> banQuerySpec.setReason("Ban issued via admin ban request")
-									.setDeleteMessageDays(7))
+					.flatMap(member1 -> member1.ban(BanQuerySpec.builder().reason("Ban issued via admin ban request").deleteMessageDays(7).build())
 							.onErrorResume(err -> {
 								SoaLogging.getLogger(this).error("Failed to ban user: " + err.getMessage());
 								return Mono.empty();

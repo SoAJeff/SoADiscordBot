@@ -16,10 +16,12 @@ public class NewUserUtility {
 		String memberName = "@" + member.getUsername() + "#" + member.getDiscriminator();
 		newUser.setUsername(memberName);
 		newUser.setDisplayName(member.getDisplayName());
-		newUser.setJoinedServer(Date.from(member.getJoinTime()));
-		newUser.setLastSeen(Date.from(member.getJoinTime()));
+		if(member.getJoinTime().isPresent()) {
+			newUser.setJoinedServer(Date.from(member.getJoinTime().get()));
+			newUser.setLastSeen(Date.from(member.getJoinTime().get()));
+			newUser.setLastActive(Date.from(member.getJoinTime().get()));
+		}
 		newUser.setLeftServer(Date.from(Instant.EPOCH));
-		newUser.setLastActive(Date.from(member.getJoinTime()));
 
 		return newUser;
 	}

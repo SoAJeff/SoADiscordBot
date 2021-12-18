@@ -6,6 +6,8 @@ import java.io.IOException;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
+import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
+import com.soa.rs.discordbot.v3.jaxb.RsListingEvent;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import org.junit.Assert;
@@ -22,6 +24,9 @@ public class RsNewsParserTest {
 		ByteArrayInputStream bais = new ByteArrayInputStream(feed.getBytes());
 		source = new InputSource(bais);
 		SoaLogging.initializeLogging();
+		DiscordCfgFactory.getConfig().setRsNewsTask(new RsListingEvent());
+		DiscordCfgFactory.getConfig().getRsNewsTask().setRsNewsArchiveLink("Test Link");
+		DiscordCfgFactory.getConfig().getRsNewsTask().setRsNewsArchiveImage("Test Image");
 	}
 
 	@Test
