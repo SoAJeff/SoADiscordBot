@@ -63,6 +63,7 @@ public class SetRsnCommand extends AbstractCommand {
 					.info("Assigning RSN: " + name + " for user " + member.getUsername() + "#" + member
 							.getDiscriminator());
 			userUtility.updateKnownNameForUser(name, member.getId().asLong(), member.getGuildId().asLong());
+			userUtility.updateDisplayNameForUser(name, member.getId().asLong(), member.getGuildId().asLong());
 			success = true;
 		});
 		if (success) {
