@@ -1,0 +1,4 @@
+{
+  "name": "gametime",
+  "description": "Returns the current time in Gametime (UTC)"
+}

@@ -6,6 +6,7 @@ import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.common.util.Snowflake;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.BanQuerySpec;
 import reactor.core.publisher.Mono;
@@ -59,5 +60,10 @@ public class UserBanEvent extends AbstractCommand {
 								return Mono.empty();
 							})).then(event.getMessage().delete()).then();
 		}
+	}
+
+	@Override
+	public Mono<Void> execute(ChatInputInteractionEvent event) {
+		return Mono.empty();
 	}
 }

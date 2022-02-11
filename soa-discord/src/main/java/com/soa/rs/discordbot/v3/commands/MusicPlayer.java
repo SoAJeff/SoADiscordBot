@@ -33,6 +33,7 @@ import org.reactivestreams.Publisher;
 
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Attachment;
@@ -116,6 +117,11 @@ public class MusicPlayer extends AbstractCommand {
 		default:
 			return Mono.empty();
 		}
+	}
+
+	@Override
+	public Mono<Void> execute(ChatInputInteractionEvent event) {
+		return Mono.empty();
 	}
 
 	private Mono<Void> handleJoin(MessageCreateEvent event) {

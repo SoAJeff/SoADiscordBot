@@ -20,6 +20,7 @@ import com.soa.rs.discordbot.v3.jdbi.entities.GuildEntry;
 import com.soa.rs.discordbot.v3.jdbi.entities.GuildServerUser;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateFields;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -78,6 +79,11 @@ public class UserSearchCommand extends AbstractCommand {
 
 		return Flux.fromIterable(users).flatMap(user -> event.getMessage().getChannel()
 				.flatMap(messageChannel -> messageChannel.createMessage(createEmbed(user)))).then();
+	}
+
+	@Override
+	public Mono<Void> execute(ChatInputInteractionEvent event) {
+		return Mono.empty();
 	}
 
 	public Search determineSearch(MessageCreateEvent event) {

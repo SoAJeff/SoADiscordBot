@@ -11,6 +11,7 @@ import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 import com.soa.rs.discordbot.v3.util.DiscordUtils;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.GuildMemberEditSpec;
@@ -88,6 +89,11 @@ public class SetRsnCommand extends AbstractCommand {
 				return Mono.empty();
 			}
 		}
+	}
+
+	@Override
+	public Mono<Void> execute(ChatInputInteractionEvent event) {
+		return Mono.empty();
 	}
 
 	boolean isValidRsn(String name) {

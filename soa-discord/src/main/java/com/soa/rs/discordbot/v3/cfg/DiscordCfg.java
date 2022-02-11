@@ -1,7 +1,9 @@
 package com.soa.rs.discordbot.v3.cfg;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TreeMap;
 
 import javax.xml.bind.JAXBException;
@@ -40,6 +42,8 @@ public class DiscordCfg {
 	private String avatarUrl = null;
 
 	private final TreeMap<String, String> helpMap = new TreeMap<>();
+
+	private final List<String> commandFileNames = new ArrayList<>();
 
 	/**
 	 * Constructor for creating a DiscordCfg. This should never be called within the
@@ -129,6 +133,15 @@ public class DiscordCfg {
 
 	public TreeMap<String, String> getHelpMap() {
 		return this.helpMap;
+	}
+
+	public List<String> getCommandFileNames() {
+		return commandFileNames;
+	}
+
+	public void addCommandFilename(String name)
+	{
+		this.commandFileNames.add(name);
 	}
 
 	public boolean isUserTrackingEnabled() {

@@ -19,6 +19,7 @@ import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import org.apache.commons.io.IOUtils;
 
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Attachment;
 import discord4j.core.object.entity.Message;
@@ -77,6 +78,11 @@ public class ArchiveChannelMessagesCommand extends AbstractCommand {
 						.flatMap(messageChannel -> messageChannel.createMessage("Completed Archive, " + index + " messages archived")))
 				.then(Mono.fromRunnable(()->index=0));
 
+	}
+
+	@Override
+	public Mono<Void> execute(ChatInputInteractionEvent event) {
+		return Mono.empty();
 	}
 
 	//Message.timestamp needs to be formatted...

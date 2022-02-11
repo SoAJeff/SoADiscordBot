@@ -1,14 +1,17 @@
 package com.soa.rs.discordbot.v3.commands;
 
 import com.soa.rs.discordbot.v3.api.annotation.Command;
+import com.soa.rs.discordbot.v3.api.annotation.Interaction;
 import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.util.DiscordUtils;
 
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
 
 @Command(triggers = { ".help" })
+@Interaction(trigger = "help")
 public class HelpEvent extends AbstractCommand {
 
 	@Override
@@ -20,6 +23,11 @@ public class HelpEvent extends AbstractCommand {
 	public Mono<Void> execute(MessageCreateEvent event) {
 		return event.getMessage().getChannel()
 				.flatMap(messageChannel -> DiscordUtils.sendMessage(buildHelpString(), messageChannel)).then();
+	}
+
+	@Override
+	public Mono<Void> execute(ChatInputInteractionEvent event) {
+		return event.reply().withEphemeral(true).withContent(buildHelpString()).then();
 	}
 
 	String buildHelpString() {

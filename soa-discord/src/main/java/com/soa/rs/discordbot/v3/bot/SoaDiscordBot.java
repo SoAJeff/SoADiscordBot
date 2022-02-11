@@ -3,6 +3,10 @@ package com.soa.rs.discordbot.v3.bot;
 import java.time.Duration;
 
 import com.soa.rs.discordbot.v3.api.command.CommandInitializer;
+import com.soa.rs.discordbot.v3.api.interaction.GlobalCommandRegistrar;
+import com.soa.rs.discordbot.v3.api.interaction.GuildCommandRegistrar;
+import com.soa.rs.discordbot.v3.api.interaction.InteractionInitializer;
+import com.soa.rs.discordbot.v3.api.interaction.InteractionProcessor;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 import com.soa.rs.discordbot.v3.usertrack.LastActiveCache;
@@ -20,6 +24,7 @@ import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.event.domain.guild.MemberUpdateEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.lifecycle.ReconnectEvent;
 import discord4j.core.event.domain.lifecycle.ResumeEvent;
@@ -41,6 +46,7 @@ public class SoaDiscordBot {
 
 	public void start() {
 		CommandInitializer.init();
+		InteractionInitializer.init();
 		SoaLogging.getLogger(this)
 				.info("Logging-in bot with Token: " + DiscordCfgFactory.getConfig().getDiscordToken());
 		DiscordClient client = DiscordClient.create(DiscordCfgFactory.getConfig().getDiscordToken());
@@ -53,6 +59,7 @@ public class SoaDiscordBot {
 				.withGateway(gatewayDiscordClient -> {
 					this.discordClient = gatewayDiscordClient;
 					registerEvents(gatewayDiscordClient);
+					registerCommands(gatewayDiscordClient);
 					return gatewayDiscordClient.onDisconnect();
 				})
 				/* Retry backoff is in place for if login fails due to some kind of exception (no internet)?
@@ -75,6 +82,7 @@ public class SoaDiscordBot {
 	private void registerEvents(GatewayDiscordClient gatewayDiscordClient) {
 		ReadyEventHandler readyEventHandler = new ReadyEventHandler(gatewayDiscordClient);
 		MessageCreateHandler messageCreateHandler = new MessageCreateHandler();
+		InteractionProcessor interactionProcessor = new InteractionProcessor();
 		GuildCreateHandler guildCreateHandler = new GuildCreateHandler();
 		TypingStartHandler typingStartHandler = new TypingStartHandler();
 		MemberJoinHandler memberJoinHandler = new MemberJoinHandler();
@@ -91,6 +99,8 @@ public class SoaDiscordBot {
 			lastActiveCache.setGuildUserUtility(guildUserUtility);
 			messageCreateHandler.setLastSeenCache(lastSeenCache);
 			messageCreateHandler.setLastActiveCache(lastActiveCache);
+			interactionProcessor.setLastSeenCache(lastSeenCache);
+			interactionProcessor.setLastActiveCache(lastActiveCache);
 			guildCreateHandler.setLastSeenCache(lastSeenCache);
 			guildCreateHandler.setLastActiveCache(lastActiveCache);
 			typingStartHandler.setCache(lastSeenCache);
@@ -134,6 +144,10 @@ public class SoaDiscordBot {
 						.error("Unexpected error occurred during message create event.", err)
 				))).subscribe();
 
+		gatewayDiscordClient.on(ChatInputInteractionEvent.class).flatMap(interactionProcessor::processInteraction).subscribe(null,
+				err -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred while processing interaction.", err));
+
 		gatewayDiscordClient.on(GuildCreateEvent.class).subscribe(guildCreateHandler::handleGuildCreate,
 				err -> SoaLogging.getLogger(this).error("Unexpected error occurred during guild create event.", err));
 
@@ -164,6 +178,22 @@ public class SoaDiscordBot {
 		if (DiscordCfgFactory.getInstance().isUserTrackingEnabled()) {
 			gatewayDiscordClient.on(TypingStartEvent.class).flatMap(typingStartHandler::handleTypingStart)
 					.subscribe(null, err -> SoaLogging.getLogger(this).error("Error processing typing event", err));
+		}
+
+	}
+
+	private void registerCommands(GatewayDiscordClient gatewayDiscordClient) {
+		try {
+			if (DiscordCfgFactory.getConfig().isUseGuildInteractions()) {
+				new GuildCommandRegistrar(gatewayDiscordClient.getRestClient()).registerCommands(
+						DiscordCfgFactory.getInstance().getCommandFileNames(),
+						DiscordCfgFactory.getConfig().getDefaultGuildId());
+			} else {
+				new GlobalCommandRegistrar(gatewayDiscordClient.getRestClient()).registerCommands(
+						DiscordCfgFactory.getInstance().getCommandFileNames());
+			}
+		} catch (Exception e) {
+			SoaLogging.getLogger(this).error("Failed to register commands: " + e.getMessage(), e);
 		}
 
 	}

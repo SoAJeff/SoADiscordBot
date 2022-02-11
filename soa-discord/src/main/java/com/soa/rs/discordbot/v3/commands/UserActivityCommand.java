@@ -9,6 +9,7 @@ import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -45,6 +46,11 @@ public class UserActivityCommand extends AbstractCommand {
 			return event.getMessage().getChannel()
 					.flatMap(messageChannel -> messageChannel.createMessage("Please send this message in a guild."))
 					.then();
+	}
+
+	@Override
+	public Mono<Void> execute(ChatInputInteractionEvent event) {
+		return Mono.empty();
 	}
 
 	List<String> parseNames(String names) {

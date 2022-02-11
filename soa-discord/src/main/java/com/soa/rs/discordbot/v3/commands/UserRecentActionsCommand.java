@@ -10,6 +10,7 @@ import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.jdbi.RecentActionUtility;
 import com.soa.rs.discordbot.v3.jdbi.entities.UsernameRecentAction;
 
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
 
@@ -43,6 +44,11 @@ public class UserRecentActionsCommand extends AbstractCommand {
 		String replyContent = generateString(actions);
 		return event.getMessage().getChannel().flatMap(messageChannel -> messageChannel.createMessage(replyContent))
 				.then();
+	}
+
+	@Override
+	public Mono<Void> execute(ChatInputInteractionEvent event) {
+		return Mono.empty();
 	}
 
 	public String generateString(List<UsernameRecentAction> actions) {
