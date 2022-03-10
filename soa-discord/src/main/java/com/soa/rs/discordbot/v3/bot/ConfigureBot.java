@@ -170,15 +170,6 @@ public class ConfigureBot {
 		}
 
 		try {
-			if (DiscordCfgFactory.getConfig().getMusicPlayer() != null)
-				validator.validateMusicPlayer(DiscordCfgFactory.getConfig().getMusicPlayer());
-		} catch (InvalidBotConfigurationException e) {
-			SoaLogging.getLogger(this).warn("Music Event failed to validate: " + e.getMessage() + ", setting disabled");
-			DiscordCfgFactory.getConfig().getMusicPlayer().setEnabled(false);
-			result.setEventWasInvalid(true);
-		}
-
-		try {
 			if (DiscordCfgFactory.getConfig().getAdminEvent() != null)
 				validator.validateAdminEvent(DiscordCfgFactory.getConfig().getAdminEvent());
 		} catch (InvalidBotConfigurationException e) {

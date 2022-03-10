@@ -3,7 +3,6 @@ package com.soa.rs.discordbot.v3.cfg;
 import com.soa.rs.discordbot.v3.jaxb.AdminEvent;
 import com.soa.rs.discordbot.v3.jaxb.DiscordConfiguration;
 import com.soa.rs.discordbot.v3.jaxb.EventListingEvent;
-import com.soa.rs.discordbot.v3.jaxb.MusicPlayer;
 import com.soa.rs.discordbot.v3.jaxb.RankList;
 import com.soa.rs.discordbot.v3.jaxb.UserTrackingEvent;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
@@ -53,32 +52,6 @@ public class ConfigValidatorTest {
 		testResult = validator.validateListingEvent(event);
 
 		Assert.assertTrue(testResult);
-	}
-
-	@Test
-	public void testMusicNoCanDisableRankCheck() throws InvalidBotConfigurationException {
-		MusicPlayer event = new MusicPlayer();
-		event.setEnabled(true);
-
-		validator.validateMusicPlayer(event);
-
-		Assert.assertTrue(
-				DiscordCfgFactory.getConfig().getMusicPlayer().getCanDisableRankCheck().getRole().size() == 1);
-		Assert.assertEquals("Role 1",
-				DiscordCfgFactory.getConfig().getMusicPlayer().getCanDisableRankCheck().getRole().get(0));
-	}
-
-	@Test
-	public void testMusicValidConfig() throws InvalidBotConfigurationException {
-		MusicPlayer event = new MusicPlayer();
-		event.setEnabled(true);
-		RankList list = new RankList();
-		list.getRole().add("Role 1");
-		event.setAllowedRoles(list);
-		event.setCanDisableRankCheck(list);
-
-		boolean valid = validator.validateMusicPlayer(event);
-		Assert.assertTrue(valid);
 	}
 
 	@Test

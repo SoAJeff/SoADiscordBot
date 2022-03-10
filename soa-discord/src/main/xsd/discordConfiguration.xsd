@@ -13,7 +13,6 @@
       <xsd:element name="enable-text-commands" type="xsd:boolean" minOccurs="1" maxOccurs="1" />
       <xsd:element name="event-listing-event" type="EventListingEvent" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="news-listing-event" type="ListingEvent" minOccurs="0" maxOccurs="1"/>
-      <xsd:element name="music-player" type="MusicPlayer" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="dj-pls-event" type="BaseEvent" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="admin-event" type="AdminEvent" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="user-tracking-event" type="UserTrackingEvent" minOccurs="0" maxOccurs="1"/>
@@ -77,17 +76,6 @@
         <xsd:sequence>
           <xsd:element name="rs-news-archive-link" type="xsd:string" minOccurs="1" maxOccurs="1"/>
           <xsd:element name="rs-news-archive-image" type="xsd:string" minOccurs="1" maxOccurs="1"/>
-        </xsd:sequence>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-  <xsd:complexType name="MusicPlayer">
-    <xsd:complexContent>
-      <xsd:extension base="BaseEvent">
-        <xsd:sequence>
-          <xsd:element name="allowed-roles" type="RankList" minOccurs="0" maxOccurs="1"/>
-          <xsd:element name="can-disable-rank-check" type="RankList" minOccurs="0" maxOccurs="1"/>
-          <xsd:element name="enforce-only-allowed-roles" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
         </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>

@@ -14,7 +14,6 @@ import com.soa.rs.discordbot.v3.jaxb.AdminEvent;
 import com.soa.rs.discordbot.v3.jaxb.DiscordConfiguration;
 import com.soa.rs.discordbot.v3.jaxb.EventListingEvent;
 import com.soa.rs.discordbot.v3.jaxb.ListingEvent;
-import com.soa.rs.discordbot.v3.jaxb.MusicPlayer;
 import com.soa.rs.discordbot.v3.jaxb.UserTrackingEvent;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
@@ -37,25 +36,6 @@ public class DefaultConfigValidator implements ConfigValidator {
 		}
 		if (!validateURL(event.getUrl())) {
 			throw new InvalidBotConfigurationException("An invalid URL was provided", eventType);
-		}
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.soa.rs.discordbot.cfg.ConfigValidator#validateMusicPlayer(com.soa.rs.discordbot.jaxb.MusicPlayer)
-	 */
-	@Override
-	public boolean validateMusicPlayer(MusicPlayer event) {
-		if (event.getCanDisableRankCheck() == null || event.getCanDisableRankCheck().getRole().isEmpty()) {
-			// List has no roles, by default set this to be Staff roles
-			if (DiscordCfgFactory.getConfig().getStaffRoles() != null && !DiscordCfgFactory.getConfig().getStaffRoles()
-					.getRole().isEmpty()) {
-				event.setCanDisableRankCheck(DiscordCfgFactory.getConfig().getStaffRoles());
-				DiscordCfgFactory.getConfig().setMusicPlayer(event);
-				SoaLogging.getLogger(this)
-						.debug("No disable rank check ranks in Music Player config, setting to staff roles");
-			}
 		}
 		return true;
 	}

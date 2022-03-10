@@ -3,7 +3,6 @@ package com.soa.rs.discordbot.v3.cfg;
 import com.soa.rs.discordbot.v3.jaxb.AdminEvent;
 import com.soa.rs.discordbot.v3.jaxb.DiscordConfiguration;
 import com.soa.rs.discordbot.v3.jaxb.ListingEvent;
-import com.soa.rs.discordbot.v3.jaxb.MusicPlayer;
 import com.soa.rs.discordbot.v3.jaxb.UserTrackingEvent;
 
 /**
@@ -22,17 +21,6 @@ public interface ConfigValidator {
 	 *             Thrown if the event does cannot be successfully validated
 	 */
 	public boolean validateListingEvent(ListingEvent event) throws InvalidBotConfigurationException;
-
-	/**
-	 * Validates a Music Player Event configuration
-	 * 
-	 * @param event
-	 *            The event containing the parameters to validate
-	 * @return True if the event passes validation, false otherwise
-	 * @throws InvalidBotConfigurationException
-	 *             Thrown if the event does cannot be successfully validated
-	 */
-	public boolean validateMusicPlayer(MusicPlayer event) throws InvalidBotConfigurationException;
 
 	/**
 	 * Validates an Admin Event configuration
