@@ -25,6 +25,7 @@ import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.event.domain.guild.MemberUpdateEvent;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.lifecycle.ReconnectEvent;
 import discord4j.core.event.domain.lifecycle.ResumeEvent;
@@ -45,7 +46,9 @@ public class SoaDiscordBot {
 	private GatewayDiscordClient discordClient;
 
 	public void start() {
-		CommandInitializer.init();
+		if(DiscordCfgFactory.getConfig().isEnableTextCommands()) {
+			CommandInitializer.init();
+		}
 		InteractionInitializer.init();
 		SoaLogging.getLogger(this)
 				.info("Logging-in bot with Token: " + DiscordCfgFactory.getConfig().getDiscordToken());
@@ -145,6 +148,10 @@ public class SoaDiscordBot {
 				))).subscribe();
 
 		gatewayDiscordClient.on(ChatInputInteractionEvent.class).flatMap(interactionProcessor::processInteraction).subscribe(null,
+				err -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred while processing interaction.", err));
+
+		gatewayDiscordClient.on(ModalSubmitInteractionEvent.class).flatMap(interactionProcessor::processModal).subscribe(null,
 				err -> SoaLogging.getLogger(this)
 						.error("Unexpected error occurred while processing interaction.", err));
 

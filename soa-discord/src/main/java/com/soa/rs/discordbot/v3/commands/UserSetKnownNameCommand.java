@@ -1,18 +1,24 @@
 package com.soa.rs.discordbot.v3.commands;
 
 import com.soa.rs.discordbot.v3.api.annotation.Command;
+import com.soa.rs.discordbot.v3.api.annotation.Interaction;
 import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.jdbi.GuildNicknameUtility;
 import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.reaction.ReactionEmoji;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Command(triggers = { ".user-setname" })
+@Interaction(trigger = "usersetknownname")
 public class UserSetKnownNameCommand extends AbstractCommand {
 
 	private GuildNicknameUtility guildNicknameUtility = new GuildNicknameUtility();
@@ -64,6 +70,33 @@ public class UserSetKnownNameCommand extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(ChatInputInteractionEvent event) {
+		if(!event.getInteraction().getGuildId().isPresent())
+			return event.reply("Sorry, this command can only be used in a server, not in private messages.").withEphemeral(true).then();
+
+		Mono<Member> user = event.getOption("user").flatMap(ApplicationCommandInteractionOption::getValue)
+				.map(ApplicationCommandInteractionOptionValue::asUser).orElse(Mono.empty())
+				.flatMap(u -> u.asMember(event.getInteraction().getGuildId().get()));
+
+		String name = event.getOption("name").flatMap(ApplicationCommandInteractionOption::getValue)
+				.map(ApplicationCommandInteractionOptionValue::asString).get();
+
+		return event.deferReply().withEphemeral(true)
+				.then(permittedToExecuteEvent(event.getInteraction().getMember().orElse(null))
+						.switchIfEmpty(Mono.error(new Throwable("You don't have permission.")))
+						.flatMap(ignored -> user.flatMapIterable(
+										u -> guildUserUtility.getGuildUser(u.getId().asLong(), u.getGuildId().asLong()))
+								.flatMap(guildUser -> Mono.fromRunnable(() -> {
+									guildUser.setKnownName(name);
+									guildUserUtility.updateExistingUser(guildUser);
+								}))
+								.then(event.createFollowup("Known name for user updated.").withEphemeral(true).then())))
+				.onErrorResume(throwable -> event.createFollowup(throwable.getMessage()).withEphemeral(true).then())
+				.then();
+
+	}
+
+	@Override
+	public Mono<Void> execute(ModalSubmitInteractionEvent event) {
 		return Mono.empty();
 	}
 

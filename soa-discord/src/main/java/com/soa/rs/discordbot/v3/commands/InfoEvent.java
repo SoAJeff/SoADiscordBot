@@ -12,6 +12,7 @@ import com.soa.rs.discordbot.v3.util.SoaLogging;
 import com.soa.rs.discordbot.v3.util.UptimeUtility;
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
 
@@ -37,6 +38,11 @@ public class InfoEvent extends AbstractCommand {
 	public Mono<Void> execute(ChatInputInteractionEvent event) {
 		SoaLogging.getLogger(this).info("Made it to the chat event!");
 		return event.reply().withEphemeral(true).withContent(generateInfo()).then();
+	}
+
+	@Override
+	public Mono<Void> execute(ModalSubmitInteractionEvent event) {
+		return Mono.empty();
 	}
 
 	private String generateInfo()

@@ -1,0 +1,12 @@
+{
+  "name": "setrsn",
+  "description": "Change your Discord Nickname to your RuneScape Name",
+  "options": [
+    {
+      "name": "rsn",
+      "description": "Your RuneScape name",
+      "type": 3,
+      "required": true
+    }
+  ]
+}

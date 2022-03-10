@@ -7,6 +7,7 @@ import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.util.DiscordUtils;
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
 
@@ -28,6 +29,11 @@ public class HelpEvent extends AbstractCommand {
 	@Override
 	public Mono<Void> execute(ChatInputInteractionEvent event) {
 		return event.reply().withEphemeral(true).withContent(buildHelpString()).then();
+	}
+
+	@Override
+	public Mono<Void> execute(ModalSubmitInteractionEvent event) {
+		return Mono.empty();
 	}
 
 	String buildHelpString() {

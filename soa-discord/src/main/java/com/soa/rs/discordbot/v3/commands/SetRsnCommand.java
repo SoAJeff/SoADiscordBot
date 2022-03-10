@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.soa.rs.discordbot.v3.api.annotation.Command;
+import com.soa.rs.discordbot.v3.api.annotation.Interaction;
 import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
@@ -12,12 +13,16 @@ import com.soa.rs.discordbot.v3.util.DiscordUtils;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.GuildMemberEditSpec;
 import reactor.core.publisher.Mono;
 
 @Command(triggers = { "!setrsn", ".setrsn" })
+@Interaction(trigger = "setrsn")
 public class SetRsnCommand extends AbstractCommand {
 
 	private GuildUserUtility userUtility;
@@ -93,11 +98,48 @@ public class SetRsnCommand extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(ChatInputInteractionEvent event) {
+		if (!event.getInteraction().getGuildId().isPresent()) {
+			return event.reply("This command must be run in a server.").withEphemeral(true).then();
+		}
+		String name = event.getOption("rsn").flatMap(ApplicationCommandInteractionOption::getValue)
+				.map(ApplicationCommandInteractionOptionValue::asString).get();
+		if (!isValidRsn(name)) {
+			StringBuilder sb = new StringBuilder();
+			event.getInteraction().getMember().ifPresent(user -> sb.append(user.getMention()));
+			sb.append(", ");
+			sb.append(" the name entered does not appear to be a valid RSN.  ");
+			sb.append("If you are using this command to attempt to set your server nickname to ");
+			sb.append("something that isn't your RSN (e.g., to add an emoji or also add your IRL name),");
+			sb.append(" then contact a member of staff for assistance.");
+			return event.reply(sb.toString()).withEphemeral(true).then();
+		}
+		SoaLogging.getLogger(this).debug("RuneScape name was determined to be valid, continuing...");
+		return event.deferReply().withEphemeral(true).then(Mono.fromRunnable(() -> {
+					event.getInteraction().getMember().ifPresent(member -> {
+						SoaLogging.getLogger(this).info("Assigning RSN: " + name + " for user " + member.getUsername() + "#"
+								+ member.getDiscriminator());
+						userUtility.updateKnownNameForUser(name, member.getId().asLong(), member.getGuildId().asLong());
+						userUtility.updateDisplayNameForUser(name, member.getId().asLong(), member.getGuildId().asLong());
+					});
+				})).then(event.getInteraction().getMember().get()
+						.edit(GuildMemberEditSpec.builder().nicknameOrNull(name).build()))
+				.flatMap(member -> event.createFollowup("Your name has been changed.").withEphemeral(true))
+				.onErrorResume(throwable -> {
+					SoaLogging.getLogger(this).error("Unable to change name: " + throwable.getMessage(), throwable);
+					return event.createFollowup(
+									"Failed to change server nickname, missing permissions - your role may be higher than the bot's role!")
+							.withEphemeral(true).then(Mono.empty());
+				}).then();
+	}
+
+	@Override
+	public Mono<Void> execute(ModalSubmitInteractionEvent event) {
 		return Mono.empty();
 	}
 
 	boolean isValidRsn(String name) {
 		boolean isValid = false;
+		SoaLogging.getLogger(this).debug("Name provided: " + name);
 		if (name.length() <= 12) {
 			Matcher matcher = rsnPattern.matcher(name);
 			if (matcher.matches()) {

@@ -57,7 +57,7 @@ public class InteractionInitializer {
 			}
 		}
 		catch (Exception e) {
-			SoaLogging.getLoggerForClass(InteractionInitializer.class).error("Error initializing command: " + clazz.getSimpleName());
+			SoaLogging.getLoggerForClass(InteractionInitializer.class).error("Error initializing command: " + clazz.getSimpleName(), e);
 		}
 	}
 

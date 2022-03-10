@@ -5,6 +5,7 @@ import com.soa.rs.discordbot.v3.usertrack.RecentCache;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.object.entity.User;
 import reactor.core.publisher.Mono;
 
@@ -38,6 +39,34 @@ public class InteractionProcessor {
 		}
 		else
 			return Mono.empty();
+	}
+
+	public Mono<Void> processModal(ModalSubmitInteractionEvent event)
+	{
+		User member = event.getInteraction().getUser();
+
+		if(!member.isBot())
+		{
+			if (event.getInteraction().getGuildId().isPresent() && DiscordCfgFactory.getInstance().isUserTrackingEnabled()) {
+				if (lastSeenCache != null) {
+					lastSeenCache.updateCacheForGuildUser(event.getInteraction().getGuildId().get().asLong(),
+							member.getId().asLong());
+				}
+				if (lastActiveCache != null) {
+					lastActiveCache.updateCacheForGuildUser(event.getInteraction().getGuildId().get().asLong(),
+							member.getId().asLong());
+				}
+			}
+		}
+
+		SoaLogging.getLogger(this).info("Received Modal with custom ID " + event.getCustomId());
+		if(InteractionInitializer.getInteraction(event.getCustomId()) != null)
+		{
+			return InteractionInitializer.getInteraction(event.getCustomId()).execute(event);
+		}
+		else
+			return Mono.empty();
+
 	}
 
 	public void setLastSeenCache(RecentCache cache) {

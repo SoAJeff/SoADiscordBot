@@ -19,6 +19,7 @@ import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.util.UptimeUtility;
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
 
@@ -54,6 +55,11 @@ public class BotstatsInteraction extends AbstractCommand {
 		sb.append("Uptime: " + uptime.toDays() + " days, " + (uptime.toHours() % 24) + " hours, " + (uptime.toMinutes()
 				% 60) + " minutes");
 		return event.reply().withEphemeral(true).withContent(sb.toString()).then();
+	}
+
+	@Override
+	public Mono<Void> execute(ModalSubmitInteractionEvent event) {
+		return Mono.empty();
 	}
 
 	private String formatNumber(double number) {

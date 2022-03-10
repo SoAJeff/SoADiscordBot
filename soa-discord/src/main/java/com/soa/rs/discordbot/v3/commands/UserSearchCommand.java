@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import com.soa.rs.discordbot.v3.api.annotation.Command;
+import com.soa.rs.discordbot.v3.api.annotation.Interaction;
 import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.jdbi.GuildNicknameUtility;
@@ -21,13 +22,18 @@ import com.soa.rs.discordbot.v3.jdbi.entities.GuildServerUser;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.spec.EmbedCreateFields;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.InteractionFollowupCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Command(triggers = { ".usersearch", ".user-search" })
+@Interaction(trigger = "usersearch")
 public class UserSearchCommand extends AbstractCommand {
 
 	private final GuildUtility guildUtility = new GuildUtility();
@@ -83,7 +89,34 @@ public class UserSearchCommand extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(ChatInputInteractionEvent event) {
+		String name = event.getOption("name").flatMap(ApplicationCommandInteractionOption::getValue)
+				.map(ApplicationCommandInteractionOptionValue::asString).get();
+
+		return event.deferReply().withEphemeral(true)
+				.then(performSearch(event, name)
+						.flatMap(user->event.createFollowup(
+						InteractionFollowupCreateSpec.builder().addEmbed(createEmbed(user)).ephemeral(true).build()))
+						.then())
+				.onErrorResume(throwable ->  event.createFollowup(throwable.getMessage()).withEphemeral(true).then()).then();
+
+	}
+
+	@Override
+	public Mono<Void> execute(ModalSubmitInteractionEvent event) {
 		return Mono.empty();
+	}
+
+	private Flux<GuildServerUser> performSearch(ChatInputInteractionEvent event, String name) {
+		Set<GuildServerUser> users = new HashSet<>();
+		if (event.getInteraction().getGuildId().isPresent()) {
+			users.addAll(guildNicknameUtility.getGuildUserWithNameInGuildWithServerName(name,
+					event.getInteraction().getGuildId().get().asLong()));
+		} else {
+			users.addAll(guildNicknameUtility.getGuildUserWithServerName(name));
+		}
+		if (users.isEmpty())
+			return Flux.error(new Throwable("No results in search."));
+		return Flux.fromIterable(users);
 	}
 
 	public Search determineSearch(MessageCreateEvent event) {

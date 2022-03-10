@@ -20,8 +20,7 @@ public class CommandProcessor {
 		String content = Optional.of(event.getMessage().getContent()).orElse("").trim().toLowerCase();
 		User member = event.getMessage().getAuthor().orElse(null);
 
-		if (member != null && !member.isBot() && !(content.isEmpty())) {
-
+		if (member != null && !member.isBot()) {
 			//Update the cache
 			if (event.getGuildId().isPresent() && DiscordCfgFactory.getInstance().isUserTrackingEnabled()) {
 				if (lastSeenCache != null) {
@@ -32,30 +31,31 @@ public class CommandProcessor {
 				}
 			}
 
-			if (content.startsWith(SoaDiscordBotConstants.BOT_PREFIX) || content.toLowerCase()
-					.startsWith(SoaDiscordBotConstants.RUNEINFO_PREFIX)) {
-				String cmd = content.split(" ")[0];
-				SoaLogging.getLogger(this).info("cmd is: " + cmd);
-				if (CommandInitializer.getCommand(cmd.toLowerCase()) != null) {
-					SoaLogging.getLogger(CommandProcessor.class)
-							.info("Executing command [" + CommandInitializer.getCommand(cmd).getClass().getSimpleName()
-									+ "]");
-					return (CommandInitializer.getCommand(cmd).execute(event));
+			if (!(content.isEmpty()) && DiscordCfgFactory.getConfig().isEnableTextCommands()) {
+				if (content.startsWith(SoaDiscordBotConstants.BOT_PREFIX) || content.toLowerCase().startsWith(SoaDiscordBotConstants.RUNEINFO_PREFIX)) {
+					String cmd = content.split(" ")[0];
+					SoaLogging.getLogger(this).info("cmd is: " + cmd);
+					if (CommandInitializer.getCommand(cmd.toLowerCase()) != null) {
+						SoaLogging.getLogger(CommandProcessor.class)
+								.info("Executing command [" + CommandInitializer.getCommand(cmd).getClass().getSimpleName()
+										+ "]");
+						return (CommandInitializer.getCommand(cmd).execute(event));
+					} else {
+						return Mono.empty();
+					}
 				} else {
+					//Handle the 'everything events'
+					for (String key : CommandInitializer.getAnyMessageMap().keySet()) {
+						if (content.contains(key.toLowerCase())) {
+							SoaLogging.getLogger(CommandProcessor.class)
+									.info("Executing msgRcvEvent [" + CommandInitializer.getMsgRcvd(key).getClass().getSimpleName() + "]");
+							return (CommandInitializer.getMsgRcvd(key).execute(event));
+						}
+					}
 					return Mono.empty();
 				}
-			} else {
-				//Handle the 'everything events'
-				for (String key : CommandInitializer.getAnyMessageMap().keySet()) {
-					if (content.contains(key.toLowerCase())) {
-						SoaLogging.getLogger(CommandProcessor.class)
-								.info("Executing msgRcvEvent [" + CommandInitializer.getMsgRcvd(key).getClass()
-										.getSimpleName() + "]");
-						return (CommandInitializer.getMsgRcvd(key).execute(event));
-					}
-				}
-				return Mono.empty();
 			}
+			return Mono.empty();
 		} else {
 			return Mono.empty();
 		}

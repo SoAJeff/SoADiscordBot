@@ -1,0 +1,12 @@
+{
+  "name": "userrecentactions",
+  "description": "List recent changes to users in the server",
+  "options": [
+    {
+      "name": "number",
+      "description": "Number of entries to list.  Defaults to 15 if not entered",
+      "type": 4,
+      "required": false
+    }
+  ]
+}

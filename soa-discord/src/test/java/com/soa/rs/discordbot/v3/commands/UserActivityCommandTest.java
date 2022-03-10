@@ -46,7 +46,7 @@ public class UserActivityCommandTest {
 	public void testParseNameUserActivityBlankFirstLine() {
 		UserActivityCommand command = new UserActivityCommand();
 		List<String> parsedNames = command.parseNames(
-				".useractivity" + System.lineSeparator() + "Applejuiceaj ~ 100xp" + System.lineSeparator()
+				".useractivity" + "\n" + "Applejuiceaj ~ 100xp" + "\n"
 						+ "Bennybear ~ 200xp");
 
 		Assert.assertEquals(2, parsedNames.size());
@@ -62,7 +62,7 @@ public class UserActivityCommandTest {
 	public void testParseNameUserActivityNameLongerThan12Chars() {
 		UserActivityCommand command = new UserActivityCommand();
 		List<String> parsedNames = command.parseNames(
-				".useractivity" + System.lineSeparator() + "Applejuiceaj ~ 100xp" + System.lineSeparator()
+				".useractivity" + "\n" + "Applejuiceaj ~ 100xp" + "\n"
 						+ "BennybearIsAGiantNoob ~ 200xp");
 
 		Assert.assertEquals(1, parsedNames.size());
@@ -77,7 +77,7 @@ public class UserActivityCommandTest {
 	public void testParseNameUserActivityOneHasSymbolOneDoesnt() {
 		UserActivityCommand command = new UserActivityCommand();
 		List<String> parsedNames = command
-				.parseNames(".useractivity Applejuiceaj" + System.lineSeparator() + "Bennybear ~ 200xp");
+				.parseNames(".useractivity Applejuiceaj" + "\n" + "Bennybear ~ 200xp");
 
 		Assert.assertEquals(2, parsedNames.size());
 		for (String name : parsedNames) {

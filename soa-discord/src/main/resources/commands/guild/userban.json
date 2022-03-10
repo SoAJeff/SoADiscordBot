@@ -1,0 +1,30 @@
+{
+  "name": "userban",
+  "description": "Ban a user from the server",
+  "options": [
+    {
+      "name": "user",
+      "description": "Tagged user to ban",
+      "type": 6,
+      "required": false
+    },
+    {
+      "name": "id",
+      "description": "Id of user to ban",
+      "type": 3,
+      "required": false
+    },
+    {
+      "name": "reason",
+      "description": "Reason for ban; if not provided, a default will be provided",
+      "type": 3,
+      "required": false
+    },
+    {
+      "name": "deletehistory",
+      "description": "True to delete 7 days of history, false or not provided to delete no history",
+      "type": 5,
+      "required": false
+    }
+  ]
+}

@@ -9,6 +9,7 @@ import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
@@ -16,7 +17,7 @@ import reactor.core.publisher.Mono;
 
 public abstract class AbstractCommand {
 
-	private final List<String> triggers;
+	private List<String> triggers = null;
 
 	private boolean isEnabled;
 
@@ -28,7 +29,9 @@ public abstract class AbstractCommand {
 
 	public AbstractCommand() {
 		final Command cmdAnnotation = this.getClass().getAnnotation(Command.class);
-		this.triggers = new ArrayList<>(Arrays.asList(cmdAnnotation.triggers()));
+		if(cmdAnnotation != null) {
+			this.triggers = new ArrayList<>(Arrays.asList(cmdAnnotation.triggers()));
+		}
 	}
 
 	public void setMustHavePermission(List<String> ranks) {
@@ -48,10 +51,14 @@ public abstract class AbstractCommand {
 	}
 
 	protected Mono<Role> permittedToExecuteEvent(Member member) {
-		return member.getRoles()
-				.filter(role -> mustHavePermission.contains(role.getName()) || mustHavePermission.isEmpty()).next()
-				.switchIfEmpty(Mono.fromRunnable(
-						() -> SoaLogging.getLogger(this).debug("User does not have permission to run event")));
+		if(member != null) {
+			return member.getRoles()
+					.filter(role -> mustHavePermission.contains(role.getName()) || mustHavePermission.isEmpty()).next()
+					.switchIfEmpty(Mono.fromRunnable(
+							() -> SoaLogging.getLogger(this).debug("User does not have permission to run event")));
+		} else {
+			return Mono.empty();
+		}
 	}
 
 	protected void addHelpMsg(String command, String text) {
@@ -66,4 +73,6 @@ public abstract class AbstractCommand {
 	public abstract Mono<Void> execute(MessageCreateEvent event);
 
 	public abstract Mono<Void> execute(ChatInputInteractionEvent event);
+
+	public abstract Mono<Void> execute(ModalSubmitInteractionEvent event);
 }
