@@ -27,7 +27,7 @@ public class GlobalCommandRegistrar {
 	private final RestClient restClient;
 
 	// The name of the folder the commands json is in, inside our resources folder
-	private static final String commandsFolderName = "commands/global/";
+	private static final String commandsFolderName = "commands/";
 
 	public GlobalCommandRegistrar(RestClient restClient) {
 		this.restClient = restClient;

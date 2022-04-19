@@ -27,7 +27,7 @@ public class GuildCommandRegistrar {
 	private final RestClient restClient;
 
 	// The name of the folder the commands json is in, inside our resources folder
-	private static final String commandsFolderName = "commands/guild/";
+	private static final String commandsFolderName = "commands/";
 
 	public GuildCommandRegistrar(RestClient restClient) {
 		this.restClient = restClient;
