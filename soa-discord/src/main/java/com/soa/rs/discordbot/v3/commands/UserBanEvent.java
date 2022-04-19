@@ -100,21 +100,31 @@ public class UserBanEvent extends AbstractCommand {
 		BanQuerySpec finalSpec = spec;
 		if (userIsPresent) {
 			return event.deferReply().withEphemeral(true)
-					.then(permittedToExecuteEvent(event.getInteraction().getMember().orElse(null)).flatMap(
-									ignored -> user.flatMap(m -> m.ban(finalSpec))).then(event.createFollowup("User banned").withEphemeral(true)).onErrorResume(throwable -> {
+					.then(permittedToExecuteEvent(event.getInteraction().getMember().orElse(null))
+							.switchIfEmpty(Mono.error(new Throwable("You do not have the correct permissions to execute this command.")))
+							.flatMap(ignored -> user.flatMap(m -> m.ban(finalSpec)))
+							.then(event.createFollowup("User banned").withEphemeral(true))
+							.onErrorResume(throwable -> {
 								SoaLogging.getLogger(this)
 										.error("Unable to ban user: " + throwable.getMessage(), throwable);
 								return event.createFollowup("Failed to ban user - you may be missing permissions!")
 										.withEphemeral(true).then(Mono.empty());
-							}).then()).then();
+							}).then())
+					.onErrorResume(throwable -> event.createFollowup(throwable.getMessage()).withEphemeral(true).then())
+					.then();
 		} else {
 			return event.deferReply().withEphemeral(true)
-					.then(permittedToExecuteEvent(event.getInteraction().getMember().orElse(null)).flatMap(
-									ignored -> event.getInteraction().getGuild())
-							.flatMap(guild -> guild.ban(Snowflake.of(id), finalSpec)).then(event.createFollowup("User banned").withEphemeral(true)).onErrorResume(throwable -> {
+					.then(permittedToExecuteEvent(event.getInteraction().getMember().orElse(null))
+							.switchIfEmpty(Mono.error(new Throwable("You do not have the correct permissions to execute this command.")))
+							.flatMap(ignored -> event.getInteraction().getGuild())
+							.flatMap(guild -> guild.ban(Snowflake.of(id), finalSpec))
+							.then(event.createFollowup("User banned").withEphemeral(true))
+							.onErrorResume(throwable -> {
 								SoaLogging.getLogger(this).error("Unable to ban user: " + throwable.getMessage(), throwable);
 								return event.createFollowup("Failed to ban user - you may be missing permissions!").withEphemeral(true).then(Mono.empty());
-							}).then()).then();
+							}).then()).
+							onErrorResume(throwable -> event.createFollowup(throwable.getMessage()).withEphemeral(true).then())
+					.then();
 		}
 	}
 
