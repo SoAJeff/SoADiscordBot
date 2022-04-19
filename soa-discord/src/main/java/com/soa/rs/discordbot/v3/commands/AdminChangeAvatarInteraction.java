@@ -44,8 +44,9 @@ public class AdminChangeAvatarInteraction extends AbstractCommand {
 				.map(ApplicationCommandInteractionOptionValue::asString).get();
 
 		return event.deferReply().withEphemeral(true).then(updateAvatar(avatarUrl, event))
-				.then(permittedToExecuteEvent(event.getInteraction().getMember().orElse(null)).flatMap(
-						ignored -> event.createFollowup("Avatar Updated").withEphemeral(true).then()));
+				.then(event.createFollowup("Avatar Updated").withEphemeral(true).then())
+				.onErrorResume(throwable -> event.createFollowup(throwable.getMessage()).withEphemeral(true).then())
+				.then();
 	}
 
 	@Override
@@ -58,6 +59,7 @@ public class AdminChangeAvatarInteraction extends AbstractCommand {
 		try (InputStream is = FileDownloader.downloadFile(avatarUrl)) {
 			Image avatar = getImage(is, avatarUrl);
 			return permittedToExecuteEvent(event.getInteraction().getMember().orElse(null))
+					.switchIfEmpty(Mono.error(new Throwable("You do not have the correct permissions to execute this command.")))
 					.flatMap(ignored -> event.getClient().edit(UserEditSpec.builder().avatar(avatar).build())).then();
 		} catch (Exception e) {
 			SoaLogging.getLogger(this).error("Error downloading the external image", e);

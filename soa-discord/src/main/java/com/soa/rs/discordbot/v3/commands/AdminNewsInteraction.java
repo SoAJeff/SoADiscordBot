@@ -41,13 +41,15 @@ public class AdminNewsInteraction extends AbstractCommand {
 				ApplicationCommandInteractionOptionValue::asString).get();
 
 		return event.deferReply().withEphemeral(true).then(permittedToExecuteEvent(event.getInteraction().getMember().orElse(null))
+						.switchIfEmpty(Mono.error(new Throwable("You do not have the correct permissions to execute this command.")))
 				.flatMapMany(ignored -> event.getClient().getGuilds()).flatMap(Guild::getChannels)
 				.filter(guildChannel -> guildChannel.getName().equalsIgnoreCase(channel))
 				.filter(guildChannel -> guildChannel.getType().equals(Channel.Type.GUILD_TEXT))
 				.map(guildChannel -> (MessageChannel) guildChannel)
-				.flatMap(messageChannel -> messageChannel.createMessage(message)).then())
-				.then(permittedToExecuteEvent(event.getInteraction().getMember().orElse(null))
-				.flatMapMany(ignored->event.createFollowup("Message sent").withEphemeral(true)).then());
+				.flatMap(messageChannel -> messageChannel.createMessage(message))
+						.then(event.createFollowup("Message sent").withEphemeral(true)).then())
+				.onErrorResume(throwable -> event.createFollowup(throwable.getMessage()).withEphemeral(true).then())
+				.then();
 	}
 
 	@Override

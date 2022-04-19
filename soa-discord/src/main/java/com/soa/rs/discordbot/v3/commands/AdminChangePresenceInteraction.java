@@ -40,11 +40,13 @@ public class AdminChangePresenceInteraction extends AbstractCommand {
 		DiscordCfgFactory.getConfig().setDefaultStatus(presence);
 
 		return event.deferReply().withEphemeral(true)
-				.then(permittedToExecuteEvent(event.getInteraction().getMember().orElse(null)).flatMap(
-						ignored -> event.getClient()
-								.updatePresence(ClientPresence.online(ClientActivity.playing(presence)))).then())
-				.then(permittedToExecuteEvent(event.getInteraction().getMember().orElse(null)).flatMap(
-						ignored -> event.createFollowup("Presence Updated").withEphemeral(true).then()));
+				.then(permittedToExecuteEvent(event.getInteraction().getMember().orElse(null))
+						.switchIfEmpty(Mono.error(new Throwable("You do not have the correct permissions to execute this command.")))
+						.flatMap(ignored -> event.getClient()
+								.updatePresence(ClientPresence.online(ClientActivity.playing(presence))))
+						.then(event.createFollowup("Presence Updated").withEphemeral(true)).then())
+				.onErrorResume(throwable -> event.createFollowup(throwable.getMessage()).withEphemeral(true).then())
+				.then();
 
 	}
 
