@@ -70,6 +70,9 @@ public class UserBanEvent extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(ChatInputInteractionEvent event) {
+		if (!event.getInteraction().getGuildId().isPresent()) {
+			return event.reply("This can only be executed from a guild.").withEphemeral(true).then();
+		}
 		Mono<Member> user = event.getOption("user").flatMap(ApplicationCommandInteractionOption::getValue)
 				.map(ApplicationCommandInteractionOptionValue::asUser).orElse(Mono.empty())
 				.flatMap(u -> u.asMember(event.getInteraction().getGuildId().get()));
