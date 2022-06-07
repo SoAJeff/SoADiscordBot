@@ -6,8 +6,10 @@ import com.soa.rs.discordbot.v3.jdbi.RecentActionUtility;
 import com.soa.rs.discordbot.v3.usertrack.UserTrackMemberLeft;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.guild.BanEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
+import discord4j.core.object.entity.channel.MessageChannel;
 
 public class MemberLeftHandler {
 
@@ -25,6 +27,13 @@ public class MemberLeftHandler {
 				this.memberLeft.handleMemberLeft(memberLeaveEvent.getMember().get());
 			}
 		}
+		if(memberLeaveEvent.getGuildId().asLong() == 133922153010692096L)
+		{
+			memberLeaveEvent.getGuild().flatMap(guild -> guild.getChannelById(Snowflake.of(974413726063132793L)))
+					.flatMap(guildChannel -> ((MessageChannel) guildChannel).createMessage(
+							memberLeaveEvent.getUser().getUsername() + "#" + memberLeaveEvent.getUser()
+									.getDiscriminator() + " has left the server.")).subscribe();
+		}
 	}
 
 	public void handle(BanEvent banEvent) {
@@ -34,6 +43,12 @@ public class MemberLeftHandler {
 							+ ", " + banEvent.getUser().getId().asLong() + ", " + banEvent.getGuildId().asLong()
 							+ "] was banned, marking as left server");
 			this.memberLeft.handleUserBanned(banEvent.getUser().getId().asLong(), banEvent.getGuildId().asLong());
+			if (banEvent.getGuildId().asLong() == 133922153010692096L) {
+				banEvent.getGuild().flatMap(guild -> guild.getChannelById(Snowflake.of(974413726063132793L))).flatMap(
+						guildChannel -> ((MessageChannel) guildChannel).createMessage(
+								banEvent.getUser().getUsername() + "#" + banEvent.getUser().getDiscriminator()
+										+ " was banned from the server.")).subscribe();
+			}
 		}
 	}
 }
