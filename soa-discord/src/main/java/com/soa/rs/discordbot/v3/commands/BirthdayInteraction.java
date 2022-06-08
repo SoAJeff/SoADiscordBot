@@ -49,7 +49,7 @@ public class BirthdayInteraction extends AbstractCommand {
 	}
 
 	private String performForumLookup(String month) {
-		int[] groups = { ForumRank.ELDAR.getId(), ForumRank.LIAN.getId(), ForumRank.ADMINISTRATOR.getId(),
+		int[] groups = { ForumRank.ONTARI.getId(), ForumRank.ELDAR.getId(), ForumRank.LIAN.getId(), ForumRank.ADMINISTRATOR.getId(),
 				ForumRank.ARQUENDI.getId(), ForumRank.ADELE.getId(), ForumRank.VORONWE.getId(),
 				ForumRank.ELENDUR.getId(), ForumRank.SADRON.getId(), ForumRank.ATHEM.getId(), ForumRank.MYRTH.getId(),
 				ForumRank.TYLAR.getId() };
