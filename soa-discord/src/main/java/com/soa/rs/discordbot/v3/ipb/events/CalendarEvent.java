@@ -41,6 +41,7 @@ public class CalendarEvent implements Comparable<CalendarEvent> {
 		}
 		if (validEvent) {
 			sb.append("\nEvent Date: " + DateAnalyzer.showMultipleTimezonesForEvent(this.date));
+			sb.append( " (<t:" + this.date.toInstant().getEpochSecond() + ":R>)");
 			sb.append("\nPosted by: " + event.getAuthor().getName());
 			sb.append("\nFor details, visit: <" + event.getUrl() + ">");
 		}

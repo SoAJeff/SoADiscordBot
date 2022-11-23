@@ -233,7 +233,7 @@ public class IpbEventListParserTest {
 		String result = parser.handleEvents(events, date).get(0);
 
 		Assert.assertEquals(
-				"Event Title: Forum Event 1\nEvent Date: 04-Nov 23:00 EST | 05-Nov 04:00 UTC (Game time) | 05-Nov 15:00 AEDT\nPosted by: Applejuiceaj\nFor details, visit: <https://discord.bot>",
+				"Event Title: Forum Event 1\nEvent Date: 04-Nov 23:00 EST | 05-Nov 04:00 UTC (Game time) | 05-Nov 15:00 AEDT (<t:1572926400:R>)\nPosted by: Applejuiceaj\nFor details, visit: <https://discord.bot>",
 				result);
 	}
 
