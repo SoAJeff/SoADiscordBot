@@ -23,6 +23,11 @@
             <url>https://repo1.maven.org/maven2</url>
         </repository>
         <repository>
+            <id>github-clancompare</id>
+            <name>Github ClanCompare repo</name>
+            <url>https://maven.pkg.github.com/SoAJeff/ClanCompare</url>
+        </repository>
+        <repository>
             <!-- This repo fixes issues with transitive dependencies -->
             <id>jcenter</id>
             <url>https://jcenter.bintray.com</url>
@@ -54,6 +59,11 @@
             <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
             <version>3.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.soajeff</groupId>
+            <artifactId>clancompare</artifactId>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>

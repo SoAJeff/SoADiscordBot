@@ -17,5 +17,9 @@
       <AppenderRef ref="Console"/>
       <AppenderRef ref="MyFile"/>
     </Logger>
+    <Logger name="com.github.soajeff.clancompare" level="debug" additivity="false">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="MyFile"/>
+    </Logger>
   </Loggers>
 </Configuration>

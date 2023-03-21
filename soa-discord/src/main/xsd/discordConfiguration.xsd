@@ -17,6 +17,7 @@
       <xsd:element name="admin-event" type="AdminEvent" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="user-tracking-event" type="UserTrackingEvent" minOccurs="0" maxOccurs="1"/>
       <xsd:element name="rs-news-task" type="RsListingEvent" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="clan-compare-event" type="ClanCompareEvent" minOccurs="0" maxOccurs="1"/>
     </xsd:sequence>
   </xsd:complexType>
   </xsd:element>
@@ -94,6 +95,18 @@
       <xsd:extension base="BaseEvent">
         <xsd:sequence>
           <xsd:element name="can-update-query" type="RankList" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="ClanCompareEvent">
+    <xsd:complexContent>
+      <xsd:extension base="BaseEvent">
+        <xsd:sequence>
+          <xsd:element name="forums-api-url" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+          <xsd:element name="forums-api-key" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+          <xsd:element name="rs-clan-url" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+          <xsd:element name="competitions-url" type="xsd:string" minOccurs="1" maxOccurs="1"/>
         </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>

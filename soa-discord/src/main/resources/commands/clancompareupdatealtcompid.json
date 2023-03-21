@@ -1,0 +1,12 @@
+{
+  "name": "clancompareupdatealtcompid",
+  "description": "Update the ID of the monthly alt xp competition used by the clancompare command",
+  "options": [
+    {
+      "name": "compid",
+      "description": "Competition ID of the xp comp that is currently tracking clan alts.",
+      "type": 4,
+      "required": true
+    }
+  ]
+}

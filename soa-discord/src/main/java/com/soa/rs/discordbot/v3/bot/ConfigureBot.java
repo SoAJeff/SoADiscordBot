@@ -195,11 +195,12 @@ public class ConfigureBot {
 			}
 
 			if (JdbiWrapper.getInstance().getJdbi()
-					.withHandle(handle -> handle.createQuery("show tables").mapTo(String.class).list()).size() != 4) {
+					.withHandle(handle -> handle.createQuery("show tables").mapTo(String.class).list()).size() != 5) {
 				//Disable any event that uses the db
 				if (DiscordCfgFactory.getConfig().getUserTrackingEvent() != null) {
 					SoaLogging.getLogger(this).warn("Database structure does not seem right, disabling db events");
 					DiscordCfgFactory.getConfig().getUserTrackingEvent().setEnabled(false);
+					DiscordCfgFactory.getConfig().getClanCompareEvent().setEnabled(false);
 				}
 			}
 		} else {
@@ -207,6 +208,7 @@ public class ConfigureBot {
 			if (DiscordCfgFactory.getConfig().getUserTrackingEvent() != null) {
 				SoaLogging.getLogger(this).warn("Database configuration not present, disabling any db events");
 				DiscordCfgFactory.getConfig().getUserTrackingEvent().setEnabled(false);
+				DiscordCfgFactory.getConfig().getClanCompareEvent().setEnabled(false);
 			}
 		}
 
