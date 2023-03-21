@@ -36,11 +36,6 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
-        <!-- Temporarily needed due to bot running on a 32 bit linux platform -->
-<!--        <repository>
-            <id>soa</id>
-            <url>http://repo.spiritsofarianwyn.com</url>
-        </repository>-->
     </repositories>
 
     <properties>
@@ -58,7 +53,7 @@
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>3.2.3</version>
+            <version>3.2.4</version>
         </dependency>
         <dependency>
             <groupId>com.github.soajeff</groupId>
