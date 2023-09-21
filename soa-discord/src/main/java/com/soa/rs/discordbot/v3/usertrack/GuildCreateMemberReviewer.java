@@ -26,9 +26,9 @@ public class GuildCreateMemberReviewer {
 	private List<Long> guildUsers;
 	private List<GuildUser> allUsers;
 	private List<GuildUser> leftUsers;
-	private List<GuildUser> usersToSubmit = new ArrayList<>();
+	private final List<GuildUser> usersToSubmit = new ArrayList<>();
 	private long guildId;
-	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
 	public Mono<Void> reviewMember(Member member) {
 		SoaLogging.getLogger(this)
@@ -36,7 +36,7 @@ public class GuildCreateMemberReviewer {
 						.getGuildId().asLong() + "]");
 		List<GuildUser> listUser = this.allUsers.stream()
 				.filter(guildUser -> guildUser.getSnowflake() == member.getId().asLong()).collect(Collectors.toList());
-		if (listUser.size() > 0) {
+		if (!listUser.isEmpty()) {
 			//Existing user
 			guildUsers.remove(member.getId().asLong());
 			GuildUser user = updateExistingMember(member, listUser.get(0));
@@ -46,7 +46,7 @@ public class GuildCreateMemberReviewer {
 					.filter(guildUser -> guildUser.getSnowflake() == member.getId().asLong())
 					.collect(Collectors.toList());
 			GuildUser user;
-			if (leftUser.size() > 0) {
+			if (!leftUser.isEmpty()) {
 				SoaLogging.getLogger(this)
 						.debug("Member [" + getMemberName(member) + ", " + member.getGuildId().asLong()
 								+ "] previously left server and has returned.");
@@ -87,9 +87,15 @@ public class GuildCreateMemberReviewer {
 			newUser.setJoinedServer(Date.from(member.getJoinTime().get()));
 		}
 		if (!sdf.format(user.getJoinedServer()).equals(sdf.format(newUser.getJoinedServer()))) {
-			SoaLogging.getLogger(this).debug("Joined server times did not match, assuming rejoined server.");
-			this.recentActionUtility
-					.addRecentAction(member.getGuildId().asLong(), member.getId().asLong(), "Joined the server");
+			//Need an additional check to account for rounding, since snowflakes are in milliseconds.
+			if (!sdf.format(user.getJoinedServer().getTime() - 1000).equals(sdf.format(newUser.getJoinedServer()))) {
+				SoaLogging.getLogger(this).debug("Joined server times did not match, assuming rejoined server.");
+				SoaLogging.getLogger(this)
+						.trace("Existing user: " + sdf.format(user.getJoinedServer()) + ", New User: " + sdf.format(
+								newUser.getJoinedServer()));
+				this.recentActionUtility.addRecentAction(member.getGuildId().asLong(), member.getId().asLong(),
+						"Joined the server");
+			}
 		}
 		//We will see if this needs to be updated after, make it equal for now...
 		newUser.setLastSeen(user.getLastSeen());
@@ -133,7 +139,7 @@ public class GuildCreateMemberReviewer {
 				.debug("GuildUsers has " + guildUsers.size() + " items remaining after all processed, marking as left");
 		for (long id : guildUsers) {
 			List<GuildUser> listUser = this.userUtility.getGuildUser(id, guildId);
-			if (listUser.size() > 0) {
+			if (!listUser.isEmpty()) {
 				GuildUser user = listUser.get(0);
 				SoaLogging.getLogger(this)
 						.debug("Marking " + user.getUsername() + " [" + user.getSnowflake() + "] as left server.");
