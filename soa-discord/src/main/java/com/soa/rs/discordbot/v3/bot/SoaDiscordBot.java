@@ -56,7 +56,7 @@ public class SoaDiscordBot {
 		client.gateway().setInitialPresence(
 				shardInfo -> ClientPresence.online(ClientActivity.playing(DiscordCfgFactory.getConfig().getDefaultStatus())))
 				.setEnabledIntents(IntentSet
-						.of(Intent.GUILDS, Intent.GUILD_MEMBERS, Intent.GUILD_BANS, Intent.GUILD_VOICE_STATES,
+						.of(Intent.GUILDS, Intent.GUILD_MEMBERS, Intent.GUILD_MODERATION, Intent.GUILD_VOICE_STATES,
 								Intent.GUILD_PRESENCES, Intent.GUILD_MESSAGES, Intent.GUILD_MESSAGE_REACTIONS,
 								Intent.GUILD_MESSAGE_TYPING, Intent.DIRECT_MESSAGES))
 				.withGateway(gatewayDiscordClient -> {

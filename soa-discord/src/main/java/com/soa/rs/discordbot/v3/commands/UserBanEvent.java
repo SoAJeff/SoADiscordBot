@@ -97,7 +97,7 @@ public class UserBanEvent extends AbstractCommand {
 		spec = spec.withReason(banReason);
 
 		if (deleteHistory) {
-			spec.withDeleteMessageDays(7);
+			spec.withDeleteMessageSeconds(60*60*24*7);
 		}
 
 		BanQuerySpec finalSpec = spec;
