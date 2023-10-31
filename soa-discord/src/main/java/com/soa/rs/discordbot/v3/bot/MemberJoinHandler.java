@@ -7,6 +7,7 @@ import com.soa.rs.discordbot.v3.jdbi.RecentActionUtility;
 import com.soa.rs.discordbot.v3.usertrack.UserTrackMemberJoin;
 
 import discord4j.core.event.domain.guild.MemberJoinEvent;
+import reactor.core.publisher.Mono;
 
 public class MemberJoinHandler {
 
@@ -19,9 +20,10 @@ public class MemberJoinHandler {
 		this.userTrackMemberJoin.setRecentActionUtility(new RecentActionUtility());
 	}
 
-	public void handle(MemberJoinEvent event) {
+	public Mono<Void> handle(MemberJoinEvent event) {
 		if (DiscordCfgFactory.getInstance().isUserTrackingEnabled() && !event.getMember().isBot()) {
-			userTrackMemberJoin.handleAddUser(event.getMember());
+			return Mono.fromRunnable(()->userTrackMemberJoin.handleAddUser(event.getMember()));
 		}
+		return Mono.empty();
 	}
 }

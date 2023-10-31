@@ -144,47 +144,56 @@ public class SoaDiscordBot {
 
 		gatewayDiscordClient.on(MessageCreateEvent.class).flatMap(event -> messageCreateHandler.handle(event)
 				.onErrorResume(err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
-						.error("Unexpected error occurred during message create event.", err)
-				))).subscribe();
+						.error("Unexpected error occurred during message create event.", err)))).subscribe();
 
-		gatewayDiscordClient.on(ChatInputInteractionEvent.class).flatMap(interactionProcessor::processInteraction).subscribe(null,
-				err -> SoaLogging.getLogger(this)
-						.error("Unexpected error occurred while processing interaction.", err));
+		gatewayDiscordClient.on(ChatInputInteractionEvent.class).flatMap(interactionProcessor::processInteraction)
+				.onErrorResume(err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred while processing interaction.", err))).subscribe();
 
-		gatewayDiscordClient.on(ModalSubmitInteractionEvent.class).flatMap(interactionProcessor::processModal).subscribe(null,
-				err -> SoaLogging.getLogger(this)
-						.error("Unexpected error occurred while processing interaction.", err));
+		gatewayDiscordClient.on(ModalSubmitInteractionEvent.class).flatMap(interactionProcessor::processModal)
+				.onErrorResume(err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred while processing interaction.", err))).subscribe();
 
-		gatewayDiscordClient.on(GuildCreateEvent.class).subscribe(guildCreateHandler::handleGuildCreate,
-				err -> SoaLogging.getLogger(this).error("Unexpected error occurred during guild create event.", err));
+		gatewayDiscordClient.on(GuildCreateEvent.class).flatMap(guildCreateHandler::handleGuildCreate).onErrorResume(
+				err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred during guild create event.", err))).subscribe();
 
-		gatewayDiscordClient.on(MemberJoinEvent.class).subscribe(memberJoinHandler::handle,
-				err -> SoaLogging.getLogger(this).error("Unexpected error occurred during member join event.", err));
+		gatewayDiscordClient.on(MemberJoinEvent.class).flatMap(memberJoinHandler::handle).onErrorResume(
+				err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred during member join event.", err))).subscribe();
 
-		gatewayDiscordClient.on(MemberLeaveEvent.class).subscribe(memberLeftHandler::handle,
-				err -> SoaLogging.getLogger(this).error("Unexpected error occurred during member leave event.", err));
+		gatewayDiscordClient.on(MemberLeaveEvent.class).flatMap(memberLeftHandler::handle).onErrorResume(
+				err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred during member leave event.", err))).subscribe();
 
-		gatewayDiscordClient.on(BanEvent.class).subscribe(memberLeftHandler::handle,
-				err -> SoaLogging.getLogger(this).error("Unexpected error occurred during member leave event.", err));
+		gatewayDiscordClient.on(BanEvent.class).flatMap(memberLeftHandler::handle).onErrorResume(
+				err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred during member leave event.", err))).subscribe();
 
-		gatewayDiscordClient.on(MemberUpdateEvent.class).flatMap(memberUpdateHandler::handle).subscribe(null,
-				err -> SoaLogging.getLogger(this).error("Unexpected error during member update event.", err));
+		gatewayDiscordClient.on(MemberUpdateEvent.class).flatMap(memberUpdateHandler::handle).onErrorResume(
+				err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred during member update event.", err))).subscribe();
 
-		gatewayDiscordClient.on(UserUpdateEvent.class).subscribe(memberUpdateHandler::handle,
-				err -> SoaLogging.getLogger(this).error("Unexpected error during user update event.", err));
+		gatewayDiscordClient.on(UserUpdateEvent.class).flatMap(memberUpdateHandler::handle).onErrorResume(
+				err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred during user update event.", err))).subscribe();
 
-		gatewayDiscordClient.on(PresenceUpdateEvent.class).flatMap(memberUpdateHandler::handle).subscribe(null,
-				err -> SoaLogging.getLogger(this).error("Unexpected error during presence update event.", err));
+		gatewayDiscordClient.on(PresenceUpdateEvent.class).flatMap(memberUpdateHandler::handle).onErrorResume(
+				err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred during presence update event.", err))).subscribe();
 
-		gatewayDiscordClient.on(VoiceStateUpdateEvent.class).flatMap(voiceStateUpdateHandler::handle).subscribe(null,
-				err -> SoaLogging.getLogger(this).error("Unexpected error during voice state update event.", err));
+		gatewayDiscordClient.on(VoiceStateUpdateEvent.class).flatMap(voiceStateUpdateHandler::handle).onErrorResume(
+				err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred during voice state update event.", err))).subscribe();
 
-		gatewayDiscordClient.on(ReactionAddEvent.class).flatMap(reactionAddEventHandler::handle).subscribe(null,
-				err -> SoaLogging.getLogger(this).error("Unexpected error during reaction add event.", err));
+		gatewayDiscordClient.on(ReactionAddEvent.class).flatMap(reactionAddEventHandler::handle).onErrorResume(
+				err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred during reaction add event.", err))).subscribe();
 
 		if (DiscordCfgFactory.getInstance().isUserTrackingEnabled()) {
 			gatewayDiscordClient.on(TypingStartEvent.class).flatMap(typingStartHandler::handleTypingStart)
-					.subscribe(null, err -> SoaLogging.getLogger(this).error("Error processing typing event", err));
+					.onErrorResume(err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+							.error("Unexpected error occurred during Typing Start event.", err))).subscribe();
 		}
 
 	}

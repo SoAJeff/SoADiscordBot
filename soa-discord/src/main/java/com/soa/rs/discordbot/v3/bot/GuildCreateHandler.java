@@ -9,6 +9,7 @@ import com.soa.rs.discordbot.v3.usertrack.RecentCache;
 import com.soa.rs.discordbot.v3.usertrack.UserTrackGuildCreate;
 
 import discord4j.core.event.domain.guild.GuildCreateEvent;
+import reactor.core.publisher.Mono;
 
 public class GuildCreateHandler {
 
@@ -22,19 +23,19 @@ public class GuildCreateHandler {
 		this.guildCreate.setRecentActionUtility(new RecentActionUtility());
 	}
 
-	public void handleGuildCreate(GuildCreateEvent event) {
+	public Mono<Void> handleGuildCreate(GuildCreateEvent event) {
 		if (DiscordCfgFactory.getConfig().getUserTrackingEvent() != null && DiscordCfgFactory.getConfig()
 				.getUserTrackingEvent().isEnabled()) {
-			guildCreate.handleJoinedGuild(event);
+			return Mono.fromRunnable(()->guildCreate.handleJoinedGuild(event)).then();
 		}
+		return Mono.empty();
 	}
 
 	public void setLastSeenCache(RecentCache cache) {
 		this.guildCreate.setLastSeenCache(cache);
 	}
 
-	public void setLastActiveCache(RecentCache cache)
-	{
+	public void setLastActiveCache(RecentCache cache) {
 		this.guildCreate.setLastActiveCache(cache);
 	}
 }

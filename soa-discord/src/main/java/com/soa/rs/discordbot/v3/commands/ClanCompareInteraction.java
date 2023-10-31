@@ -8,6 +8,7 @@ import com.soa.rs.discordbot.v3.api.annotation.Interaction;
 import com.soa.rs.discordbot.v3.api.command.AbstractCommand;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.jdbi.SettingsUtility;
+import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
@@ -45,12 +46,17 @@ public class ClanCompareInteraction extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(ChatInputInteractionEvent event) {
-		return event.deferReply().withEphemeral(true).then(Mono.fromCallable(() -> settingsUtility.getValueForKey("clancompare.altId"))
-				.map(Integer::parseInt)
-				.flatMap(i -> Mono.fromCallable(() -> processClanCompare(i)))
-						.flatMapMany(Flux::fromIterable)
-				.flatMapSequential(s -> event.createFollowup(s).withEphemeral(true)).then())
-				.then();
+		return event.deferReply().withEphemeral(true)
+				.then(Mono.fromCallable(() -> settingsUtility.getValueForKey("clancompare.altId"))
+						.map(Integer::parseInt).flatMap(i -> Mono.fromCallable(() -> processClanCompare(i)))
+						.onErrorResume(err -> {
+							String error = "Error encountered during clan compare operation.";
+							List<String> e = new ArrayList<>();
+							e.add(error);
+							SoaLogging.getLogger(this).error(error, err);
+							return Mono.just(e);
+						}).flatMapMany(Flux::fromIterable)
+						.flatMapSequential(s -> event.createFollowup(s).withEphemeral(true)).then()).then();
 	}
 
 	@Override
@@ -65,7 +71,7 @@ public class ClanCompareInteraction extends AbstractCommand {
 
 		List<String> response = new ArrayList<>();
 
-		if(processResult.size() == 0)
+		if(processResult.isEmpty())
 		{
 			response.add("Clan Compare found no deltas between the forums and the in-game clan.");
 			return response;

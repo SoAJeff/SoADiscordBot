@@ -32,10 +32,11 @@ public class MemberUpdateHandler {
 				.flatMap(member -> Mono.fromRunnable(() -> userTrackMemberUpdated.handleMemberUpdate(member))).then();
 	}
 
-	public void handle(UserUpdateEvent event) {
+	public Mono<Void> handle(UserUpdateEvent event) {
 		if (DiscordCfgFactory.getInstance().isUserTrackingEnabled() && !event.getCurrent().isBot()) {
-			userTrackMemberUpdated.handleUserUpdate(event.getCurrent());
+			return Mono.fromRunnable(()->userTrackMemberUpdated.handleUserUpdate(event.getCurrent())).then();
 		}
+		return Mono.empty();
 	}
 
 	public Mono<Void> handle(PresenceUpdateEvent event) {
