@@ -97,7 +97,7 @@ public class UserTrackMemberJoinTest {
 		Mockito.verify(nicknameUtility).addNickname(1234, 6789, "User1");
 		Mockito.verify(recentActionUtility).addRecentAction(6789, 1234, "Joined the server");
 
-		Assert.assertEquals(Date.from(Instant.EPOCH), user.getLeftServer());
+		Assert.assertEquals(Date.from(Instant.EPOCH), user.getLeftServerAsDate());
 
 	}
 
@@ -142,7 +142,7 @@ public class UserTrackMemberJoinTest {
 		Mockito.verify(nicknameUtility, Mockito.never()).addNickname(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString());
 		Mockito.verify(recentActionUtility).addRecentAction(6789, 1234, "Joined the server");
 
-		Assert.assertEquals(Date.from(Instant.EPOCH), user.getLeftServer());
+		Assert.assertEquals(Date.from(Instant.EPOCH), user.getLeftServerAsDate());
 
 	}
 

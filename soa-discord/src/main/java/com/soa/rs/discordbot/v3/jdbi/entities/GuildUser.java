@@ -1,6 +1,9 @@
 package com.soa.rs.discordbot.v3.jdbi.entities;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 public class GuildUser {
@@ -19,7 +22,7 @@ public class GuildUser {
 
 	private Date joinedServer;
 
-	private Date leftServer;
+	private LocalDateTime leftServer;
 
 	private Date lastActive;
 
@@ -79,11 +82,22 @@ public class GuildUser {
 		this.joinedServer = joinedServer;
 	}
 
-	public Date getLeftServer() {
+	public LocalDateTime getLeftServer() {
 		return leftServer;
 	}
 
+	public Date getLeftServerAsDate() {
+		if(leftServer != null) {
+			return Date.from(leftServer.atZone(ZoneId.systemDefault()).toInstant());
+		}
+		return null;
+	}
+
 	public void setLeftServer(Date leftServer) {
+		this.leftServer = leftServer.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+	}
+
+	public void setLeftServer(LocalDateTime leftServer) {
 		this.leftServer = leftServer;
 	}
 
@@ -130,14 +144,14 @@ public class GuildUser {
 			return false;
 
 		//Leftserver WILL be null if someone is in the server
-		if (comparedUser.getLeftServer() != null) {
+		if (comparedUser.getLeftServerAsDate() != null) {
 			if (getLeftServer() != null) {
-				if (!(sdf.format(comparedUser.getLeftServer()).equals(sdf.format(getLeftServer()))))
+				if (!comparedUser.getLeftServer().isEqual(getLeftServer()))
 					return false;
 			} else {
 				return false;
 			}
-		} else if (getLeftServer() != null)
+		} else if (getLeftServerAsDate() != null)
 			return false;
 
 		return true;

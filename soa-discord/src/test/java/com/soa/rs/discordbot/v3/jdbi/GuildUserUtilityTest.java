@@ -70,7 +70,7 @@ public class GuildUserUtilityTest {
 		Assert.assertEquals(date, user2.getJoinedServer());
 		Assert.assertEquals(date, user2.getLastSeen());
 		Assert.assertEquals(date, user2.getLastActive());
-		Assert.assertNull(user.getLeftServer());
+		Assert.assertNull(user.getLeftServerAsDate());
 	}
 
 	@Test
@@ -549,7 +549,7 @@ public class GuildUserUtilityTest {
 		Assert.assertEquals(users.size(), 1);
 		GuildUser user2 = users.get(0);
 
-		Assert.assertEquals(now, user2.getLeftServer());
+		Assert.assertEquals(now, user2.getLeftServerAsDate());
 
 	}
 
@@ -579,7 +579,7 @@ public class GuildUserUtilityTest {
 
 		Assert.assertNotNull(user2.getJoinedServer());
 		Assert.assertNotNull(user2.getLastSeen());
-		Assert.assertNull(user2.getLeftServer());
+		Assert.assertNull(user2.getLeftServerAsDate());
 		Assert.assertNotNull(user2.getLastActive());
 	}
 
@@ -609,7 +609,7 @@ public class GuildUserUtilityTest {
 
 		Assert.assertNotNull(user2.getJoinedServer());
 		Assert.assertNotNull(user2.getLastSeen());
-		Assert.assertNull(user2.getLeftServer());
+		Assert.assertNull(user2.getLeftServerAsDate());
 		Assert.assertNotNull(user2.getLastActive());
 	}
 
@@ -639,7 +639,7 @@ public class GuildUserUtilityTest {
 
 		Assert.assertNotNull(user2.getJoinedServer());
 		Assert.assertNotNull(user2.getLastSeen());
-		Assert.assertNull(user2.getLeftServer());
+		Assert.assertNull(user2.getLeftServerAsDate());
 		Assert.assertNotNull(user2.getLastActive());
 	}
 

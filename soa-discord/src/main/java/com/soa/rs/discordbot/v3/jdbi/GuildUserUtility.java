@@ -28,7 +28,7 @@ public class GuildUserUtility {
 				"update users set username = :username, knownname = :knownname, displayname = :displayname, lastseen = :lastseen, joinedserver = :joinedserver, leftserver = :leftserver, lastactive = :lastactive where snowflake = :snowflake and guildsnowflake = :guildsnowflake")
 				.bind("username", user.getUsername()).bind("knownname", user.getKnownName())
 				.bind("displayname", user.getDisplayName()).bind("lastseen", user.getLastSeen())
-				.bind("joinedserver", user.getJoinedServer()).bind("leftserver", user.getLeftServer())
+				.bind("joinedserver", user.getJoinedServer()).bind("leftserver", user.getLeftServerAsDate())
 				.bind("lastactive", user.getLastActive()).bind("snowflake", user.getSnowflake())
 				.bind("guildsnowflake", user.getGuildSnowflake()).execute());
 	}
@@ -40,7 +40,7 @@ public class GuildUserUtility {
 						"update users set username = :username, knownname = :knownname, displayname = :displayname, lastseen = :lastseen, joinedserver = :joinedserver, leftserver = :leftserver, lastactive = :lastactive where snowflake = :snowflake and guildsnowflake = :guildsnowflake")
 						.bind("username", user.getUsername()).bind("knownname", user.getKnownName())
 						.bind("displayname", user.getDisplayName()).bind("lastseen", user.getLastSeen())
-						.bind("joinedserver", user.getJoinedServer()).bind("leftserver", user.getLeftServer())
+						.bind("joinedserver", user.getJoinedServer()).bind("leftserver", user.getLeftServerAsDate())
 						.bind("lastactive", user.getLastActive()).bind("snowflake", user.getSnowflake())
 						.bind("guildsnowflake", user.getGuildSnowflake()).execute();
 			}

@@ -205,12 +205,12 @@ public class UserSearchCommand extends AbstractCommand {
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 		fields.add(EmbedCreateFields.Field.of("Joined server date", sdf.format(user.getJoinedServer()), true));
-		if (sdf.format(user.getLeftServer()).equals(sdf.format(Date.from(Instant.EPOCH)))) {
+		if (sdf.format(user.getLeftServerAsDate()).equals(sdf.format(Date.from(Instant.EPOCH)))) {
 			fields.add(EmbedCreateFields.Field.of("Last seen date", sdf.format(user.getLastSeen()), true));
 			fields.add(EmbedCreateFields.Field.of("Last active date", sdf.format(user.getLastActive()), false));
 
 		} else {
-			fields.add(EmbedCreateFields.Field.of("Left server date", sdf.format(user.getLeftServer()), true));
+			fields.add(EmbedCreateFields.Field.of("Left server date", sdf.format(user.getLeftServerAsDate()), true));
 		}
 
 		return spec.withFields(fields).withFooter(EmbedCreateFields.Footer.of(

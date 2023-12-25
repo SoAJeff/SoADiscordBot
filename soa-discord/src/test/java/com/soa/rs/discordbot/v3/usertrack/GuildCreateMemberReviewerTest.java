@@ -244,7 +244,7 @@ public class GuildCreateMemberReviewerTest {
 
 		GuildUser user = reviewer.updateExistingMember(member, newUser);
 
-		Assert.assertEquals(Date.from(Instant.EPOCH), user.getLeftServer());
+		Assert.assertEquals(Date.from(Instant.EPOCH), user.getLeftServerAsDate());
 		Mockito.verify(recentActionUtility).addRecentAction(6789, 1234, "Joined the server");
 		Assert.assertFalse(newUser.equals(user));
 	}
@@ -400,7 +400,7 @@ public class GuildCreateMemberReviewerTest {
 		Mockito.verify(recentActionUtility).addRecentAction(6789, 1234, "Left the server");
 
 		//Maybe...
-		Assert.assertNotNull(newUser.getLeftServer());
+		Assert.assertNotNull(newUser.getLeftServerAsDate());
 	}
 
 	@Test
