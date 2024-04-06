@@ -7,7 +7,7 @@ Version 3 of the SoA Discord Bot is a complete rewrite to accomodate the new Pro
 
 ## Building the Bot
 To build the bot it is recommended to have:
-- Java 8+.  Discord4J supports Java 8 and above.  You can download the JDK from [Oracle's Website](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+- Java 17+.  Discord4J supports Java 8 and above.  The current bot is tested and running with Java 21.  You can download the JDK from [Oracle's Website](https://www.oracle.com/java/technologies/downloads/)
 - Apache Maven.  The bot is currently structured to build with Maven.  You can get Maven from [Apache's Website](https://maven.apache.org/)
 
 The bot can be built by running the following command:
