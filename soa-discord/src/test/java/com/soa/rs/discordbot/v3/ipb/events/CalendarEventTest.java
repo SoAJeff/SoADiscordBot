@@ -67,6 +67,28 @@ public class CalendarEventTest {
 	}
 
 	@Test
+	public void testRecursiveEventWithUntilInRule() throws ParseException {
+		CalendarEvent calendarEvent = new CalendarEvent();
+		Event event = new Event();
+		event.setRecurrence("FREQ=WEEKLY;INTERVAL=1;UNTIL=20240309T000000");
+		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		event.setStart(inputFormat.parse("2023-11-11T18:00:00Z"));
+
+		Date today = inputFormat.parse("2024-01-06T00:00:00Z");
+
+		Date date = null;
+		try {
+			date = calendarEvent.getDateForRecurringEvent(event, today);
+			System.out.println(date.toString());
+		} catch (Exception e) {
+			Assert.fail();
+		}
+		Assert.assertEquals(inputFormat.parse("2024-01-06T18:00:00Z"), date);
+	}
+
+	@Test
 	public void testCanCreateEventString() throws ParseException {
 		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));

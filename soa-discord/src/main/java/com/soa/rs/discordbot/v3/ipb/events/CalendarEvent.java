@@ -1,5 +1,6 @@
 package com.soa.rs.discordbot.v3.ipb.events;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +35,10 @@ public class CalendarEvent implements Comparable<CalendarEvent> {
 			try {
 				this.date = getDateForRecurringEvent(event, today);
 			} catch (Exception e) {
+				if (!e.getMessage().equals("Failsafe reached for event")) {
+					SoaLogging.getLogger(this).error("Error encountered finding a date for event [" + event.getTitle()
+							+ "], will not display.", e);
+				}
 				this.validEvent = false;
 			}
 		} else {
@@ -72,7 +77,10 @@ public class CalendarEvent implements Comparable<CalendarEvent> {
 			SoaLogging.getLogger(this).error("Failed to parse recurrence rule, just returning midnight tonight.", e);
 			return new Date(ld1.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli());
 		}
-		DateTime startDate = new DateTime(event.getStart().toInstant().toEpochMilli());
+		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+		inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		String start = inputFormat.format(event.getStart());
+		DateTime startDate = DateTime.parse(start);
 		RecurrenceRuleIterator it = rule.iterator(startDate);
 		int maxInstances = 300; //Likely overkill, but covers our bases
 
@@ -90,7 +98,6 @@ public class CalendarEvent implements Comparable<CalendarEvent> {
 		//Unable to determine, just return today
 		SoaLogging.getLogger(this).debug("Failsafe reached for event " + event.getTitle() + ", do not display");
 		throw new Exception("Failsafe reached for event");
-		//return new Date(ld1.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli());
 	}
 
 	@Override
