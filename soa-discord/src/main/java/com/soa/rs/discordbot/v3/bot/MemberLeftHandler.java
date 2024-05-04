@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 public class MemberLeftHandler {
 
-	private UserTrackMemberLeft memberLeft;
+	private final UserTrackMemberLeft memberLeft;
 
 	public MemberLeftHandler() {
 		this.memberLeft = new UserTrackMemberLeft();
@@ -33,7 +33,8 @@ public class MemberLeftHandler {
 			return memberLeaveEvent.getGuild().flatMap(guild -> guild.getChannelById(Snowflake.of(974413726063132793L)))
 					.flatMap(guildChannel -> ((MessageChannel) guildChannel).createMessage(
 							memberLeaveEvent.getUser().getUsername() + "#" + memberLeaveEvent.getUser()
-									.getDiscriminator() + " has left the server.")).then();
+									.getDiscriminator() + " (" + memberLeaveEvent.getUser().getId().asString()
+									+ ") has left the server.")).then();
 		}
 		return Mono.empty();
 	}
@@ -46,10 +47,11 @@ public class MemberLeftHandler {
 							+ "] was banned, marking as left server");
 			this.memberLeft.handleUserBanned(banEvent.getUser().getId().asLong(), banEvent.getGuildId().asLong());
 			if (banEvent.getGuildId().asLong() == 133922153010692096L) {
-				return banEvent.getGuild().flatMap(guild -> guild.getChannelById(Snowflake.of(974413726063132793L))).flatMap(
-						guildChannel -> ((MessageChannel) guildChannel).createMessage(
-								banEvent.getUser().getUsername() + "#" + banEvent.getUser().getDiscriminator()
-										+ " was banned from the server.")).then();
+				return banEvent.getGuild().flatMap(guild -> guild.getChannelById(Snowflake.of(974413726063132793L)))
+						.flatMap(guildChannel -> ((MessageChannel) guildChannel).createMessage(
+								banEvent.getUser().getUsername() + "#" + banEvent.getUser().getDiscriminator() + " ("
+										+ banEvent.getUser().getId().asString() + ") was banned from the server."))
+						.then();
 			}
 		}
 		return Mono.empty();
