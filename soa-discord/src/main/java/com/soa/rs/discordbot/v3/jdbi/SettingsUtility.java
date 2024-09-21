@@ -18,4 +18,11 @@ public class SettingsUtility {
 				handle -> handle.createUpdate("update settings set settingvalue = :settingvalue where settingkey = :settingkey")
 						.bind("settingvalue", value).bind("settingkey", key).execute());
 	}
+
+	public int insertOrUpdateValueForKey(String key, String value) {
+		return JdbiWrapper.getInstance().getJdbi().withHandle(handle -> handle.createUpdate(
+						"insert into settings (settingkey, settingvalue) values (:settingkey, :settingvalue) "
+								+ "on duplicate key update settingvalue = :settingvalue").bind("settingkey", key)
+				.bind("settingvalue", value).execute());
+	}
 }

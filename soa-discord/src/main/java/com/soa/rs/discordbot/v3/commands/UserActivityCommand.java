@@ -12,6 +12,7 @@ import com.soa.rs.discordbot.v3.jdbi.GuildUserUtility;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import discord4j.common.util.Snowflake;
+import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -77,6 +78,11 @@ public class UserActivityCommand extends AbstractCommand {
 		return event.deferReply().withEphemeral(true)
 				.then(Flux.fromIterable(createParsedOutput(parseNames(activityComponent.getValue().get()), event.getInteraction().getGuildId().get()))
 								.flatMapSequential(s -> event.createFollowup(s).withEphemeral(true)).then()).then();
+	}
+
+	@Override
+	public Mono<Void> execute(ButtonInteractionEvent event) {
+		return Mono.empty();
 	}
 
 	List<String> createParsedOutput(List<String> names, Snowflake guildId)

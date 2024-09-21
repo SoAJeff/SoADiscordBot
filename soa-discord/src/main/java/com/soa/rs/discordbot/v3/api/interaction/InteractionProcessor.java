@@ -4,7 +4,9 @@ import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.usertrack.RecentCache;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
+import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import discord4j.core.event.domain.interaction.ComponentInteractionEvent;
 import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.object.entity.User;
 import reactor.core.publisher.Mono;
@@ -43,6 +45,29 @@ public class InteractionProcessor {
 
 	public Mono<Void> processModal(ModalSubmitInteractionEvent event)
 	{
+		String customId = getCustomIdForEvent(event);
+		if(InteractionInitializer.getInteraction(customId) != null)
+		{
+			return InteractionInitializer.getInteraction(customId).execute(event);
+		}
+		else
+			return Mono.empty();
+
+	}
+
+	public Mono<Void> processButton(ButtonInteractionEvent event)
+	{
+		String customId = getCustomIdForEvent(event);
+		if(InteractionInitializer.getInteraction(customId) != null)
+		{
+			return InteractionInitializer.getInteraction(customId).execute(event);
+		}
+		else
+			return Mono.empty();
+
+	}
+
+	private String getCustomIdForEvent(ComponentInteractionEvent event) {
 		User member = event.getInteraction().getUser();
 
 		if(!member.isBot())
@@ -59,14 +84,14 @@ public class InteractionProcessor {
 			}
 		}
 
-		SoaLogging.getLogger(this).info("Received Modal with custom ID " + event.getCustomId());
-		if(InteractionInitializer.getInteraction(event.getCustomId()) != null)
+		String customId = event.getCustomId();
+		SoaLogging.getLogger(this).info("Received ComponentEvent with custom ID " + customId);
+		if (customId.contains("-"))
 		{
-			return InteractionInitializer.getInteraction(event.getCustomId()).execute(event);
+			customId = customId.substring(0, customId.indexOf("-"));
+			SoaLogging.getLogger(this).info("Searching for ComponentEvent whose interaction begins with " + customId);
 		}
-		else
-			return Mono.empty();
-
+		return customId;
 	}
 
 	public void setLastSeenCache(RecentCache cache) {

@@ -8,6 +8,7 @@ import com.soa.rs.discordbot.v3.api.annotation.Command;
 import com.soa.rs.discordbot.v3.cfg.DiscordCfgFactory;
 import com.soa.rs.discordbot.v3.util.SoaLogging;
 
+import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -75,4 +76,7 @@ public abstract class AbstractCommand {
 	public abstract Mono<Void> execute(ChatInputInteractionEvent event);
 
 	public abstract Mono<Void> execute(ModalSubmitInteractionEvent event);
+
+	public abstract Mono<Void> execute(ButtonInteractionEvent event);
+
 }

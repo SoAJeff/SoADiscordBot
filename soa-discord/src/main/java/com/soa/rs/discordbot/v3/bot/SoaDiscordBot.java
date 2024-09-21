@@ -24,6 +24,7 @@ import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.event.domain.guild.MemberUpdateEvent;
+import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
@@ -151,6 +152,10 @@ public class SoaDiscordBot {
 						.error("Unexpected error occurred while processing interaction.", err))).subscribe();
 
 		gatewayDiscordClient.on(ModalSubmitInteractionEvent.class).flatMap(interactionProcessor::processModal)
+				.onErrorResume(err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
+						.error("Unexpected error occurred while processing interaction.", err))).subscribe();
+
+		gatewayDiscordClient.on(ButtonInteractionEvent.class).flatMap(interactionProcessor::processButton)
 				.onErrorResume(err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
 						.error("Unexpected error occurred while processing interaction.", err))).subscribe();
 

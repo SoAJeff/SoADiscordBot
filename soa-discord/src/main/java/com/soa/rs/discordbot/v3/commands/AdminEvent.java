@@ -12,6 +12,7 @@ import com.soa.rs.discordbot.v3.util.SoaLogging;
 
 import org.apache.commons.io.IOUtils;
 
+import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -71,6 +72,11 @@ public class AdminEvent extends AbstractCommand {
 
 	@Override
 	public Mono<Void> execute(ModalSubmitInteractionEvent event) {
+		return Mono.empty();
+	}
+
+	@Override
+	public Mono<Void> execute(ButtonInteractionEvent event) {
 		return Mono.empty();
 	}
 
