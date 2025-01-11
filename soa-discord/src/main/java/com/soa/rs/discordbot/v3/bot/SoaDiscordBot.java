@@ -147,17 +147,11 @@ public class SoaDiscordBot {
 				.onErrorResume(err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
 						.error("Unexpected error occurred during message create event.", err)))).subscribe();
 
-		gatewayDiscordClient.on(ChatInputInteractionEvent.class).flatMap(interactionProcessor::processInteraction)
-				.onErrorResume(err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
-						.error("Unexpected error occurred while processing interaction.", err))).subscribe();
+		gatewayDiscordClient.on(ChatInputInteractionEvent.class, interactionProcessor::processInteraction).subscribe();
 
-		gatewayDiscordClient.on(ModalSubmitInteractionEvent.class).flatMap(interactionProcessor::processModal)
-				.onErrorResume(err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
-						.error("Unexpected error occurred while processing interaction.", err))).subscribe();
+		gatewayDiscordClient.on(ModalSubmitInteractionEvent.class, interactionProcessor::processModal).subscribe();
 
-		gatewayDiscordClient.on(ButtonInteractionEvent.class).flatMap(interactionProcessor::processButton)
-				.onErrorResume(err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)
-						.error("Unexpected error occurred while processing interaction.", err))).subscribe();
+		gatewayDiscordClient.on(ButtonInteractionEvent.class, interactionProcessor::processButton).subscribe();
 
 		gatewayDiscordClient.on(GuildCreateEvent.class).flatMap(guildCreateHandler::handleGuildCreate).onErrorResume(
 				err -> Mono.fromRunnable(() -> SoaLogging.getLogger(this)

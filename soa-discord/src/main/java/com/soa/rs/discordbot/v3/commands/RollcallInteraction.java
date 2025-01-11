@@ -62,7 +62,9 @@ public class RollcallInteraction extends AbstractCommand {
 		spec = spec.withTitle("Respond to the Roll Call!");
 		spec = spec.withDescription("Thank you for reading the above message from clan leadership.\n\n"
 				+ "To let us know that you have read the message and receive attendance credit, click the button below "
-				+ "and fill in the form to let us know that you've been Elfed!");
+				+ "and fill in the form to let us know that you've been Elfed!"
+				+ "\n\nNote: This feature is experimental; if you get an `Interaction Failed` response, "
+				+ "try again in a little bit or post your response on the SoA forums instead.");
 		spec = spec.withColor(Color.of(19, 114, 38));
 
 		Button responseButton = Button.success("rollcall-" + event.getInteraction().getGuildId().get().asString() + "-" + event.getClient().getSelfId().asString(),
