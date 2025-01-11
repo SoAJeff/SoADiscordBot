@@ -1,21 +1,21 @@
 # Spirits of Arianwyn Discord Bot
-Version: 3.2:  ![Build](https://github.com/SoAJeff/SoADiscordBot/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master)
+Version: 4.0
 
-A (mostly) Reactive Discord Bot written using the [Discord4J](https://github.com/Discord4J/Discord4J) v3.2 Java library for use by the Spirits of Arianwyn RuneScape clan's Discord Server.
+A Rewrite of the SoA Discord Bot project using the [Discord.py](https://github.com/Rapptz/discord.py) framework for use by the Spirits of Arianwyn RuneScape clan's Discord Server.
 
-Version 3 of the SoA Discord Bot is a complete rewrite to accomodate the new Project Reactor framework used within Discord4J.  The new bot is within the soa-discord module. 
+This rewrite is a work-in-progress.  The plan is to start from scratch, replicating the features that we wish to keep while eliminating functionality that is no longer useful.
 
-## Building the Bot
-To build the bot it is recommended to have:
-- Java 17+.  Discord4J supports Java 8 and above.  The current bot is tested and running with Java 21.  You can download the JDK from [Oracle's Website](https://www.oracle.com/java/technologies/downloads/)
-- Apache Maven.  The bot is currently structured to build with Maven.  You can get Maven from [Apache's Website](https://maven.apache.org/)
+## Project History:
+The original bot (version 1) was written using Discord4J in Java.  Early versions used Discord4J 2.x and provided a few useful utilities for the clan's server.
 
-The bot can be built by running the following command:
-```
-mvn clean install
-```
+There was no Version 2 of the bot, as Version 2 was skipped to keep version numbers more in line with Discord4J's version numbers.
 
-The build creates a shaded Jar with all dependencies included within to make executing the bot easier.
+Version 3 of the SoA Discord Bot is a complete rewrite to accomodate the new Project Reactor framework used within Discord4J.  This bot utilized application commands rather than text based commands and had rewritten older components to be more stable as the original implementations of some components were prone to issues and could have been implemented much better.  The final version was using Discord4J version 3.2.x.  
+
+While the bot as it stands written in Java is still completely functional, development on Discord4J has slowed significantly and work on a different project that made use of Discord.py provided some significant enhancements to the development experience.  Given the bot has been in the state of needing a refresh for some time, it is being rewritten to take advantage of the different framework as well as to remove some old tech debt that the previous versions had.
+
+## Using the bot
+TBD
 
 ## More Information
 For more information, please refer to the thread within Elvish Lounge found on the [SoA Forums](https://forums.soa-rs.com).

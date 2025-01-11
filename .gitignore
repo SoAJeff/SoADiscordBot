@@ -10,3 +10,8 @@
 **/jaxb/**
 **/.idea/**
 **/META-INF/**
+
+# Python values
+
+__pycache__/
+*.pyc
