@@ -194,6 +194,7 @@ class UserTrack(commands.GroupCog, name="users"):
                                                       action="Joined the server",
                                                       original_value="",
                                                       new_value=""))
+            await self.add_nickname_for_user(new_guild_user)
         
         if member.status != discord.Status.offline:
             new_guild_user.last_seen = discord.utils.utcnow()
@@ -246,7 +247,9 @@ class UserTrack(commands.GroupCog, name="users"):
         for row in rows:
             if user.display_name == row['nickname']:
                 return
-            
+        await self.add_nickname_for_user(user)
+    
+    async def add_nickname_for_user(self, user: UserEntry):
         insert_query = "INSERT INTO nicknames (user_id, guild_id, nickname) VALUES ($1, $2, $3)"
         await self.bot.pool.execute(insert_query, user.user_id, user.guild_id, user.display_name)
     
