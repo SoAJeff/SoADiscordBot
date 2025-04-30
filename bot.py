@@ -9,6 +9,7 @@ import logging
 import logging.handlers
 import asyncio
 import asyncpg
+import aiohttp
 
 logger = logging.getLogger("bot")
 
@@ -44,6 +45,7 @@ class SoAClient(commands.Bot):
         )
 
     async def setup_hook(self):
+        self.session = aiohttp.ClientSession()
         if config.INITIAL_PRESENCE:
             self.activity = discord.Game(config.INITIAL_PRESENCE)
         self.pool = await self.create_psql_pool()
@@ -65,6 +67,10 @@ class SoAClient(commands.Bot):
 
     async def on_resumed(self):
         logger.info('Bot has resumed.')
+
+    async def close(self) -> None:
+        await super().close()
+        await self.session.close()
 
     async def load_cogs(self):
         logger.info("Loading cogs...")

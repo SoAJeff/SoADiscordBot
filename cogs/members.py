@@ -23,10 +23,6 @@ class MemberBirthdate:
 class Members(commands.Cog):
     def __init__(self, bot: SoAClient):
         self.bot = bot
-        self.session = aiohttp.ClientSession()
-
-    async def cog_unload(self):
-        await self.session.close()
 
     @app_commands.command(name="birthdays", description="Gets a list of SoA forum members with birthdays during the current month")
     @app_commands.describe(month="Month to search (as word)")
@@ -103,7 +99,7 @@ class Members(commands.Cog):
         params=[("page", page),
                 ("perPage", 100)]
         params.extend(groups)
-        async with self.session.get(url=API_ENDPOINT, 
+        async with self.bot.session.get(url=API_ENDPOINT,
                                     auth=aiohttp.BasicAuth(config.FORUMS_API_KEY),
                                     params=params) as resp:
             return await resp.json()

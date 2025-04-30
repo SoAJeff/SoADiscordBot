@@ -37,7 +37,6 @@ class Event:
 class Events(commands.GroupCog, name="events"):
     def __init__(self, bot: SoAClient):
         self.bot: SoAClient = bot
-        self.session = aiohttp.ClientSession()
         self.embed_colors: dict[int, discord.Color]= dict()
         self.create_embed_color_mapping()
 
@@ -50,7 +49,6 @@ class Events(commands.GroupCog, name="events"):
         self.daily_event_list_task.start()
 
     async def cog_unload(self):
-        await self.session.close()
         self.daily_event_list_task.cancel()
 
     @tasks.loop()
@@ -226,7 +224,7 @@ class Events(commands.GroupCog, name="events"):
               ("rangeEnd", date),
               ("sortBy", "start"),
               ("page", page)]
-        async with self.session.get(url=API_ENDPOINT, 
+        async with self.bot.session.get(url=API_ENDPOINT,
                                     auth=aiohttp.BasicAuth(config.FORUMS_API_KEY),
                                     params=params) as resp:
             return await resp.json()
