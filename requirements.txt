@@ -6,7 +6,7 @@ attrs==24.2.0
 discord.py==2.5.2
 dnspython==2.7.0
 feedparser==6.0.11
-frozenlist==1.5.0
+frozenlist==1.6.0
 idna==3.10
 multidict==6.1.0
 parsedatetime==2.6
