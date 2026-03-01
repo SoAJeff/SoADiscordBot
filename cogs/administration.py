@@ -154,7 +154,7 @@ class Admin(commands.Cog):
     async def get_bot_stats(self, ctx: commands.Context):
         """Get bot stats.  Adapted from jishaku
         https://github.com/scarletcafe/jishaku/blob/0abbb363433c306f8e3cb77a0ffc98948bd2c535/jishaku/features/root_command.py#L49"""
-        summary = ["Gnomechild Stats:"]
+        summary = ["SoA Bot Stats:"]
 
         summary.append("")  # blank line
 
