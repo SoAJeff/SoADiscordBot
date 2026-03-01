@@ -5,6 +5,8 @@ from typing import Optional, Literal
 import discord
 from discord.ext import commands
 from discord import app_commands
+import math
+import psutil
 
 from bot import SoAClient
 
@@ -145,6 +147,71 @@ class Admin(commands.Cog):
             await self.bot.reload_extension(module)
         except commands.ExtensionNotLoaded:
             await self.bot.load_extension(module)
+
+    @commands.command(hidden=True)
+    @commands.guild_only()
+    @commands.is_owner()
+    async def get_bot_stats(self, ctx: commands.Context):
+        """Get bot stats.  Adapted from jishaku
+        https://github.com/scarletcafe/jishaku/blob/0abbb363433c306f8e3cb77a0ffc98948bd2c535/jishaku/features/root_command.py#L49"""
+        summary = ["Gnomechild Stats:"]
+
+        summary.append("")  # blank line
+
+        if psutil:
+            try:
+                proc = psutil.Process()
+
+                with proc.oneshot():
+                    try:
+                        mem = proc.memory_full_info()
+                        summary.append(f"Using {self.natural_size(mem.rss)} physical memory and "
+                                       f"{self.natural_size(mem.vms)} virtual memory, "
+                                       f"{self.natural_size(mem.uss)} of which unique to this process.")
+                    except psutil.AccessDenied:
+                        pass
+
+                    try:
+                        name = proc.name()
+                        pid = proc.pid
+                        thread_count = proc.num_threads()
+
+                        summary.append(f"Running on PID {pid} (`{name}`) with {thread_count} thread(s) using Discord.py version {discord.__version__}.")
+                    except psutil.AccessDenied:
+                        pass
+
+                    summary.append("")  # blank line
+            except psutil.AccessDenied:
+                summary.append(
+                    "psutil is installed, but this process does not have high enough access rights "
+                    "to query process information."
+                )
+                summary.append("")  # blank line
+
+        s_for_guilds = "" if len(self.bot.guilds) == 1 else "s"
+        s_for_users = "" if len(self.bot.users) == 1 else "s"
+        summary.append(f"The bot can currently see {len(self.bot.guilds)} guild{s_for_guilds} and {len(self.bot.users)} user{s_for_users}.")
+
+        cached_messages = len(self.bot.cached_messages)
+        summary.append(f"There are a total of {cached_messages} messages cached, with a max cache size of {self.bot._connection.max_messages}.")
+        summary.append("")  # blank line
+        summary.append(f"Current bot uptime: {self.bot.uptime}")
+        summary.append(f"Average websocket latency: {round(self.bot.latency * 1000, 2)}ms")
+
+        await ctx.reply(content="\n".join(summary))
+
+    def natural_size(self, size_in_bytes: int) -> str:
+        """
+        Converts a number of bytes to an appropriately-scaled unit
+        E.g.:
+            1024 -> 1.00 KiB
+            12345678 -> 11.77 MiB
+        """
+        units = ('B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB')
+
+        power = int(math.log(max(abs(size_in_bytes), 1), 1024))
+
+        return f"{size_in_bytes / (1024 ** power):.2f} {units[power]}"
 
     @load.error
     @unload.error
