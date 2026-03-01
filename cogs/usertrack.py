@@ -216,6 +216,7 @@ class UserTrack(commands.GroupCog, name="users"):
                                                       action="Changed their user handle",
                                                       original_value=existing_user.user_name,
                                                       new_value=new_guild_user.user_name))
+            await self.log_user_handle_change(existing_user, new_guild_user)
             
     async def check_display_name_equality(self, existing_user: UserEntry, new_guild_user: UserEntry):
         if existing_user.display_name != new_guild_user.display_name:
@@ -376,6 +377,24 @@ class UserTrack(commands.GroupCog, name="users"):
                               description=f"{user.mention} (`{user}`) was banned from the server!")
         embed.set_thumbnail(url=user.display_avatar.url)
         embed.set_footer(text=f"There are {guild.member_count} members.")
+        return embed
+    
+    async def log_user_handle_change(self, existing_user: UserEntry, new_guild_user: UserEntry):
+        channel_id = await self.get_auditing_channel(existing_user.guild_id, AuditingChannelType.USER_LEAVE)
+        if channel_id:
+            logger.info("Channel id is %d", channel_id)
+            await self.bot.get_guild(existing_user.guild_id).get_channel(channel_id).send(embed=self.create_user_handle_change_embed(existing_user, new_guild_user))
+
+    def create_user_handle_change_embed(self, existing_user: UserEntry, new_guild_user: UserEntry):
+        member = self.bot.get_guild(existing_user.guild_id).get_member(existing_user.user_id)
+        embed = discord.Embed(title="User Handle Change Notification", 
+                              timestamp=discord.utils.utcnow(),
+                              color=self.bot.green_color,
+                              description=f"{member.mention} (`{member}`) has changed their user handle!")
+        embed.set_thumbnail(url=member.display_avatar.url)
+        embed.add_field(name="Before", value=existing_user.user_name)
+        embed.add_field(name="After", value=new_guild_user.user_name)
+        embed.set_footer(text=f"User ID: {existing_user.user_id}")
         return embed
                     
     @commands.Cog.listener()

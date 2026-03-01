@@ -53,7 +53,7 @@ class Members(commands.Cog):
         page = 1
         total_pages = 2 # So it runs at least once
         members: list[MemberBirthdate] = list()
-        while page < total_pages:
+        while page <= total_pages:
             results = await self.fetch_members_from_api(page, self.get_groups_for_members())
             total_pages = results['totalPages']
             page += 1
