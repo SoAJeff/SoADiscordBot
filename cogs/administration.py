@@ -20,7 +20,7 @@ class Admin(commands.Cog):
     @commands.guild_only()
     @commands.is_owner()
     async def sync(self, ctx: commands.Context, guilds: commands.Greedy[discord.Object],
-                   spec: Optional[Literal["~", "*", "^"]] = None) -> None:
+                   spec: Optional[Literal["~", "*", "^", "%"]] = None) -> None:
         """Implementation of Umbra's Sync command:
        https://about.abstractumbra.dev/discord.py/2023/01/29/sync-command-example.html """
 
@@ -38,6 +38,10 @@ class Admin(commands.Cog):
                 ctx.bot.tree.clear_commands(guild=ctx.guild)
                 await ctx.bot.tree.sync(guild=ctx.guild)
                 synced = []
+            elif spec == "%":
+                logger.info("Processing requesat to clear global commands")
+                ctx.bot.tree.clear_commands(guild=None)
+                synced = await ctx.bot.tree.sync()
             else:
                 logger.info(f"Processing request to sync global commands")
                 synced = await ctx.bot.tree.sync()
