@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from pydantic import BaseModel
-from typing import Optional, Callable
+from typing import Optional, Callable, List
 import re
 from urllib.parse import urlparse
 
@@ -100,6 +100,31 @@ class ResChangeFieldEditModal(discord.ui.Modal, title="Update Resource Change Fi
         except ValueError as e:
             await interaction.followup.send(e, ephemeral=True)
 
+class ResChangeEditStatusModal(discord.ui.Modal, title="Edit Resource Change Field"):
+    def __init__(self, status: ResourceChangeStatus, callback: Callable):
+        super().__init__()
+        self.callback = callback
+        self.res_change_id = status.res_change_id
+        self.status_id = status.id
+        options = []
+        for u in status.res_change_value:
+            options.append(discord.SelectOption(label=u, value=u))
+        logger.info("Names determined to be present for status %d: %s", status.id, ', '.join(status.res_change_value))
+
+        self.user_field = discord.ui.Label(text="User to Remove:",
+                                           component=discord.ui.Select(placeholder="Select user...",
+                                                                       options=options))
+        self.add_item(self.user_field)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        try:
+            await interaction.response.defer(ephemeral=True)
+            user = self.user_field.component.values[0]
+            await self.callback(user, self.res_change_id, self.status_id)
+            await interaction.followup.send("Changes saved.", ephemeral=True)
+        except ValueError as e:
+            await interaction.followup.send(e, ephemeral=True)
+
 #Dynamic Button
 class UpdateResourceChangeDynamicButton(discord.ui.DynamicItem[discord.ui.Button], template=r'update-reschange:id:(?P<id>[0-9]+)'):
     def __init__(self, id: int):
@@ -142,6 +167,7 @@ class StartResourceChangeView(discord.ui.View):
 
 @app_commands.guilds(SOA_STAFF, JEFF_TEST)
 class ResourceChanges(commands.GroupCog, name="resource_changes"):
+    """Commands for interacting with Resource Changes"""
     def __init__(self, bot: SoAClient):
         self.bot = bot
         self.dynamic_items = [UpdateResourceChangeDynamicButton]
@@ -192,6 +218,13 @@ class ResourceChanges(commands.GroupCog, name="resource_changes"):
     async def update_res_change_status(self, status: ResourceChangeStatus):
         query = "UPDATE resource_change_statuses SET res_change_value = $1 WHERE id = $2 AND res_change_id = $3"
         await self.bot.pool.execute(query, status.res_change_value, status.id, status.res_change_id)
+
+    async def get_res_change_status(self, status_id: int) -> ResourceChangeStatus:
+        query = """SELECT id, res_change_id, res_change_field, res_change_value
+                   FROM resource_change_statuses
+                   WHERE id = $1"""
+        result = await self.bot.pool.fetchrow(query, status_id)
+        return ResourceChangeStatus(**result)
 
     async def get_res_change_statuses_for_change(self, id: int) -> list[ResourceChangeStatus]:
         query = """SELECT r.id, r.res_change_id, r.res_change_field, r.res_change_value
@@ -307,6 +340,24 @@ class ResourceChanges(commands.GroupCog, name="resource_changes"):
         msg = self.bot.get_guild(res_change.guild_id).get_channel(res_change.channel_id).get_partial_message(res_change.message_id)
         await msg.edit(embed=embed)
         logger.info("Successfully updated resource change with ID: %d and posted to channel", res_change_id)
+
+    async def update_res_change_status_callback(self, user: str, res_change_id: int, status_id: int):
+        logger.info("Received request to remove user from resource change status: status id: %d, name to remove: %s, res_change_id: %d",
+                         status_id,
+                         user,
+                         res_change_id)
+        status = await self.get_res_change_status(status_id)
+        if user in status.res_change_value:
+            logger.debug("Removing value from status.")
+            status.res_change_value.remove(user)
+        await self.update_res_change_status(status)
+        logger.debug("Status update successful.")
+        res_change = await self.get_resource_change(res_change_id)
+        # Generate new Embed
+        embed = await self.create_res_change_embed(res_change_id)
+        msg = self.bot.get_guild(res_change.guild_id).get_channel(res_change.channel_id).get_partial_message(res_change.message_id)
+        await msg.edit(embed=embed)
+        logger.info("Successfully updated resource change with ID: %d and posted to channel", res_change_id)
         
     async def create_res_change_embed(self, res_change_id: int) -> discord.Embed:
         res_change = await self.get_resource_change(res_change_id)
@@ -362,6 +413,33 @@ class ResourceChanges(commands.GroupCog, name="resource_changes"):
                                                                             res_change_id))
         else:
             await interaction.response.send_message("A resource change with that ID does not exist for this guild.", ephemeral=True)
+
+    @app_commands.command(name="undo_entry_update", description="Remove a user from a field for an existing res change")
+    @app_commands.describe(res_change_id="ID of the resource change", field_name="Name of field to update")
+    async def undo_entry_update(self, interaction: discord.Interaction, res_change_id: int, field_name: int):
+        # Field name is really the field ID - hacky, but it works!  Maybe even genius!
+        logger.info("Processing command to query user for status to remove a user from initated by %d for res change %d", interaction.user.id, res_change_id)
+        try:
+            status = await self.get_res_change_status_for_field(res_change_id, field_name)
+        except:
+            logger.error("No status exists for field id/resource change combo %d, %d", field_name, res_change_id)
+            await interaction.response.send_message("No status exists for that field name/resource change ID combination", ephemeral=True)
+            return
+        if len(status.res_change_value) == 0:
+            logger.error("Request to remove a name from status was rejected because there are no names assigned to that status.")
+            await interaction.response.send_message("No names are assigned to this field in this resource change.", ephemeral=True)
+            return
+        await interaction.response.send_modal(ResChangeEditStatusModal(status, self.update_res_change_status_callback))
+
+    @undo_entry_update.autocomplete('field_name')
+    async def field_name_autocomplete(self, interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+        fields = await self.get_res_change_fields(interaction.guild_id)
+        # Set the display to be the name, but set the value to be the integer,
+        # since that's the key we need for the DB lookups later.
+        return [
+            app_commands.Choice(name=field.field_name, value=field.id)
+            for field in fields if current.lower() in field.field_name.lower()
+        ]
 
     @app_commands.command(name="add_field", description="Add a Resource Change Field")
     @app_commands.describe(field_name="Name of field", position="Position in list to put field", link="Link for field (optional)")
@@ -477,7 +555,7 @@ class ResourceChanges(commands.GroupCog, name="resource_changes"):
     @commands.command(hidden=True)
     @commands.guild_only()
     @commands.is_owner()
-    async def add_start_embed(self, ctx: commands.Context, channel: discord.TextChannel):
+    async def add_res_change_start_embed(self, ctx: commands.Context, channel: discord.TextChannel):
         try:
             self.can_post_in_channel(ctx.guild.me, channel)
             embed = discord.Embed(title="Create New Resource Change", color=self.bot.green_color)
