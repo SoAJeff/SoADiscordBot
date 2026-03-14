@@ -562,7 +562,7 @@ class ResourceChanges(commands.GroupCog, name="resource_changes"):
             embed.description="Use the button below to start a new resource change."
             embed.set_author(name=ctx.guild.me.display_name, icon_url=ctx.guild.me.display_avatar.url)
             view = StartResourceChangeView()
-            await ctx.send(embed=embed, view=view)
+            await channel.send(embed=embed, view=self.new_res_change_view)
         except InsufficientPermissionsException as e:
             await ctx.reply(e)
             return
