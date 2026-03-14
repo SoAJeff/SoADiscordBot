@@ -157,6 +157,7 @@ class Attendance(commands.GroupCog, name="attendance"):
     
     @app_commands.command(name="set_submission_thread", description="Set the attendance submission thread")
     @app_commands.describe(thread="thread to post attendance in")
+    @app_commands.checks.has_permissions(bypass_slowmode=True)
     async def set_submission_thread(self, interaction: discord.Interaction, thread: discord.Thread):
         await interaction.response.defer(ephemeral=True)
         try:
@@ -207,6 +208,14 @@ class Attendance(commands.GroupCog, name="attendance"):
         except InsufficientPermissionsException as e:
             await ctx.reply(e)
             return
+        
+    @set_submission_thread.error
+    async def on_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.MissingPermissions):
+            await interaction.response.send_message(f"You do not have permission to use this command. Required permissions: {', '.join(error.missing_permissions)}", ephemeral=True)
+        else:
+            logger.error(f"An error occurred during command execution: {error}", exc_info=True)
+            await interaction.response.send_message("An error occurred while processing the command.", ephemeral=True)
 
 async def setup(bot: SoAClient):
     await bot.add_cog(Attendance(bot))
