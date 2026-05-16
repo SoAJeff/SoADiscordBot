@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import discord
 from discord.ext import commands, tasks
@@ -33,9 +34,9 @@ class Feeds(commands.GroupCog, name="feeds"):
         # Set a variable so we don't post on the first run.  This is to prevent us from spamming things we already posted on a refresh
         self.feeds_initialized = False
         logger.info("Prepopulating RuneScape News Items")
-        self.initial_jagex_news_population(RUNESCAPE_NEWS_URL, self.rs_news_map)
+        await asyncio.to_thread(self.initial_jagex_news_population, RUNESCAPE_NEWS_URL, self.rs_news_map)
         logger.info("Prepopulating Old School RuneScape News Items")
-        self.initial_jagex_news_population(OLDSCHOOL_NEWS_URL, self.os_news_map)
+        await asyncio.to_thread(self.initial_jagex_news_population, OLDSCHOOL_NEWS_URL, self.os_news_map)
         logger.info("Starting feed tasks")
         self.runescape_feed_task.start()
         self.oldschool_feed_task.start()
@@ -53,7 +54,7 @@ class Feeds(commands.GroupCog, name="feeds"):
     async def runescape_feed_task(self):
         await self.bot.wait_until_ready()
         logger.info("Running RuneScape RSS feed task")
-        embeds = self.jagex_feed_task(RUNESCAPE_NEWS_URL, self.rs_news_map)
+        embeds = await asyncio.to_thread(self.jagex_feed_task, RUNESCAPE_NEWS_URL, self.rs_news_map)
         if embeds is not None and len(embeds) > 0:
             query = "SELECT news_feed_channel_id from runescape_news_feed"
             rows = await self.bot.pool.fetch(query)
@@ -65,7 +66,7 @@ class Feeds(commands.GroupCog, name="feeds"):
     async def oldschool_feed_task(self):
         await self.bot.wait_until_ready()
         logger.info("Running Oldschool RSS feed task")
-        embeds = self.jagex_feed_task(OLDSCHOOL_NEWS_URL, self.os_news_map)
+        embeds = await asyncio.to_thread(self.jagex_feed_task, OLDSCHOOL_NEWS_URL, self.os_news_map)
         if embeds is not None:
             query = "SELECT news_feed_channel_id from oldschool_news_feed"
             rows = await self.bot.pool.fetch(query)
@@ -77,7 +78,7 @@ class Feeds(commands.GroupCog, name="feeds"):
     async def soa_feed_task(self):
         await self.bot.wait_until_ready()
         logger.info("Running SoA RSS feed task")
-        new_entries = self.delta_check_soa_news()
+        new_entries = await asyncio.to_thread(self.delta_check_soa_news)
         if len(new_entries) > 0 and self.feeds_initialized is True:
             embeds = self.create_soa_news_embed(new_entries)
             if embeds is not None:
