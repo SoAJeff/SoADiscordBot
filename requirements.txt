@@ -5,7 +5,7 @@ asyncpg
 attrs==24.3.0
 discord.py==2.7.0
 dnspython==2.7.0
-feedparser==6.0.11
+feedparser==6.0.12
 frozenlist==1.5.0
 idna==3.10
 multidict==6.1.0
