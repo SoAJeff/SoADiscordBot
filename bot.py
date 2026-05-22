@@ -13,26 +13,11 @@ import aiohttp
 
 logger = logging.getLogger("bot")
 
-class SoACommandTree(app_commands.CommandTree):
-    # overriding the on_error method for the entire tree
-    async def on_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
-        if isinstance(error, app_commands.CheckFailure):
-                interaction.response.send_message("You do not have permission to execute this command", ephemeral=True)
-
-        else:
-            logger.error(f"An error occurred during command execution: {error}", exc_info=True)
-            if config.ERROR_WEBHOOK:
-                trace = traceback.format_exc()
-                error_str = f"An unexpected error occurred within the following interaction: {interaction.command.name}\n\n```\n{trace}\n```"
-                hook = discord.Webhook.from_url(config.ERROR_WEBHOOK, client=self.client)
-                await hook.send(content=error_str, username="SoA Error Reporting")
-
-
 class SoAClient(commands.Bot):
     green_color = int('6eb62d', 16)
 
     def __init__(self, *, intents: discord.Intents):
-        super().__init__(command_prefix=commands.when_mentioned, intents=intents, max_messages=10000, tree_cls=SoACommandTree)
+        super().__init__(command_prefix=commands.when_mentioned, intents=intents, max_messages=10000)
         self.start_time = discord.utils.utcnow()
 
     async def create_psql_pool(self) -> asyncpg.Pool:
@@ -53,14 +38,6 @@ class SoAClient(commands.Bot):
 
     async def on_ready(self):
         logger.info(f'Logged in as {self.user}')
-
-    async def on_error(self, event, *args, **kwargs):
-        logger.error(f'An error occurred: {event}', exc_info=True)
-        if config.ERROR_WEBHOOK:
-            trace = traceback.format_exc()
-            error_str = f"An unexpected error occurred within the following event: {event}\n\n```\n{trace}\n```"
-            hook = discord.Webhook.from_url(config.ERROR_WEBHOOK, client=self)
-            await hook.send(content=error_str, username="SoA Error Reporting")
 
     async def on_disconnect(self):
         logger.info('Bot has disconnected.')
