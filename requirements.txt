@@ -3,7 +3,7 @@ aiohttp==3.13.3
 aiosignal>=1.4.0
 asyncpg
 attrs==24.3.0
-discord.py==2.7.0
+discord.py==2.7.1
 dnspython==2.7.0
 feedparser==6.0.11
 frozenlist==1.5.0
